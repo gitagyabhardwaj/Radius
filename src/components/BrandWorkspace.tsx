@@ -583,7 +583,61 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
     });
   };
 
-  // Deposit handled automatically by backend now
+  const createEscrowOrder = useAction(api.payments.createEscrowOrder);
+  const verifyAndCreditEscrow = useAction(api.payments.verifyAndCreditEscrow);
+
+  const handleDeposit = async (amount: number) => {
+    if (!currentUser) return;
+    setIsDepositing(true);
+
+    try {
+      const order = await createEscrowOrder({ amount });
+      if (order.error) throw new Error(order.error);
+
+      const options = {
+        key: order.keyId,
+        order_id: order.orderId,
+        amount: order.amount,
+        currency: order.currency,
+        name: 'Radius',
+        description: 'Escrow Deposit',
+        handler: async (response: any) => {
+          try {
+            const result = await verifyAndCreditEscrow({
+              ...response,
+              amount,
+            });
+            if (!result.verified) throw new Error("Payment verification failed");
+            // Deposit successful, balance will update automatically via Convex subscription
+          } catch (err) {
+            console.error('Verification error:', err);
+            alert('Payment verification failed.');
+          } finally {
+            setIsDepositing(false);
+          }
+        },
+        prefill: {
+          name: currentUser.name || '',
+          email: currentUser.email || '',
+        },
+        theme: {
+          color: '#4f46e5',
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', function (response: any) {
+        console.error('Payment failed:', response.error);
+        alert(`Payment failed: ${response.error.description}`);
+        setIsDepositing(false);
+      });
+      rzp.open();
+    } catch (err) {
+      console.error('Failed to create Razorpay order:', err);
+      alert('Could not start checkout. Please try again.');
+      setIsDepositing(false);
+    }
+  };
 
   const currentMatches = matchingCreators();
 
@@ -639,9 +693,12 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
         escrowStatus: 'locked',
         activeBatchIndex: 0,
         batches: [],
+        submissionCount: 0,
+        approvedCount: 0,
+        matchScore: 0
       });
-    } catch (err) {
-      console.error('Failed to create campaign:', err);
+    } catch (err: any) {
+      alert("Failed to launch campaign: " + err.message);
     } finally {
       setIsActivating(false);
     }
@@ -1136,27 +1193,51 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
           </div>
 
           {/* Action Buttons */}
-          <button
-            onClick={handleLaunchCampaign}
-            disabled={isActivating}
-            className={`w-full py-3 px-4 rounded-xl font-display font-medium text-base flex items-center justify-center gap-2 transition-all ${
-              isActivating
-                ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200'
-                : 'bg-zinc-950 text-white hover:bg-zinc-900 active:scale-[0.98] cursor-pointer shadow-md shadow-zinc-200'
-            }`}
-          >
-            {isActivating ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white/25 border-t-white rounded-full animate-spin" />
-                <span>Locking Budget & Dispersing Batches...</span>
-              </>
-            ) : (
-              <>
-                <Play className="w-4 h-4 fill-current" />
-                <span>Lock ₹{budget} in Escrow & Launch Campaign</span>
-              </>
-            )}
-          </button>
+          {(currentUser?.escrowBalance || 0) < budget ? (
+            <button
+              onClick={() => handleDeposit(budget - (currentUser?.escrowBalance || 0))}
+              disabled={isDepositing}
+              className={`w-full py-3 px-4 rounded-xl font-display font-medium text-base flex items-center justify-center gap-2 transition-all ${
+                isDepositing
+                  ? 'bg-indigo-100 text-indigo-400 cursor-not-allowed border border-indigo-200'
+                  : 'bg-indigo-600 text-white hover:bg-indigo-500 active:scale-[0.98] cursor-pointer shadow-md shadow-indigo-200/50'
+              }`}
+            >
+              {isDepositing ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/25 border-t-white rounded-full animate-spin" />
+                  <span>Processing Deposit...</span>
+                </>
+              ) : (
+                <>
+                  <DollarSign className="w-4 h-4 fill-current" />
+                  <span>Deposit ₹{budget - (currentUser?.escrowBalance || 0)} to Escrow Account via Razorpay</span>
+                </>
+              )}
+            </button>
+          ) : (
+            <button
+              onClick={handleLaunchCampaign}
+              disabled={isActivating}
+              className={`w-full py-3 px-4 rounded-xl font-display font-medium text-base flex items-center justify-center gap-2 transition-all ${
+                isActivating
+                  ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200'
+                  : 'bg-zinc-950 text-white hover:bg-zinc-900 active:scale-[0.98] cursor-pointer shadow-md shadow-zinc-200'
+              }`}
+            >
+              {isActivating ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/25 border-t-white rounded-full animate-spin" />
+                  <span>Locking Budget & Dispersing Batches...</span>
+                </>
+              ) : (
+                <>
+                  <Play className="w-4 h-4 fill-current" />
+                  <span>Lock ₹{budget} in Escrow & Launch Campaign</span>
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
     );

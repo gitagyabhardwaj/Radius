@@ -37,6 +37,10 @@ export const create = mutation({
 
     if (!user) throw new Error("User not found");
     if (user.role !== "brand") throw new Error("Only brands can create campaigns");
+    if ((user.escrowBalance || 0) < args.budget) {
+      throw new Error("Insufficient escrow balance");
+    }
+
     // Deduct the budget from the user's escrow balance
     await ctx.db.patch(user._id, {
       escrowBalance: (user.escrowBalance || 0) - args.budget,

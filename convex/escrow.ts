@@ -175,7 +175,7 @@ export const getCreatorEarnings = query({
         if (!hasRelease) {
           const campaign = await ctx.db.get(offer.campaignId);
           if (campaign) {
-            totalPending += campaign.budget / campaign.spotsTotal;
+            totalPending += (campaign.budget * 0.95) / campaign.spotsTotal;
           }
         }
       }

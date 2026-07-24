@@ -1163,7 +1163,7 @@ export default function BrandWorkspace({
                   </div>
                 </div>
                 <p className="text-xs text-zinc-500 leading-normal mt-1">
-                  Your budget of <span className="font-semibold text-zinc-800">₹{budget}</span> will be locked instantly in a smart contract. Payouts release autonomously to creators upon successful multi-modal EXIF location match.
+                  Your budget of <span className="font-semibold text-zinc-800">₹{budget}</span> will be locked in smart escrow. A 5% platform fee is deducted — creators share <span className="font-semibold text-zinc-800">₹{Math.round(budget * 0.95)}</span> equally, so each creator receives <span className="font-semibold text-emerald-700">₹{spotsTotal > 0 ? Math.round((budget * 0.95) / spotsTotal) : '—'}</span>.
                 </p>
               </div>
             </div>

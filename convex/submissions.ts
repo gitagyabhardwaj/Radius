@@ -233,7 +233,7 @@ export const approveFinal = mutation({
     await ctx.scheduler.runAfter(0, internal.escrow.releasePayout, {
       campaignId: submission.campaignId,
       creatorUserId: submission.creatorUserId,
-      amount: campaign.budget / campaign.spotsTotal,
+      amount: (campaign.budget * 0.95) / campaign.spotsTotal,
     });
 
     return args.submissionId;

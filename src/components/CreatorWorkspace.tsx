@@ -877,7 +877,7 @@ export default function CreatorWorkspace({
                   onClick={handleUpgradeVelocity}
                   className="w-full py-2 px-3 rounded-xl font-mono text-[11px] font-bold tracking-wider uppercase transition-all active:scale-[0.98] bg-amber-400 hover:bg-amber-500 text-zinc-950"
                 >
-                  Upgrade to Velocity Tier ($9.9/mo)
+                  Upgrade to Velocity Tier (₹9.9/mo)
                 </button>
               )}
             </div>
@@ -952,7 +952,7 @@ export default function CreatorWorkspace({
 
                       <div className="flex flex-col items-end text-right">
                         <span className="text-[11px] font-mono text-zinc-400">Budget:</span>
-                        <span className="text-sm font-bold text-emerald-600 font-mono">${camp.budget}</span>
+                        <span className="text-sm font-bold text-emerald-600 font-mono">₹${camp.budget}</span>
                       </div>
 
                       <button
@@ -1062,7 +1062,7 @@ export default function CreatorWorkspace({
                   <div className="flex items-center gap-6">
                     <div className="flex flex-col items-end p-4 bg-white/5 rounded-2xl border border-white/5 backdrop-blur-md">
                       <span className="text-[10px] font-mono tracking-widest text-zinc-400 uppercase mb-1">Escrow Release Value</span>
-                      <span className="text-3xl font-display font-black text-emerald-400">${camp.budget} <span className="text-lg text-emerald-600">USD</span></span>
+                      <span className="text-3xl font-display font-black text-emerald-400">₹{camp.budget}</span>
                     </div>
                     
                     <div className="p-2 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-transform duration-300">
@@ -1382,7 +1382,7 @@ export default function CreatorWorkspace({
                         <h4 className="text-xl font-display font-black text-emerald-400">Deliverable Approved — Payout Released!</h4>
                         <p className="text-sm text-zinc-400 leading-relaxed">
                           <span className="text-white font-bold">{camp.brandName}</span> approved your content. Budget of{' '}
-                          <span className="text-emerald-400 font-bold">${camp.budget}</span> has been transferred directly into your creator account.
+                          <span className="text-emerald-400 font-bold">₹${camp.budget}</span> has been transferred directly into your creator account.
                         </p>
                       </div>
 
@@ -1431,7 +1431,7 @@ export default function CreatorWorkspace({
               {earnings === undefined ? (
                 <span className="inline-block w-24 h-8 bg-zinc-100 rounded animate-pulse" />
               ) : (
-                `$${earnings.totalPending.toFixed(2)} USD`
+                `₹${earnings.totalPending.toFixed(2)}`
               )}
             </span>
             <p className="text-xs text-zinc-400">Locked in verified smart contracts. Instant bank payout available.</p>
@@ -1445,7 +1445,7 @@ export default function CreatorWorkspace({
               {earnings === undefined ? (
                 <span className="inline-block w-24 h-8 bg-zinc-100 rounded animate-pulse" />
               ) : (
-                `$${earnings.totalReleased.toFixed(2)} USD`
+                `₹${earnings.totalReleased.toFixed(2)}`
               )}
             </span>
             <p className="text-xs text-zinc-400">All historical geofence runs cleared without disputes.</p>
@@ -1474,7 +1474,7 @@ export default function CreatorWorkspace({
                 { month: 'Jan 27 (Est)', amount: 620, height: 'h-[75%]' },
               ].map((bar, i) => (
                 <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                  <span className="text-[11px] font-mono font-bold text-zinc-800">${bar.amount}</span>
+                  <span className="text-[11px] font-mono font-bold text-zinc-800">₹${bar.amount}</span>
                   <div className={`w-full bg-indigo-600/90 rounded-t-sm ${bar.height} transition-all duration-500 hover:bg-indigo-700`} />
                   <span className="text-[11px] font-mono text-zinc-400 mt-1">{bar.month}</span>
                 </div>
@@ -1501,7 +1501,7 @@ export default function CreatorWorkspace({
                     <span className="text-[11px] text-zinc-400 font-mono">{log.date}</span>
                   </div>
                   <div className="flex flex-col items-end gap-1">
-                    <span className="font-mono font-bold text-emerald-600">+${log.amount}</span>
+                    <span className="font-mono font-bold text-emerald-600">+₹${log.amount}</span>
                     <span className="text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-100 px-1.5 py-0.2 rounded font-medium">Secured</span>
                   </div>
                 </div>

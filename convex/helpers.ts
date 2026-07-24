@@ -94,18 +94,33 @@ export function computeMatchScore(
   const reachScore = Math.min(55, (effectiveLocalReach / 100000) * 55);
   score += reachScore;
 
-  // Niche match — case-insensitive comparison
-  if (
-    creatorNiche &&
-    creatorNiche.toLowerCase() === campaignNiche.toLowerCase()
-  ) {
-    score += 30;
-  } else if (
-    creatorNiche &&
-    campaignNiche.toLowerCase().includes(creatorNiche.toLowerCase())
-  ) {
-    // Partial match (e.g. "Food" matches "Food & Lifestyle")
-    score += 15;
+  // Define related niches for partial matching
+  const relatedNiches: Record<string, string[]> = {
+    "Food & Lifestyle": ["Travel & Adventure", "Parenting & Family", "Fitness & Health", "Fashion & Aesthetics"],
+    "Fashion & Aesthetics": ["Beauty & Makeup", "Photography & Art", "Food & Lifestyle"],
+    "Beauty & Makeup": ["Fashion & Aesthetics", "Food & Lifestyle", "Fitness & Health"],
+    "Tech & Gaming": ["Education & Review", "Entertainment & Comedy", "Business & Finance"],
+    "Photography & Art": ["Fashion & Aesthetics", "Travel & Adventure", "Entertainment & Comedy"],
+    "Travel & Adventure": ["Food & Lifestyle", "Photography & Art", "Fitness & Health"],
+    "Fitness & Health": ["Sports & Athletics", "Food & Lifestyle", "Beauty & Makeup"],
+    "Sports & Athletics": ["Fitness & Health", "Entertainment & Comedy"],
+    "Business & Finance": ["Tech & Gaming", "Education & Review"],
+    "Entertainment & Comedy": ["Tech & Gaming", "Sports & Athletics", "Photography & Art"],
+    "Education & Review": ["Tech & Gaming", "Business & Finance", "Parenting & Family"],
+    "Parenting & Family": ["Food & Lifestyle", "Education & Review"]
+  };
+
+  // Niche match
+  if (creatorNiche && creatorNiche.toLowerCase() === campaignNiche.toLowerCase()) {
+    score += 30; // Exact match
+  } else if (creatorNiche) {
+    // Check for partial match using the related niches dictionary
+    const relatedToCampaign = relatedNiches[campaignNiche] || [];
+    const relatedToCreator = relatedNiches[creatorNiche] || [];
+    
+    if (relatedToCampaign.includes(creatorNiche) || relatedToCreator.includes(campaignNiche)) {
+      score += 15; // Partial match
+    }
   }
 
   // Velocity tier bonus

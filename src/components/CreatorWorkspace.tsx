@@ -542,6 +542,14 @@ export default function CreatorWorkspace({
                 <option value="Fashion & Aesthetics">Fashion & Aesthetics</option>
                 <option value="Tech & Gaming">Tech & Gaming</option>
                 <option value="Photography & Art">Photography & Art</option>
+                <option value="Beauty & Makeup">Beauty & Makeup</option>
+                <option value="Travel & Adventure">Travel & Adventure</option>
+                <option value="Fitness & Health">Fitness & Health</option>
+                <option value="Sports & Athletics">Sports & Athletics</option>
+                <option value="Business & Finance">Business & Finance</option>
+                <option value="Entertainment & Comedy">Entertainment & Comedy</option>
+                <option value="Education & Review">Education & Review</option>
+                <option value="Parenting & Family">Parenting & Family</option>
               </select>
             </div>
 

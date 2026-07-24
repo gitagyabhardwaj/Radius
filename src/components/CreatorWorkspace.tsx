@@ -978,8 +978,8 @@ export default function CreatorWorkspace({
                       </div>
 
                       <div className="flex flex-col items-end text-right">
-                        <span className="text-[11px] font-mono text-zinc-400">Budget:</span>
-                        <span className="text-sm font-bold text-emerald-600 font-mono">₹${camp.budget}</span>
+                        <span className="text-[11px] font-mono text-zinc-400">Your Payout:</span>
+                        <span className="text-sm font-bold text-emerald-600 font-mono">₹{Math.round((camp.budget * 0.95) / camp.spotsTotal)}</span>
                       </div>
 
                       <button
@@ -1088,8 +1088,8 @@ export default function CreatorWorkspace({
 
                   <div className="flex items-center gap-6">
                     <div className="flex flex-col items-end p-4 bg-white/5 rounded-2xl border border-white/5 backdrop-blur-md">
-                      <span className="text-[10px] font-mono tracking-widest text-zinc-400 uppercase mb-1">Escrow Release Value</span>
-                      <span className="text-3xl font-display font-black text-emerald-400">₹{camp.budget}</span>
+                      <span className="text-[10px] font-mono tracking-widest text-zinc-400 uppercase mb-1">Your Payout (after 5% fee)</span>
+                      <span className="text-3xl font-display font-black text-emerald-400">₹{Math.round((camp.budget * 0.95) / camp.spotsTotal)}</span>
                     </div>
                     
                     <div className="p-2 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-transform duration-300">
@@ -1471,8 +1471,8 @@ export default function CreatorWorkspace({
                       <div className="flex flex-col gap-2 max-w-md">
                         <h4 className="text-xl font-display font-black text-emerald-400">Final Post Approved — Payout Released!</h4>
                         <p className="text-sm text-zinc-400 leading-relaxed">
-                          <span className="text-white font-bold">{camp.brandName}</span> approved your final post. Budget of{' '}
-                          <span className="text-emerald-400 font-bold">₹{camp.budget}</span> has been transferred directly into your creator account.
+                          <span className="text-white font-bold">{camp.brandName}</span> approved your final post. Your payout of{' '}
+                          <span className="text-emerald-400 font-bold">₹{Math.round((camp.budget * 0.95) / camp.spotsTotal)}</span> (after 5% platform fee) has been transferred directly into your creator account.
                         </p>
                       </div>
 

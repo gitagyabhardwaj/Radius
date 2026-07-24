@@ -69,8 +69,11 @@ export default defineSchema({
     escrowStatus: v.union(
       v.literal("none"),
       v.literal("locked"),
-      v.literal("content_submitted"),
-      v.literal("verifying"),
+      v.literal("draft_submitted"),
+      v.literal("draft_verifying"),
+      v.literal("draft_approved"),
+      v.literal("published_link_submitted"),
+      v.literal("final_verifying"),
       v.literal("released")
     ),
     activeBatchIndex: v.number(),
@@ -124,8 +127,12 @@ export default defineSchema({
     contentUrl: v.optional(v.string()), // link to the live reel/story/post
     caption: v.optional(v.string()),
     status: v.union(
-      v.literal("uploaded"),
-      v.literal("verifying"),
+      v.literal("draft_uploaded"),
+      v.literal("draft_verifying"),
+      v.literal("draft_approved"),
+      v.literal("draft_rejected"),
+      v.literal("published_uploaded"),
+      v.literal("final_verifying"),
       v.literal("approved"),
       v.literal("rejected")
     ),

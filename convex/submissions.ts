@@ -16,13 +16,12 @@ export const generateUploadUrl = mutation({
 });
 
 /**
- * Record a submission after the creator uploads content.
+ * Record a draft submission after the creator uploads content.
  */
-export const create = mutation({
+export const submitDraft = mutation({
   args: {
     campaignId: v.id("campaigns"),
     fileId: v.id("_storage"),
-    contentUrl: v.optional(v.string()),
     caption: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -47,104 +46,42 @@ export const create = mutation({
     );
 
     if (!acceptedOffer) {
-      // If no accepted offer, check if there's a pending one and auto-accept it for a smoother UX
-      const pendingOffer = offers.find(
-        (o) => o.campaignId === args.campaignId && o.status === "pending"
-      );
-
-      if (pendingOffer) {
-        // Auto-accept it
-        await ctx.db.patch(pendingOffer._id, {
-          status: "accepted",
-          respondedAt: Date.now(),
-        });
-        
-        const campaign = await ctx.db.get(args.campaignId);
-        if (campaign) {
-          await ctx.db.patch(args.campaignId, {
-            spotsFilled: campaign.spotsFilled + 1,
-          });
-          
-          if (campaign.spotsFilled + 1 >= campaign.spotsTotal) {
-            const batch = await ctx.db.get(pendingOffer.batchId);
-            if (batch && batch.status === "dispatched") {
-              await ctx.db.patch(pendingOffer.batchId, { status: "completed" });
-            }
-          }
-        }
-        
-        acceptedOffer = { ...pendingOffer, status: "accepted" };
-      } else {
-        // For a seamless hackathon demo, if they have no offer at all, 
-        // we will create an accepted offer on the fly.
-        const campaign = await ctx.db.get(args.campaignId);
-        if (!campaign) throw new Error("Campaign not found");
-        
-        const batches = await ctx.db
-          .query("batches")
-          .withIndex("by_campaign", (q) => q.eq("campaignId", args.campaignId))
-          .collect();
-          
-        let activeBatch = batches.find((b) => b.batchIndex === campaign.activeBatchIndex) || batches[0];
-        
-        if (!activeBatch) {
-          // If no batches exist (e.g. they were never generated or campaign was manually seeded),
-          // create a dummy 'Batch A' on the fly to satisfy the offer schema.
-          const newBatchId = await ctx.db.insert("batches", {
-            campaignId: args.campaignId,
-            batchIndex: 0,
-            name: "Batch A",
-            creatorIds: [user._id],
-            status: "pending",
-            cascadeAfterMs: 3600000,
-          });
-          activeBatch = (await ctx.db.get(newBatchId))!;
-        }
-
-        const newOfferId = await ctx.db.insert("campaignOffers", {
-          campaignId: args.campaignId,
-          batchId: activeBatch._id,
-          creatorUserId: user._id,
-          status: "accepted",
-        });
-
-        const existing = user.acceptedCampaignIds || [];
-        if (!existing.includes(args.campaignId)) {
-          await ctx.db.patch(args.campaignId, {
-            spotsFilled: campaign.spotsFilled + 1,
-          });
-        }
-
-        acceptedOffer = { _id: newOfferId, campaignId: args.campaignId, batchId: activeBatch._id, creatorUserId: user._id, status: "accepted" as const, _creationTime: Date.now() };
-      }
+      throw new Error("You must have an accepted offer before submitting.");
     }
 
-    // Check for duplicate submission
+    // Check for existing submission
     const existingSubmission = await ctx.db
       .query("submissions")
       .withIndex("by_creator", (q) => q.eq("creatorUserId", user._id))
-      .collect();
+      .collect()
+      .then(res => res.find(s => s.campaignId === args.campaignId));
 
-    const alreadySubmitted = existingSubmission.some(
-      (s) => s.campaignId === args.campaignId
-    );
-
-    if (alreadySubmitted) {
-      throw new Error("You have already submitted content for this campaign.");
+    if (existingSubmission) {
+      if (["draft_uploaded", "draft_verifying", "draft_approved", "published_uploaded", "final_verifying", "approved"].includes(existingSubmission.status)) {
+         throw new Error("Cannot submit a new draft at this stage.");
+      }
+      // If draft_rejected or rejected, they can re-upload draft.
+      await ctx.db.patch(existingSubmission._id, {
+        fileId: args.fileId,
+        caption: args.caption,
+        status: "draft_uploaded",
+        rejectionReason: undefined,
+      });
+      await ctx.db.patch(args.campaignId, { escrowStatus: "draft_submitted" });
+      return existingSubmission._id;
     }
 
     const submissionId = await ctx.db.insert("submissions", {
       campaignId: args.campaignId,
       creatorUserId: user._id,
       fileId: args.fileId,
-      contentUrl: args.contentUrl,
       caption: args.caption,
-      status: "uploaded",
+      status: "draft_uploaded",
     });
 
     // Update campaign escrow status
     await ctx.db.patch(args.campaignId, {
-      escrowStatus: "content_submitted",
+      escrowStatus: "draft_submitted",
     });
 
     return submissionId;
@@ -152,12 +89,9 @@ export const create = mutation({
 });
 
 /**
- * Mark a submission as "in review" once the brand opens it to preview the
- * deliverable (the uploaded photo/video and/or the live reel/story link).
- * This is a manual, human-in-the-loop review — there is no EXIF or GPS
- * auto-check. The brand looks at the actual content and decides.
+ * Mark a draft submission as "in review" by the brand.
  */
-export const startReview = mutation({
+export const startDraftReview = mutation({
   args: { submissionId: v.id("submissions") },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -165,67 +99,127 @@ export const startReview = mutation({
 
     const submission = await ctx.db.get(args.submissionId);
     if (!submission) throw new Error("Submission not found");
-
     const campaign = await ctx.db.get(submission.campaignId);
     if (!campaign) throw new Error("Campaign not found");
-
     const user = await ctx.db
       .query("users")
       .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
       .unique();
+    if (!user || campaign.brandUserId !== user._id) throw new Error("Unauthorized");
 
-    if (!user || campaign.brandUserId !== user._id) {
-      throw new Error("Only the campaign owner can review submissions");
-    }
-
-    await ctx.db.patch(args.submissionId, { status: "verifying" });
-    await ctx.db.patch(submission.campaignId, { escrowStatus: "verifying" });
-
+    await ctx.db.patch(args.submissionId, { status: "draft_verifying" });
+    await ctx.db.patch(submission.campaignId, { escrowStatus: "draft_verifying" });
     return args.submissionId;
   },
 });
 
 /**
- * Approve a submission after the brand has previewed the actual deliverable.
- * Approval is what triggers escrow release — there is no automated
- * location/EXIF check standing in for the brand's judgment.
+ * Approve a draft submission.
  */
-export const approve = mutation({
+export const approveDraft = mutation({
   args: { submissionId: v.id("submissions") },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
-
     const submission = await ctx.db.get(args.submissionId);
     if (!submission) throw new Error("Submission not found");
-
     const campaign = await ctx.db.get(submission.campaignId);
     if (!campaign) throw new Error("Campaign not found");
+    const user = await ctx.db.query("users").withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject)).unique();
+    if (!user || campaign.brandUserId !== user._id) throw new Error("Unauthorized");
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .unique();
+    await ctx.db.patch(args.submissionId, { status: "draft_approved" });
+    await ctx.db.patch(submission.campaignId, { escrowStatus: "draft_approved" });
+    return args.submissionId;
+  },
+});
 
-    if (!user || campaign.brandUserId !== user._id) {
-      throw new Error("Only the campaign owner can approve submissions");
+/**
+ * Reject a draft submission.
+ */
+export const rejectDraft = mutation({
+  args: { submissionId: v.id("submissions"), reason: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+    const submission = await ctx.db.get(args.submissionId);
+    if (!submission) throw new Error("Submission not found");
+    const campaign = await ctx.db.get(submission.campaignId);
+    if (!campaign) throw new Error("Campaign not found");
+    const user = await ctx.db.query("users").withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject)).unique();
+    if (!user || campaign.brandUserId !== user._id) throw new Error("Unauthorized");
+
+    await ctx.db.patch(args.submissionId, { status: "draft_rejected", rejectionReason: args.reason });
+    await ctx.db.patch(submission.campaignId, { escrowStatus: "locked" });
+    return args.submissionId;
+  },
+});
+
+/**
+ * Creator submits the final published link.
+ */
+export const submitPublishedLink = mutation({
+  args: {
+    submissionId: v.id("submissions"),
+    contentUrl: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+    const submission = await ctx.db.get(args.submissionId);
+    if (!submission) throw new Error("Submission not found");
+    const user = await ctx.db.query("users").withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject)).unique();
+    if (!user || submission.creatorUserId !== user._id) throw new Error("Unauthorized");
+
+    if (submission.status !== "draft_approved" && submission.status !== "rejected") {
+      throw new Error("Cannot submit published link at this stage.");
     }
 
-    // Sanity check: creator must still have an accepted offer for this campaign
-    const offers = await ctx.db
-      .query("campaignOffers")
-      .withIndex("by_creator", (q) =>
-        q.eq("creatorUserId", submission.creatorUserId)
-      )
-      .collect();
+    await ctx.db.patch(args.submissionId, {
+      contentUrl: args.contentUrl,
+      status: "published_uploaded",
+      rejectionReason: undefined,
+    });
+    await ctx.db.patch(submission.campaignId, { escrowStatus: "published_link_submitted" });
+    return args.submissionId;
+  },
+});
 
-    const isAssigned = offers.some(
-      (o) => o.campaignId === submission.campaignId && o.status === "accepted"
-    );
+/**
+ * Mark a final published link as "in review" by the brand.
+ */
+export const startFinalReview = mutation({
+  args: { submissionId: v.id("submissions") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+    const submission = await ctx.db.get(args.submissionId);
+    if (!submission) throw new Error("Submission not found");
+    const campaign = await ctx.db.get(submission.campaignId);
+    if (!campaign) throw new Error("Campaign not found");
+    const user = await ctx.db.query("users").withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject)).unique();
+    if (!user || campaign.brandUserId !== user._id) throw new Error("Unauthorized");
 
-    if (!isAssigned) {
-      throw new Error("Creator does not have an accepted offer for this campaign");
-    }
+    await ctx.db.patch(args.submissionId, { status: "final_verifying" });
+    await ctx.db.patch(submission.campaignId, { escrowStatus: "final_verifying" });
+    return args.submissionId;
+  },
+});
+
+/**
+ * Approve the final published content. Releases Escrow.
+ */
+export const approveFinal = mutation({
+  args: { submissionId: v.id("submissions") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+    const submission = await ctx.db.get(args.submissionId);
+    if (!submission) throw new Error("Submission not found");
+    const campaign = await ctx.db.get(submission.campaignId);
+    if (!campaign) throw new Error("Campaign not found");
+    const user = await ctx.db.query("users").withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject)).unique();
+    if (!user || campaign.brandUserId !== user._id) throw new Error("Unauthorized");
 
     const creator = await ctx.db.get(submission.creatorUserId);
 
@@ -235,11 +229,11 @@ export const approve = mutation({
       verifiedAt: Date.now(),
     });
 
-    // Approval is the trigger for escrow release
+    // Approval triggers escrow release
     await ctx.scheduler.runAfter(0, internal.escrow.releasePayout, {
       campaignId: submission.campaignId,
       creatorUserId: submission.creatorUserId,
-      amount: campaign.budget / campaign.spotsTotal, // equal share
+      amount: campaign.budget / campaign.spotsTotal,
     });
 
     return args.submissionId;
@@ -247,40 +241,26 @@ export const approve = mutation({
 });
 
 /**
- * Reject a submission after brand review (e.g. the deliverable doesn't
- * match the brief). No escrow is released; the creator can resubmit.
+ * Reject the final published content.
  */
-export const reject = mutation({
+export const rejectFinal = mutation({
   args: { submissionId: v.id("submissions"), reason: v.optional(v.string()) },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
-
     const submission = await ctx.db.get(args.submissionId);
     if (!submission) throw new Error("Submission not found");
-
     const campaign = await ctx.db.get(submission.campaignId);
     if (!campaign) throw new Error("Campaign not found");
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .unique();
-
-    if (!user || campaign.brandUserId !== user._id) {
-      throw new Error("Only the campaign owner can reject submissions");
-    }
+    const user = await ctx.db.query("users").withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject)).unique();
+    if (!user || campaign.brandUserId !== user._id) throw new Error("Unauthorized");
 
     await ctx.db.patch(args.submissionId, {
       status: "rejected",
       rejectionReason: args.reason,
       verifiedAt: Date.now(),
     });
-
-    await ctx.db.patch(submission.campaignId, {
-      escrowStatus: "content_submitted",
-    });
-
+    await ctx.db.patch(submission.campaignId, { escrowStatus: "draft_approved" }); // Revert so they can submit link again
     return args.submissionId;
   },
 });
@@ -306,7 +286,6 @@ export const getByCreator = query({
       .withIndex("by_creator", (q) => q.eq("creatorUserId", user._id))
       .collect();
 
-    // Enrich with campaign details + a viewable URL for the uploaded file
     return await Promise.all(
       submissions.map(async (s) => {
         const campaign = await ctx.db.get(s.campaignId);
@@ -328,7 +307,6 @@ export const getByCampaign = query({
       .withIndex("by_campaign", (q) => q.eq("campaignId", args.campaignId))
       .collect();
 
-    // Enrich with creator details + a viewable URL for the uploaded file
     return await Promise.all(
       submissions.map(async (s) => {
         const creator = await ctx.db.get(s.creatorUserId);

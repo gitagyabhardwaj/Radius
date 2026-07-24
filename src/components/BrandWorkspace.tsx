@@ -55,17 +55,14 @@ interface BrandWorkspaceProps {
   creators?: Creator[];
 }
 
-/**
- * Lets the brand open each creator's actual deliverable (the uploaded photo/
- * video, plus the live reel/story link if provided) and decide whether to
- * approve it. Approving is what releases escrow — there's no automated
- * EXIF/GPS check standing in for this review.
- */
 function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
   const submissions = useQuery(api.submissions.getByCampaign, { campaignId: campaignId as any });
-  const startReview = useMutation(api.submissions.startReview);
-  const approve = useMutation(api.submissions.approve);
-  const reject = useMutation(api.submissions.reject);
+  const startDraftReview = useMutation(api.submissions.startDraftReview);
+  const approveDraft = useMutation(api.submissions.approveDraft);
+  const rejectDraft = useMutation(api.submissions.rejectDraft);
+  const startFinalReview = useMutation(api.submissions.startFinalReview);
+  const approveFinal = useMutation(api.submissions.approveFinal);
+  const rejectFinal = useMutation(api.submissions.rejectFinal);
   const [busyId, setBusyId] = useState<string | null>(null);
 
   if (!submissions || submissions.length === 0) return null;
@@ -101,14 +98,20 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
                 <span className="text-sm font-bold text-zinc-800">{sub.creator?.name || 'Creator'}</span>
                 <span
                   className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded border ${
-                    sub.status === 'approved'
+                    sub.status === 'approved' || sub.status === 'draft_approved'
                       ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                      : sub.status === 'rejected'
+                      : sub.status === 'rejected' || sub.status === 'draft_rejected'
                       ? 'bg-rose-50 border-rose-200 text-rose-700'
                       : 'bg-indigo-50 border-indigo-150 text-indigo-700'
                   }`}
                 >
-                  {sub.status === 'uploaded' ? 'Awaiting Review' : sub.status === 'verifying' ? 'In Review' : sub.status === 'approved' ? 'Approved' : 'Rejected'}
+                  {sub.status === 'draft_uploaded' ? 'Draft Awaiting Review' : 
+                   sub.status === 'draft_verifying' ? 'Draft In Review' : 
+                   sub.status === 'draft_approved' ? 'Draft Approved (Pending Publish)' : 
+                   sub.status === 'draft_rejected' ? 'Draft Rejected' : 
+                   sub.status === 'published_uploaded' ? 'Published Awaiting Review' : 
+                   sub.status === 'final_verifying' ? 'Final In Review' : 
+                   sub.status === 'approved' ? 'Final Approved' : 'Rejected'}
                 </span>
               </div>
 
@@ -136,7 +139,7 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
                 </a>
               )}
 
-              {sub.status === 'rejected' && sub.rejectionReason && (
+              {sub.rejectionReason && (
                 <span className="text-[11px] text-rose-500">Reason: {sub.rejectionReason}</span>
               )}
 
@@ -150,14 +153,15 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
               )}
             </div>
 
-            {(sub.status === 'uploaded' || sub.status === 'verifying') && (
+            {/* DRAFT REVIEW BUTTONS */}
+            {(sub.status === 'draft_uploaded' || sub.status === 'draft_verifying') && (
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={async () => {
                     setBusyId(sub._id);
                     try {
-                      if (sub.status === 'uploaded') await startReview({ submissionId: sub._id });
-                      await approve({ submissionId: sub._id });
+                      if (sub.status === 'draft_uploaded') await startDraftReview({ submissionId: sub._id });
+                      await approveDraft({ submissionId: sub._id });
                     } catch (err) {
                       console.error('Approve failed:', err);
                     } finally {
@@ -165,18 +169,18 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
                     }
                   }}
                   disabled={busyId === sub._id}
-                  className="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                  className="py-1.5 px-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <Check className="w-3.5 h-3.5" />
-                  Approve & Release
+                  Approve Draft
                 </button>
                 <button
                   onClick={async () => {
-                    const reason = window.prompt('Reason for rejecting this deliverable (optional):') || undefined;
+                    const reason = window.prompt('Reason for rejecting this draft (optional):') || undefined;
                     setBusyId(sub._id);
                     try {
-                      if (sub.status === 'uploaded') await startReview({ submissionId: sub._id });
-                      await reject({ submissionId: sub._id, reason });
+                      if (sub.status === 'draft_uploaded') await startDraftReview({ submissionId: sub._id });
+                      await rejectDraft({ submissionId: sub._id, reason });
                     } catch (err) {
                       console.error('Reject failed:', err);
                     } finally {
@@ -187,7 +191,50 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
                   className="py-1.5 px-3 bg-white hover:bg-zinc-50 disabled:opacity-50 border border-zinc-200 text-zinc-600 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <X className="w-3.5 h-3.5" />
-                  Reject
+                  Reject Draft
+                </button>
+              </div>
+            )}
+
+            {/* FINAL REVIEW BUTTONS */}
+            {(sub.status === 'published_uploaded' || sub.status === 'final_verifying') && (
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={async () => {
+                    setBusyId(sub._id);
+                    try {
+                      if (sub.status === 'published_uploaded') await startFinalReview({ submissionId: sub._id });
+                      await approveFinal({ submissionId: sub._id });
+                    } catch (err) {
+                      console.error('Approve failed:', err);
+                    } finally {
+                      setBusyId(null);
+                    }
+                  }}
+                  disabled={busyId === sub._id}
+                  className="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  Approve Final & Release
+                </button>
+                <button
+                  onClick={async () => {
+                    const reason = window.prompt('Reason for rejecting this final post (optional):') || undefined;
+                    setBusyId(sub._id);
+                    try {
+                      if (sub.status === 'published_uploaded') await startFinalReview({ submissionId: sub._id });
+                      await rejectFinal({ submissionId: sub._id, reason });
+                    } catch (err) {
+                      console.error('Reject failed:', err);
+                    } finally {
+                      setBusyId(null);
+                    }
+                  }}
+                  disabled={busyId === sub._id}
+                  className="py-1.5 px-3 bg-white hover:bg-zinc-50 disabled:opacity-50 border border-zinc-200 text-zinc-600 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  Reject Final
                 </button>
               </div>
             )}

@@ -287,8 +287,19 @@ export default function App() {
               </span>
             </div>
           </div>
-
-
+          <div className="px-5 py-4 border-b border-zinc-900 bg-zinc-900/20 flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <img src={currentUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name || 'U')}&background=random`} alt="User" className="w-8 h-8 rounded-full" />
+              <div className="flex flex-col">
+                <span className="font-medium text-sm text-zinc-200">{currentUser.name}</span>
+                <span className="text-[10px] uppercase font-mono text-zinc-500">{currentUser.role}</span>
+              </div>
+            </div>
+            <div className="bg-zinc-950 rounded-lg p-2.5 border border-zinc-800 flex justify-between items-center">
+              <span className="text-xs font-mono text-zinc-400">Wallet</span>
+              <span className="text-sm font-bold text-emerald-500 font-mono">₹{currentUser.escrowBalance || 0}</span>
+            </div>
+          </div>
           {/* Subtab Navigation */}
           <div className="p-4 flex flex-col gap-2">
             <span className="text-[11px] font-mono uppercase tracking-widest text-zinc-500 font-bold px-1.5">Navigation Features</span>

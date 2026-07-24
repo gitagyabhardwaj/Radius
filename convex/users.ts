@@ -88,6 +88,7 @@ export const createOrUpdateUser = mutation({
       email: identity.email ?? "",
       avatarUrl: identity.pictureUrl,
       ...args,
+      escrowBalance: args.escrowBalance ?? 100000,
     });
   },
 });

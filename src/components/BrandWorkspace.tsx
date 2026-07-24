@@ -482,14 +482,13 @@ export default function BrandWorkspace({
   creators,
 }: BrandWorkspaceProps) {
   const createCampaign = useMutation(api.campaigns.create);
-  const rerunMatching = useMutation(api.campaigns.rerunMatching);
+const rerunMatching = useMutation(api.campaigns.rerunMatching);
   const { signOut } = useClerk();
   const updateProfile = useMutation(api.users.updateProfile);
   const deleteCurrentUser = useMutation(api.users.deleteCurrentUser);
   const currentUser = useQuery(api.users.getCurrentUser);
   const brandAnalytics = useQuery(api.campaigns.getBrandAnalytics);
-  const createEscrowDepositOrder = useAction(api.payments.createEscrowDepositOrder);
-  const verifyAndCreditEscrow = useAction(api.payments.verifyAndCreditEscrow);
+  const creditEscrow = useMutation(api.users.creditEscrow);
 
   // Campaign Creator State
   const [title, setTitle] = useState('New South Delhi Flash Tour');
@@ -584,55 +583,15 @@ export default function BrandWorkspace({
     });
   };
 
-  // Handle Razorpay Deposit
+  // Handle Dummy Escrow Deposit
   const handleDeposit = async (amountRequired: number) => {
     setIsDepositing(true);
     try {
-      const order = await createEscrowDepositOrder({ amount: amountRequired });
-      if (order.error) {
-        alert('Failed to start deposit: ' + order.error);
-        setIsDepositing(false);
-        return;
-      }
-      
-      const options = {
-        key: order.keyId,
-        amount: order.amount,
-        currency: order.currency,
-        name: 'Radius',
-        description: 'Escrow Wallet Deposit',
-        order_id: order.orderId,
-        handler: async (response: any) => {
-          const res = await verifyAndCreditEscrow({
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            amount: amountRequired,
-          });
-          if (res.verified) {
-            // Success, balance will automatically update from useQuery
-          } else {
-            alert('Payment verification failed.');
-          }
-          setIsDepositing(false);
-        },
-        prefill: {
-          name: currentUser?.name || '',
-          email: currentUser?.email || '',
-        },
-        theme: {
-          color: '#4f46e5',
-        },
-      };
-      const rzp = new (window as any).Razorpay(options);
-      rzp.on('payment.failed', function (response: any) {
-        alert('Payment failed.');
-        setIsDepositing(false);
-      });
-      rzp.open();
+      await creditEscrow({ amount: amountRequired });
     } catch (err: any) {
-      console.error('Failed to create Razorpay deposit order:', err);
-      alert('Failed to start deposit: ' + (err.message || err.toString()));
+      console.error('Failed to Dummy deposit:', err);
+      alert('Failed to deposit: ' + (err.message || err.toString()));
+    } finally {
       setIsDepositing(false);
     }
   };

@@ -347,3 +347,69 @@ export const rerunMatching = mutation({
     });
   },
 });
+
+/**
+ * Delete a campaign and all associated records.
+ * Refunds the locked budget back to the brand's escrow balance.
+ */
+export const deleteCampaign = mutation({
+  args: { campaignId: v.id("campaigns") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+    if (!user) throw new Error("User not found");
+
+    const campaign = await ctx.db.get(args.campaignId);
+    if (!campaign) throw new Error("Campaign not found");
+    if (campaign.brandUserId !== user._id) throw new Error("Not authorized");
+
+    // Refund the budget back to escrow
+    await ctx.db.patch(user._id, {
+      escrowBalance: (user.escrowBalance || 0) + campaign.budget,
+    });
+
+    // Delete all batches
+    const batches = await ctx.db
+      .query("batches")
+      .withIndex("by_campaign", (q) => q.eq("campaignId", args.campaignId))
+      .collect();
+    for (const batch of batches) {
+      await ctx.db.delete(batch._id);
+    }
+
+    // Delete all offers
+    const offers = await ctx.db
+      .query("campaignOffers")
+      .withIndex("by_campaign", (q) => q.eq("campaignId", args.campaignId))
+      .collect();
+    for (const offer of offers) {
+      await ctx.db.delete(offer._id);
+    }
+
+    // Delete all submissions
+    const submissions = await ctx.db
+      .query("submissions")
+      .withIndex("by_campaign", (q) => q.eq("campaignId", args.campaignId))
+      .collect();
+    for (const sub of submissions) {
+      await ctx.db.delete(sub._id);
+    }
+
+    // Delete escrow ledger entries
+    const ledgerEntries = await ctx.db
+      .query("escrowLedger")
+      .withIndex("by_campaign", (q) => q.eq("campaignId", args.campaignId))
+      .collect();
+    for (const entry of ledgerEntries) {
+      await ctx.db.delete(entry._id);
+    }
+
+    // Delete the campaign itself
+    await ctx.db.delete(args.campaignId);
+  },
+});

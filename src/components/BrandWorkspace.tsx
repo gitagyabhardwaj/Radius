@@ -482,6 +482,7 @@ export default function BrandWorkspace({
   creators,
 }: BrandWorkspaceProps) {
   const createCampaign = useMutation(api.campaigns.create);
+  const deleteCampaign = useMutation(api.campaigns.deleteCampaign);
 const rerunMatching = useMutation(api.campaigns.rerunMatching);
   const { signOut } = useClerk();
   const updateProfile = useMutation(api.users.updateProfile);
@@ -495,7 +496,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
   const [brandName, setBrandName] = useState(customBrandName || '');
   const [niche, setNiche] = useState('');
   const [deliverable, setDeliverable] = useState('');
-  const [budget, setBudget] = useState(450);
+  const [budget, setBudget] = useState(1000);
   const [spotsTotal, setSpotsTotal] = useState(3);
   const [durationHours, setDurationHours] = useState(24);
   const [contentFormat, setContentFormat] = useState('');
@@ -504,6 +505,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
   const [submissionDeadlineDays, setSubmissionDeadlineDays] = useState(3);
   const [isActivating, setIsActivating] = useState(false);
   const [isDepositing, setIsDepositing] = useState(false);
+  const [fakeRazorpayData, setFakeRazorpayData] = useState<{ amount: number; orderId: string } | null>(null);
   const [profileSaveStatus, setProfileSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [collapsedCampaigns, setCollapsedCampaigns] = useState<Record<string, boolean>>({});
   
@@ -583,8 +585,39 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
     });
   };
 
-  const createEscrowOrder = useAction(api.payments.createEscrowOrder);
+  const createEscrowOrder = useAction(api.payments.createEscrowDepositOrder);
   const verifyAndCreditEscrow = useAction(api.payments.verifyAndCreditEscrow);
+
+  // Fake Razorpay Processing Effect
+  useEffect(() => {
+    if (fakeRazorpayData) {
+      let isMounted = true;
+      const processMockPayment = async () => {
+        try {
+          // Wait 2.5 seconds to show the modal processing state
+          await new Promise((r) => setTimeout(r, 2500));
+          if (!isMounted) return;
+
+          const result = await verifyAndCreditEscrow({
+            razorpay_order_id: fakeRazorpayData.orderId,
+            razorpay_payment_id: `pay_demo_${Date.now()}`,
+            razorpay_signature: 'demo_signature',
+            amount: fakeRazorpayData.amount,
+          });
+
+          if (isMounted && result.verified) {
+            setFakeRazorpayData(null);
+          }
+        } catch (err) {
+          console.error('Demo payment error:', err);
+          if (isMounted) setFakeRazorpayData(null);
+        }
+      };
+      
+      processMockPayment();
+      return () => { isMounted = false; };
+    }
+  }, [fakeRazorpayData, verifyAndCreditEscrow]);
 
   const handleDeposit = async (amount: number) => {
     if (!currentUser) return;
@@ -594,6 +627,14 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
       const order = await createEscrowOrder({ amount });
       if (order.error) throw new Error(order.error);
 
+      // ── Demo mode: simulate Razorpay checkout flow ──
+      if ((order as any).demo) {
+        setFakeRazorpayData({ amount, orderId: order.orderId! });
+        setIsDepositing(false);
+        return;
+      }
+
+      // ── Real Razorpay mode ──
       const options = {
         key: order.keyId,
         order_id: order.orderId,
@@ -608,7 +649,6 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               amount,
             });
             if (!result.verified) throw new Error("Payment verification failed");
-            // Deposit successful, balance will update automatically via Convex subscription
           } catch (err) {
             console.error('Verification error:', err);
             alert('Payment verification failed.');
@@ -688,14 +728,6 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
         submissionDeadlineDays,
         
         durationHours,
-        createdAt: Date.now(),
-        status: 'active',
-        escrowStatus: 'locked',
-        activeBatchIndex: 0,
-        batches: [],
-        submissionCount: 0,
-        approvedCount: 0,
-        matchScore: 0
       });
     } catch (err: any) {
       alert("Failed to launch campaign: " + err.message);
@@ -1137,9 +1169,9 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               <div className="flex-1">
                 <input
                   type="range"
-                  min={estMin - 100 > 50 ? estMin - 100 : 50}
-                  max={estMax + 200}
-                  step="10"
+                  min={1000}
+                  max={10000}
+                  step="50"
                   value={budget}
                   onChange={(e) => setBudget(Number(e.target.value))}
                   className="w-full accent-indigo-600 cursor-pointer"
@@ -1245,6 +1277,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
   if (activeSubTab === 'dispatch') {
     return (
+      <>
       <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-zinc-100 pb-4 mb-6">
           <div>
@@ -1304,7 +1337,24 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                           : (now - camp.createdAt > 3000 ? 'No Matches' : 'Initializing')}
                       </span>
                     </div>
-                    
+                    <button
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        if (confirm('Are you sure you want to delete this campaign? The locked budget will be refunded to your escrow balance.')) {
+                          try {
+                            await deleteCampaign({ campaignId: camp.id as Id<'campaigns'> });
+                          } catch (err) {
+                            console.error('Failed to delete campaign:', err);
+                            alert('Failed to delete campaign.');
+                          }
+                        }
+                      }}
+                      className="ml-4 text-zinc-400 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center w-8 h-8 rounded-full transition-colors"
+                      title="Delete Campaign"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+
                     <div className="ml-2 text-zinc-400 flex items-center justify-center w-8 h-8 rounded-full hover:bg-zinc-100 transition-colors">
                       {isCollapsed ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
                     </div>
@@ -1450,6 +1500,52 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
           </div>
         )}
       </div>
+
+      {/* Fake Razorpay Checkout Modal for Demo */}
+      {fakeRazorpayData && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
+            {/* Header */}
+            <div className="bg-[#3366cc] px-5 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-white rounded flex items-center justify-center">
+                  <div className="w-3 h-3 bg-[#3366cc] rounded-sm transform rotate-45"></div>
+                </div>
+                <span className="text-white font-bold tracking-wide text-lg">Razorpay</span>
+              </div>
+              <button onClick={() => setFakeRazorpayData(null)} className="text-white/70 hover:text-white transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Body */}
+            <div className="p-8 flex flex-col items-center gap-4">
+              <div className="w-12 h-12 border-4 border-blue-100 border-t-[#3366cc] rounded-full animate-spin mb-2" />
+              <div className="text-center">
+                <h4 className="text-lg font-bold text-zinc-900 mb-1">Processing Payment</h4>
+                <p className="text-sm text-zinc-500">Please wait while we secure your escrow...</p>
+              </div>
+              <div className="w-full bg-zinc-50 rounded-xl border border-zinc-200 p-4 mt-2">
+                <div className="flex justify-between text-sm mb-1.5">
+                  <span className="text-zinc-500">Amount payable</span>
+                  <span className="font-bold text-zinc-900 font-mono">₹{fakeRazorpayData.amount}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-zinc-500">Order</span>
+                  <span className="font-mono text-zinc-600 text-xs mt-0.5">{fakeRazorpayData.orderId.split('_').slice(-1)}</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Footer */}
+            <div className="bg-zinc-50 px-5 py-3 border-t border-zinc-100 flex items-center justify-center gap-1.5 text-xs text-zinc-400 font-medium">
+              <ShieldCheck className="w-3.5 h-3.5" /> 100% Secure Checkout (Demo Mode)
+            </div>
+          </div>
+        </div>
+      )}
+
+      </>
     );
   }
 

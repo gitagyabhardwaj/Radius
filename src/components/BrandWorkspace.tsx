@@ -491,16 +491,16 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
   const creditEscrow = useMutation(api.users.creditEscrow);
 
   // Campaign Creator State
-  const [title, setTitle] = useState('New South Delhi Flash Tour');
-  const [brandName, setBrandName] = useState(customBrandName || 'Local Craft Brewers');
-  const [niche, setNiche] = useState('Food & Lifestyle');
-  const [deliverable, setDeliverable] = useState('1 Instagram Story highlighting local patio dining');
+  const [title, setTitle] = useState('');
+  const [brandName, setBrandName] = useState(customBrandName || '');
+  const [niche, setNiche] = useState('');
+  const [deliverable, setDeliverable] = useState('');
   const [budget, setBudget] = useState(450);
   const [spotsTotal, setSpotsTotal] = useState(3);
   const [durationHours, setDurationHours] = useState(24);
-  const [contentFormat, setContentFormat] = useState('Instagram Story');
-  const [creativeGuidelines, setCreativeGuidelines] = useState('Must show product clearly. No competitor logos.');
-  const [targetAudience, setTargetAudience] = useState('Gen Z / Millennials');
+  const [contentFormat, setContentFormat] = useState('');
+  const [creativeGuidelines, setCreativeGuidelines] = useState('');
+  const [targetAudience, setTargetAudience] = useState('');
   const [submissionDeadlineDays, setSubmissionDeadlineDays] = useState(3);
   const [isActivating, setIsActivating] = useState(false);
   const [isDepositing, setIsDepositing] = useState(false);
@@ -773,7 +773,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 <input
                   id="brand-profile-wallet-input"
                   type="text"
-                  defaultValue="0x3FaA881c62bE09C137119E15b8c9d09c31F7B92"
+                  defaultValue=""
                   className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-sm text-zinc-800 font-mono focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
                   placeholder="0x..."
                 />
@@ -956,6 +956,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 value={deliverable || ''}
                 onChange={(e) => setDeliverable(e.target.value)}
                 className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2 text-base text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
+                placeholder="e.g. 1 Instagram Story highlighting local patio dining"
               />
             </div>
           </div>
@@ -1105,6 +1106,23 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                   onChange={(e) => setBudget(Number(e.target.value))}
                   className="w-14 focus:outline-none text-right font-mono"
                 />
+              </div>
+            </div>
+          </div>
+
+          {/* Cost Summary Widget */}
+          <div className="bg-white border border-zinc-200/80 rounded-xl p-4 flex flex-col gap-3 shadow-sm">
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-semibold text-zinc-700">Cost Summary</span>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1 p-3 bg-zinc-50 rounded-lg border border-zinc-100">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Total Campaign Budget</span>
+                <span className="text-lg font-black text-zinc-800">₹{budget}</span>
+              </div>
+              <div className="flex flex-col gap-1 p-3 bg-indigo-50/50 rounded-lg border border-indigo-100/50">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-indigo-400">Final Cost Per Creator</span>
+                <span className="text-lg font-black text-indigo-700">₹{spotsTotal > 0 ? Math.round(budget / spotsTotal) : 0}</span>
               </div>
             </div>
           </div>

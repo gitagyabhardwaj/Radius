@@ -81,7 +81,7 @@ export default function CreatorWorkspace({
   const deleteCurrentUser = useMutation(api.users.deleteCurrentUser);
 
   const acceptGenericCampaign = useMutation(api.users.acceptCampaign);
-  const fetchRealHandleData = useAction(api.instagram.fetchRealHandleData);
+  const fetchProfileData = useAction(api.instagram.fetchProfileData);
   const createVelocityOrder = useAction(api.payments.createVelocityOrder);
   const verifyAndActivateVelocity = useAction(api.payments.verifyAndActivateVelocity);
 

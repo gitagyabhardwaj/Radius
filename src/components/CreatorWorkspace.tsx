@@ -16,6 +16,8 @@ import {
   Trash2,
   Radio,
   Terminal,
+  Check,
+  ExternalLink,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useClerk } from '@clerk/clerk-react';
@@ -1142,8 +1144,8 @@ export default function CreatorWorkspace({
                       {
                         step: 'Brand Review',
                         desc: 'Brand previews content',
-                        active: submission?.status === 'verifying' || submission?.status === 'uploaded',
-                        done: submission?.status === 'approved',
+                        active: submission?.status === 'draft_verifying' || submission?.status === 'draft_uploaded' || submission?.status === 'final_verifying' || submission?.status === 'published_uploaded',
+                        done: submission?.status === 'approved' || submission?.status === 'draft_approved',
                       },
                       {
                         step: 'Released',

@@ -1,0 +1,76 @@
+﻿diff --git a/convex/escrow.ts b/convex/escrow.ts
+index 343c329..9857b53 100644
+--- a/convex/escrow.ts
++++ b/convex/escrow.ts
+@@ -175,7 +175,7 @@ export const getCreatorEarnings = query({
+         if (!hasRelease) {
+           const campaign = await ctx.db.get(offer.campaignId);
+           if (campaign) {
+-            totalPending += campaign.budget / campaign.spotsTotal;
++            totalPending += (campaign.budget * 0.95) / campaign.spotsTotal;
+           }
+         }
+       }
+diff --git a/convex/submissions.ts b/convex/submissions.ts
+index 3a1faea..ab886f1 100644
+--- a/convex/submissions.ts
++++ b/convex/submissions.ts
+@@ -233,7 +233,7 @@ export const approveFinal = mutation({
+     await ctx.scheduler.runAfter(0, internal.escrow.releasePayout, {
+       campaignId: submission.campaignId,
+       creatorUserId: submission.creatorUserId,
+-      amount: campaign.budget / campaign.spotsTotal,
++      amount: (campaign.budget * 0.95) / campaign.spotsTotal,
+     });
+ 
+     return args.submissionId;
+diff --git a/src/components/BrandWorkspace.tsx b/src/components/BrandWorkspace.tsx
+index d564059..e70bad6 100644
+--- a/src/components/BrandWorkspace.tsx
++++ b/src/components/BrandWorkspace.tsx
+@@ -1122,7 +1122,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
+                   </div>
+                 </div>
+                 <p className="text-xs text-zinc-500 leading-normal mt-1">
+-                  Your budget of <span className="font-semibold text-zinc-800">Γé╣{budget}</span> will be locked instantly in a smart contract. Payouts release autonomously to creators upon successful multi-modal EXIF location match.
++                  Your budget of <span className="font-semibold text-zinc-800">Γé╣{budget}</span> will be locked in smart escrow. A 5% platform fee is deducted ΓÇö creators share <span className="font-semibold text-zinc-800">Γé╣{Math.round(budget * 0.95)}</span> equally, so each creator receives <span className="font-semibold text-emerald-700">Γé╣{spotsTotal > 0 ? Math.round((budget * 0.95) / spotsTotal) : 'ΓÇö'}</span>.
+                 </p>
+               </div>
+             </div>
+diff --git a/src/components/CreatorWorkspace.tsx b/src/components/CreatorWorkspace.tsx
+index fc2ba17..e011cea 100644
+--- a/src/components/CreatorWorkspace.tsx
++++ b/src/components/CreatorWorkspace.tsx
+@@ -978,8 +978,8 @@ export default function CreatorWorkspace({
+                       </div>
+ 
+                       <div className="flex flex-col items-end text-right">
+-                        <span className="text-[11px] font-mono text-zinc-400">Budget:</span>
+-                        <span className="text-sm font-bold text-emerald-600 font-mono">Γé╣${camp.budget}</span>
++                        <span className="text-[11px] font-mono text-zinc-400">Your Payout:</span>
++                        <span className="text-sm font-bold text-emerald-600 font-mono">Γé╣{Math.round((camp.budget * 0.95) / camp.spotsTotal)}</span>
+                       </div>
+ 
+                       <button
+@@ -1088,8 +1088,8 @@ export default function CreatorWorkspace({
+ 
+                   <div className="flex items-center gap-6">
+                     <div className="flex flex-col items-end p-4 bg-white/5 rounded-2xl border border-white/5 backdrop-blur-md">
+-                      <span className="text-[10px] font-mono tracking-widest text-zinc-400 uppercase mb-1">Escrow Release Value</span>
+-                      <span className="text-3xl font-display font-black text-emerald-400">Γé╣{camp.budget}</span>
++                      <span className="text-[10px] font-mono tracking-widest text-zinc-400 uppercase mb-1">Your Payout (after 5% fee)</span>
++                      <span className="text-3xl font-display font-black text-emerald-400">Γé╣{Math.round((camp.budget * 0.95) / camp.spotsTotal)}</span>
+                     </div>
+                     
+                     <div className="p-2 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-transform duration-300">
+@@ -1471,8 +1471,8 @@ export default function CreatorWorkspace({
+                       <div className="flex flex-col gap-2 max-w-md">
+                         <h4 className="text-xl font-display font-black text-emerald-400">Final Post Approved ΓÇö Payout Released!</h4>
+                         <p className="text-sm text-zinc-400 leading-relaxed">
+-                          <span className="text-white font-bold">{camp.brandName}</span> approved your final post. Budget of{' '}
+-                          <span className="text-emerald-400 font-bold">Γé╣{camp.budget}</span> has been transferred directly into your creator account.
++                          <span className="text-white font-bold">{camp.brandName}</span> approved your final post. Your payout of{' '}
++                          <span className="text-emerald-400 font-bold">Γé╣{Math.round((camp.budget * 0.95) / camp.spotsTotal)}</span> (after 5% platform fee) has been transferred directly into your creator account.
+                         </p>
+                       </div>
+ 

@@ -1,0 +1,68 @@
+--- convex/helpers.ts
++++ convex/helpers.ts
+@@ -51,21 +51,46 @@
+  * Compute a match score (0-100) for a creator against a campaign.
+  *
+  * Weighting:
+- *  - Target Audience Proximity: 55 points (scaled by IG audienceInLocality %)
+- *  - Niche match:               30 points (exact match)
+- *  - Velocity tier bonus:       15 points (Velocity tier gets full, Free gets 5)
++ *  - Absolute Local Reach & Distance: 55 points (based on followers * local% and distance penalty)
++ *  - Niche match:                     30 points (exact match)
++ *  - Velocity tier bonus:             15 points (Velocity tier gets full, Free gets 5)
+  */
++
++export function parseFollowers(followers: string | undefined): number {
++  if (!followers) return 0;
++  const str = followers.toLowerCase().replace(/,/g, "").trim();
++  const match = str.match(/^([\d.]+)\s*(k|m|l|lakh|lakhs)?$/);
++  if (!match) return 0;
++  const num = parseFloat(match[1]);
++  const suffix = match[2];
++  if (suffix === "k") return num * 1000;
++  if (suffix === "m") return num * 1000000;
++  if (suffix === "l" || suffix === "lakh" || suffix === "lakhs") return num * 100000;
++  return num;
++}
++
+ export function computeMatchScore(
++  distanceKm: number,
+   creatorNiche: string | undefined,
+   campaignNiche: string,
+   audienceInLocality: number | undefined,
++  followers: string | undefined,
+   velocityTier: "Free" | "Velocity" | undefined
+ ): number {
+   let score = 0; // base
+ 
++  // Absolute Local Reach
++  const totalFollowers = parseFollowers(followers);
++  const localPercentage = audienceInLocality !== undefined ? audienceInLocality / 100 : 0;
++  const absoluteLocalReach = totalFollowers * localPercentage;
++
++  // Proximity penalty: reduce reach effectiveness based on distance
++  // e.g. 0km = 100% effective, 10km = 50% effective, 20km = 0% effective
++  const distancePenaltyFactor = Math.max(0, 1 - (distanceKm / 20));
++  const effectiveLocalReach = absoluteLocalReach * distancePenaltyFactor;
++
++  // Map effective reach to 0-55 points. 
++  // Let's assume 100k effective reach gives max points (55)
++  const reachScore = Math.min(55, (effectiveLocalReach / 100000) * 55);
++  score += reachScore;
++
+   // Niche match — case-insensitive comparison
+   if (
+     creatorNiche &&
+@@ -82,12 +107,6 @@
+     score += 15;
+   }
+ 
+-  // Target Audience Proximity (from Instagram data)
+-  // Replaces physical distance by ranking how concentrated their audience is in the target grid
+-  if (audienceInLocality !== undefined) {
+-    score += (audienceInLocality / 100) * 55;
+-  }
+-
+   // Velocity tier bonus
+   if (velocityTier === "Velocity") {
+     score += 15;

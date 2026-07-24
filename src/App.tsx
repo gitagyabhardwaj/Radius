@@ -18,6 +18,7 @@ import {
   LogOut,
   Radio,
   DollarSign,
+  Image,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -119,7 +120,7 @@ export default function App() {
 
   // Active sub-tab states for navigation sidebar
   const [activeBrandSubTab, setActiveBrandSubTab] = useState<'setup' | 'dispatch' | 'analytics' | 'profile'>('setup');
-  const [activeCreatorSubTab, setActiveCreatorSubTab] = useState<'radar' | 'escrow' | 'wallet' | 'profile'>('radar');
+  const [activeCreatorSubTab, setActiveCreatorSubTab] = useState<'radar' | 'escrow' | 'wallet' | 'portfolio' | 'profile'>('radar');
 
   // Determine role and view from Convex user
   const userRole = currentUser?.role || null;
@@ -375,6 +376,17 @@ export default function App() {
                     <span>3. Secure Wallet</span>
                   </button>
                   <button
+                    onClick={() => setActiveCreatorSubTab('portfolio')}
+                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
+                      activeCreatorSubTab === 'portfolio'
+                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
+                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
+                    }`}
+                  >
+                    <Image className="w-4 h-4" />
+                    <span>4. Portfolio</span>
+                  </button>
+                  <button
                     onClick={() => setActiveCreatorSubTab('profile')}
                     className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeCreatorSubTab === 'profile'
@@ -383,7 +395,7 @@ export default function App() {
                     }`}
                   >
                     <User className="w-4 h-4" />
-                    <span>4. Creator Profile</span>
+                    <span>5. Creator Profile</span>
                   </button>
                 </>
               )}

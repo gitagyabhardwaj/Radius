@@ -23,6 +23,11 @@ import {
   UserPlus,
   Briefcase,
   AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  MapPin,
+  Eye,
+  FileText,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useUser, useClerk } from '@clerk/clerk-react';
@@ -193,6 +198,225 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
   );
 }
 
+/**
+ * Shows creators who have expressed interest (brand_review) and lets the brand
+ * approve or reject them. Also shows already accepted creators.
+ */
+function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; creators?: Creator[] }) {
+  const campaignOffers = useQuery(api.offers.getByCampaign, { campaignId: campaignId as any });
+  const brandApprove = useMutation(api.offers.brandApprove);
+  const brandReject = useMutation(api.offers.brandReject);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  if (!campaignOffers || campaignOffers.length === 0) return null;
+
+  const pendingReview = campaignOffers.filter((o: any) => o.status === 'brand_review');
+  const accepted = campaignOffers.filter((o: any) => o.status === 'accepted');
+
+  if (pendingReview.length === 0 && accepted.length === 0) return null;
+
+  return (
+    <div className="mt-2 pt-5 border-t border-zinc-100 flex flex-col gap-4">
+      {/* Pending Creator Applications */}
+      {pendingReview.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <span className="text-[11px] font-mono uppercase tracking-wide text-amber-600 font-bold flex items-center gap-1.5">
+            <UserPlus className="w-3.5 h-3.5" />
+            Creator Applications ({pendingReview.length})
+          </span>
+          {pendingReview.map((offer: any) => {
+            const creator = offer.creator;
+            if (!creator) return null;
+            return (
+              <div key={offer._id} className="border border-amber-100 bg-amber-50/30 rounded-xl p-4 flex flex-col md:flex-row gap-4 items-start">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <img
+                    src={creator.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=random`}
+                    alt={creator.name}
+                    className="w-10 h-10 rounded-full object-cover border border-zinc-200"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="flex flex-col gap-0.5 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-zinc-800">{creator.name}</span>
+                      {creator.velocityTier === 'Velocity' && (
+                        <span className="text-[9px] font-mono bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded border border-amber-200 font-bold">VELOCITY</span>
+                      )}
+                    </div>
+                    <span className="text-[11px] text-indigo-600 font-mono">{creator.handle || 'No handle'}</span>
+                    <div className="flex items-center gap-3 text-[11px] text-zinc-500 mt-0.5">
+                      <span>{creator.followers || '0'} followers</span>
+                      <span>•</span>
+                      <span>{creator.niche || 'No niche'}</span>
+                      <span>•</span>
+                      <span>{creator.locality || 'Unknown location'}</span>
+                    </div>
+                    {creator.bio && (
+                      <p className="text-[11px] text-zinc-400 mt-1 line-clamp-2">{creator.bio}</p>
+                    )}
+                    {/* Past work preview */}
+                    {creator.pastWork && creator.pastWork.length > 0 && (
+                      <div className="flex items-center gap-1.5 mt-2">
+                        {creator.pastWork.slice(0, 3).map((work: any, idx: number) => (
+                          <img
+                            key={idx}
+                            src={work.imgUrl}
+                            alt={work.brand}
+                            className="w-8 h-8 rounded object-cover border border-zinc-200/80"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(work.brand)}&background=f1f5f9&color=6366f1&size=32`;
+                            }}
+                          />
+                        ))}
+                        {creator.pastWork.length > 3 && (
+                          <span className="text-[9px] font-mono text-zinc-400">+{creator.pastWork.length - 3}</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={async () => {
+                      setBusyId(offer._id);
+                      try { await brandApprove({ offerId: offer._id }); } catch (err) { console.error('Approve failed:', err); }
+                      finally { setBusyId(null); }
+                    }}
+                    disabled={busyId === offer._id}
+                    className="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    Approve
+                  </button>
+                  <button
+                    onClick={async () => {
+                      setBusyId(offer._id);
+                      try { await brandReject({ offerId: offer._id }); } catch (err) { console.error('Reject failed:', err); }
+                      finally { setBusyId(null); }
+                    }}
+                    disabled={busyId === offer._id}
+                    className="py-1.5 px-3 bg-white hover:bg-zinc-50 disabled:opacity-50 border border-zinc-200 text-zinc-600 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                    Reject
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Accepted Creators */}
+      {accepted.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <span className="text-[11px] font-mono uppercase tracking-wide text-emerald-600 font-bold flex items-center gap-1.5">
+            <Check className="w-3.5 h-3.5" />
+            Approved Creators ({accepted.length})
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {accepted.map((offer: any) => {
+              const creator = offer.creator;
+              if (!creator) return null;
+              return (
+                <div key={offer._id} className="flex items-center gap-2 bg-emerald-50/50 border border-emerald-100 rounded-lg px-3 py-1.5">
+                  <img
+                    src={creator.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=random`}
+                    alt={creator.name}
+                    className="w-6 h-6 rounded-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                  <span className="text-xs font-bold text-emerald-800">{creator.name}</span>
+                  <span className="text-[9px] font-mono text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded">WORKING</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Shows full campaign details (brief, guidelines, format etc.) in a clean expandable section.
+ */
+function CampaignDetailPanel({ camp }: { camp: Campaign }) {
+  const [showDetails, setShowDetails] = useState(false);
+
+  return (
+    <div className="flex flex-col gap-2">
+      <button
+        onClick={() => setShowDetails(!showDetails)}
+        className="flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wide text-indigo-600 font-bold hover:text-indigo-700 transition-colors cursor-pointer w-max"
+      >
+        <Eye className="w-3.5 h-3.5" />
+        {showDetails ? 'Hide Campaign Details' : 'View Campaign Details'}
+      </button>
+
+      {showDetails && (
+        <div className="border border-zinc-100 bg-zinc-50/50 rounded-xl p-4 flex flex-col gap-4 animate-fade-in">
+          {/* Deliverable / Description */}
+          <div className="flex flex-col gap-1">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Deliverable</span>
+            <p className="text-sm text-zinc-700">{camp.deliverable}</p>
+          </div>
+
+          {/* Grid of details */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {camp.contentFormat && (
+              <div className="flex flex-col gap-0.5 p-3 bg-white rounded-lg border border-zinc-100">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Format</span>
+                <span className="text-sm font-medium text-zinc-800">{camp.contentFormat}</span>
+              </div>
+            )}
+            {camp.targetAudience && (
+              <div className="flex flex-col gap-0.5 p-3 bg-white rounded-lg border border-zinc-100">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Target Audience</span>
+                <span className="text-sm font-medium text-zinc-800">{camp.targetAudience}</span>
+              </div>
+            )}
+            {camp.submissionDeadlineDays && (
+              <div className="flex flex-col gap-0.5 p-3 bg-white rounded-lg border border-zinc-100">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Submission Deadline</span>
+                <span className="text-sm font-medium text-zinc-800">{camp.submissionDeadlineDays} days</span>
+              </div>
+            )}
+            <div className="flex flex-col gap-0.5 p-3 bg-white rounded-lg border border-zinc-100">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Niche</span>
+              <span className="text-sm font-medium text-zinc-800">{camp.niche}</span>
+            </div>
+            <div className="flex flex-col gap-0.5 p-3 bg-white rounded-lg border border-zinc-100">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Budget</span>
+              <span className="text-sm font-medium text-emerald-700">₹{camp.budget}</span>
+            </div>
+            <div className="flex flex-col gap-0.5 p-3 bg-white rounded-lg border border-zinc-100">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Spots</span>
+              <span className="text-sm font-medium text-zinc-800">{camp.spotsFilled}/{camp.spotsTotal} filled</span>
+            </div>
+          </div>
+
+          {/* Creative Guidelines */}
+          {camp.creativeGuidelines && (
+            <div className="flex flex-col gap-1 pt-2 border-t border-zinc-100">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Creative Guidelines</span>
+              <p className="text-sm text-zinc-600 italic">"{camp.creativeGuidelines}"</p>
+            </div>
+          )}
+
+          {/* Location */}
+          <div className="flex items-center gap-2 pt-2 border-t border-zinc-100">
+            <MapPin className="w-3.5 h-3.5 text-zinc-400" />
+            <span className="text-[11px] text-zinc-500 font-mono">
+              {camp.centerLocality} ({camp.centerLat.toFixed(4)}N, {camp.centerLng.toFixed(4)}E)
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function BrandWorkspace({
   centerLat,
   centerLng,
@@ -235,6 +459,7 @@ export default function BrandWorkspace({
   const [isActivating, setIsActivating] = useState(false);
   const [isDepositing, setIsDepositing] = useState(false);
   const [profileSaveStatus, setProfileSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [collapsedCampaigns, setCollapsedCampaigns] = useState<Record<string, boolean>>({});
   
   // Real-time tick for countdowns
   const [now, setNow] = useState(Date.now());
@@ -954,10 +1179,15 @@ export default function BrandWorkspace({
           </div>
         ) : (
           <div className="flex flex-col gap-8">
-            {activeCampaigns.map((camp) => (
-              <div key={camp.id} className="border border-zinc-150 rounded-xl p-5 flex flex-col gap-6">
+            {activeCampaigns.map((camp) => {
+              const isCollapsed = collapsedCampaigns[camp.id] ?? true;
+              return (
+              <div key={camp.id} className="border border-zinc-150 rounded-xl flex flex-col transition-all bg-white overflow-hidden">
                 {/* Header info */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-100 pb-4">
+                <div 
+                  className={`p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-zinc-50/50 transition-colors ${!isCollapsed ? 'border-b border-zinc-100' : ''}`}
+                  onClick={() => setCollapsedCampaigns(prev => ({ ...prev, [camp.id]: !(prev[camp.id] ?? true) }))}
+                >
                   <div className="flex flex-col">
                     <div className="flex items-center gap-2">
                       <h4 className="text-base font-bold text-zinc-800">{camp.title}</h4>
@@ -967,6 +1197,7 @@ export default function BrandWorkspace({
                     </div>
                     <span className="text-xs text-zinc-400 font-mono mt-0.5">
                       LOC: {camp.centerLocality} • deliverable: {camp.deliverable}
+                      {isCollapsed && ` • Spots: ${camp.spotsFilled}/${camp.spotsTotal}`}
                     </span>
                   </div>
 
@@ -987,10 +1218,16 @@ export default function BrandWorkspace({
                           : (now - camp.createdAt > 3000 ? 'No Matches' : 'Initializing')}
                       </span>
                     </div>
+                    
+                    <div className="ml-2 text-zinc-400 flex items-center justify-center w-8 h-8 rounded-full hover:bg-zinc-100 transition-colors">
+                      {isCollapsed ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
+                    </div>
                   </div>
                 </div>
 
-                {/* Programmatic Batch Timeline Track */}
+                {!isCollapsed && (
+                  <div className="p-5 flex flex-col gap-6 bg-white">
+                    {/* Programmatic Batch Timeline Track */}
                 {camp.batches.length === 0 ? (
                   (now - camp.createdAt > 3000) ? (
                     <div className="border border-rose-100 bg-rose-50/30 rounded-xl p-8 flex flex-col items-center justify-center gap-3">
@@ -1112,12 +1349,18 @@ export default function BrandWorkspace({
                   </div>
                 )}
 
+                <CampaignDetailPanel camp={camp as any} />
+
+                <CreatorApprovalPanel campaignId={camp.id} creators={creators || CREATORS} />
+
                 <SubmissionsReviewPanel campaignId={camp.id} />
 
                 <DispatchFeed campaignId={camp.id} />
 
+                  </div>
+                )}
               </div>
-            ))}
+            )})}
           </div>
         )}
       </div>

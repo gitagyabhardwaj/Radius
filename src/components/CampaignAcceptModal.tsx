@@ -42,9 +42,9 @@ export const CampaignAcceptModal: React.FC<CampaignAcceptModalProps> = ({ campai
               <div className="flex flex-col gap-1">
                 <h3 className="text-2xl font-display font-black text-white flex items-center gap-2">
                   <FileText className="w-6 h-6 text-indigo-400" />
-                  Contract Review
+                  Campaign Brief
                 </h3>
-                <p className="text-sm text-zinc-400">Review terms before initiating escrow.</p>
+                <p className="text-sm text-zinc-400">Review the brief before expressing your interest. The brand will review your profile and approve.</p>
               </div>
               <button
                 onClick={onClose}
@@ -184,12 +184,12 @@ export const CampaignAcceptModal: React.FC<CampaignAcceptModalProps> = ({ campai
                 className="w-full py-4 px-6 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-black rounded-2xl transition-all flex items-center justify-center gap-3 shadow-[0_0_40px_-10px_rgba(99,102,241,0.5)] hover:shadow-[0_0_60px_-15px_rgba(99,102,241,0.7)] group"
               >
                 <PenTool className="w-5 h-5" />
-                <span>Sign & Accept Contract</span>
+                <span>Express Interest</span>
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
               <p className="text-center text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-4 flex items-center justify-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                Secured by Radius Protocol
+                Brand will review your profile before confirming
               </p>
             </div>
           </motion.div>

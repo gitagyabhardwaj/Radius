@@ -56,7 +56,7 @@ interface CreatorWorkspaceProps {
   setSelectedCreatorId: (id: string) => void;
   selectedCampaignId: string | null;
   setSelectedCampaignId: (id: string | null) => void;
-  activeSubTab?: 'radar' | 'escrow' | 'wallet' | 'profile';
+  activeSubTab?: 'radar' | 'escrow' | 'wallet' | 'portfolio' | 'profile';
   creators?: Creator[];
 }
 
@@ -264,11 +264,12 @@ export default function CreatorWorkspace({
       if (camp.status !== 'active') return false;
       
       const hasPendingOffer = creatorOffers?.some((o: any) => o.campaignId === camp.id && o.status === 'pending');
+      const hasBrandReviewOffer = creatorOffers?.some((o: any) => o.campaignId === camp.id && o.status === 'brand_review');
       const hasAcceptedOffer = creatorOffers?.some((o: any) => o.campaignId === camp.id && o.status === 'accepted');
       const hasSubmission = mySubmissions?.some((s: any) => s.campaignId === camp.id);
       const isDatabaseAccepted = currentCreator?.acceptedCampaignIds?.includes(camp.id);
       
-      return hasPendingOffer && !(hasAcceptedOffer || hasSubmission || isDatabaseAccepted);
+      return hasPendingOffer && !(hasBrandReviewOffer || hasAcceptedOffer || hasSubmission || isDatabaseAccepted);
     });
   }, [creatorCampaigns, creatorOffers, mySubmissions, currentCreator]);
 
@@ -960,7 +961,7 @@ export default function CreatorWorkspace({
                         }}
                         className="py-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
                       >
-                        <span>Review & Accept</span>
+                        <span>Express Interest</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -1009,10 +1010,11 @@ export default function CreatorWorkspace({
 
   if (activeSubTab === 'escrow') {
     const acceptedCampaigns = creatorCampaigns.filter(camp => {
+      const hasBrandReviewOffer = creatorOffers?.some((o: any) => o.campaignId === camp.id && o.status === 'brand_review');
       const hasAcceptedOffer = creatorOffers?.some((o: any) => o.campaignId === camp.id && o.status === 'accepted');
       const hasSubmission = mySubmissions?.some((s: any) => s.campaignId === camp.id);
       const isDatabaseAccepted = currentCreator?.acceptedCampaignIds?.includes(camp.id);
-      return hasAcceptedOffer || hasSubmission || isDatabaseAccepted;
+      return hasBrandReviewOffer || hasAcceptedOffer || hasSubmission || isDatabaseAccepted;
     });
 
     return (
@@ -1039,9 +1041,18 @@ export default function CreatorWorkspace({
                   onClick={() => setExpandedCampaignId(expandedCampaignId === camp.id ? null : camp.id)}
                 >
                   <div className="flex flex-col gap-2">
-                    <span className="bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[10px] font-mono font-bold px-3 py-1 rounded-full w-max tracking-widest">
-                      ACTIVE CAMPAIGN
-                    </span>
+                    {(() => {
+                      const isPendingApproval = creatorOffers?.some((o: any) => o.campaignId === camp.id && o.status === 'brand_review');
+                      return isPendingApproval ? (
+                        <span className="bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[10px] font-mono font-bold px-3 py-1 rounded-full w-max tracking-widest animate-pulse">
+                          PENDING BRAND APPROVAL
+                        </span>
+                      ) : (
+                        <span className="bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[10px] font-mono font-bold px-3 py-1 rounded-full w-max tracking-widest">
+                          ACTIVE CAMPAIGN
+                        </span>
+                      );
+                    })()}
                     <h2 className="text-2xl font-display font-black text-white">{camp.title}</h2>
                     <span className="text-sm text-zinc-400 font-mono">
                       Brand: <span className="text-zinc-300">{camp.brandName}</span> • Quota: <span className="text-zinc-300">{camp.spotsFilled}/{camp.spotsTotal} spots</span>
@@ -1497,6 +1508,107 @@ export default function CreatorWorkspace({
               ))}
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (activeSubTab === 'portfolio') {
+    return (
+      <div className="max-w-5xl mx-auto flex flex-col gap-8 animate-fade-in">
+        {/* Portfolio Header */}
+        <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm">
+          <div className="flex items-start gap-5">
+            <img
+              src={currentCreator.avatar}
+              alt={currentCreator.name}
+              className="w-20 h-20 rounded-2xl object-cover border-2 border-indigo-100 shadow-sm"
+              referrerPolicy="no-referrer"
+            />
+            <div className="flex-1 flex flex-col gap-1.5">
+              <div className="flex items-center gap-2.5">
+                <h2 className="text-2xl font-display font-black text-zinc-900">{currentCreator.name}</h2>
+                {currentCreator.velocityTier === 'Velocity' && (
+                  <span className="bg-amber-50 text-amber-700 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-amber-200 flex items-center gap-1">
+                    <Zap className="w-3 h-3 fill-amber-500 text-amber-500" />
+                    VELOCITY
+                  </span>
+                )}
+              </div>
+              <span className="text-sm text-indigo-600 font-mono font-medium">{currentCreator.handle || 'No handle set'}</span>
+              {currentCreator.bio && (
+                <p className="text-sm text-zinc-500 leading-relaxed mt-1 max-w-xl">{currentCreator.bio}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-5 border-t border-zinc-100">
+            <div className="flex flex-col items-center text-center p-3 bg-zinc-50 rounded-xl">
+              <span className="text-xl font-black text-zinc-900 font-display">{currentCreator.followers || '0'}</span>
+              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Followers</span>
+            </div>
+            <div className="flex flex-col items-center text-center p-3 bg-zinc-50 rounded-xl">
+              <span className="text-xl font-black text-emerald-600 font-display">{currentCreator.audienceInLocality}%</span>
+              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Local Audience</span>
+            </div>
+            <div className="flex flex-col items-center text-center p-3 bg-zinc-50 rounded-xl">
+              <span className="text-xl font-black text-indigo-600 font-display">{currentCreator.niche || 'N/A'}</span>
+              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Niche</span>
+            </div>
+            <div className="flex flex-col items-center text-center p-3 bg-zinc-50 rounded-xl">
+              <span className="text-xl font-black text-zinc-900 font-display">{currentCreator.locality || 'N/A'}</span>
+              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Location</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Past Work Gallery */}
+        <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h3 className="text-lg font-display font-bold text-zinc-900">Portfolio & Past Work</h3>
+              <p className="text-xs text-zinc-500 mt-0.5">Previous brand collaborations and content samples.</p>
+            </div>
+            <span className="text-[11px] font-mono text-zinc-400 bg-zinc-50 px-2.5 py-1 rounded-full border border-zinc-100">
+              {currentCreator.pastWork?.length || 0} items
+            </span>
+          </div>
+
+          {currentCreator.pastWork && currentCreator.pastWork.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {currentCreator.pastWork.map((work, idx) => (
+                <div key={idx} className="group relative overflow-hidden rounded-xl border border-zinc-200/80 bg-zinc-50 aspect-square">
+                  <img
+                    src={work.imgUrl}
+                    alt={`${work.brand} - ${work.type}`}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(work.brand)}&background=f1f5f9&color=6366f1&size=300`;
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                    <span className="text-sm font-bold text-white">{work.brand}</span>
+                    <span className="text-[11px] text-zinc-300 font-mono uppercase">{work.type}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-16 px-4 bg-zinc-50/50 rounded-xl border border-dashed border-zinc-200">
+              <Briefcase className="w-10 h-10 text-zinc-300 mb-3" />
+              <h4 className="text-base font-display font-bold text-zinc-600">No portfolio items yet</h4>
+              <p className="text-sm text-zinc-400 text-center max-w-sm mt-2">
+                Complete your first campaign to build your portfolio. Past work will appear here automatically.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Reviews Section */}
+        <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm">
+          <h3 className="text-lg font-display font-bold text-zinc-900 mb-4">Brand Reviews</h3>
+          <ReviewsCard userId={currentCreator.id} label="Reviews from brands" />
         </div>
       </div>
     );

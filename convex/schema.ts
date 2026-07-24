@@ -105,6 +105,7 @@ export default defineSchema({
     creatorUserId: v.id("users"),
     status: v.union(
       v.literal("pending"),
+      v.literal("brand_review"),
       v.literal("accepted"),
       v.literal("declined"),
       v.literal("expired")

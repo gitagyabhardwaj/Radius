@@ -6,6 +6,7 @@ type ActivityEvent = {
   type:
     | "batch_dispatched"
     | "batch_cascaded"
+    | "offer_interest_expressed"
     | "offer_accepted"
     | "offer_declined"
     | "offer_expired"
@@ -94,7 +95,13 @@ export const getForCampaign = query({
 
     for (const offer of offers) {
       const name = creatorName.get(offer.creatorUserId) || "A creator";
-      if (offer.status === "accepted" && offer.respondedAt) {
+      if (offer.status === "brand_review" && offer.respondedAt) {
+        events.push({
+          time: offer.respondedAt,
+          type: "offer_interest_expressed",
+          message: `${name} expressed interest — awaiting your approval`,
+        });
+      } else if (offer.status === "accepted" && offer.respondedAt) {
         events.push({
           time: offer.respondedAt,
           type: "offer_accepted",

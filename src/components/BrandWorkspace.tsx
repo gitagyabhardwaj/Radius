@@ -728,6 +728,11 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
         submissionDeadlineDays,
         
         durationHours,
+        createdAt: Date.now(),
+        status: 'active',
+        escrowStatus: 'locked',
+        activeBatchIndex: 0,
+        batches: [],
       });
     } catch (err: any) {
       alert("Failed to launch campaign: " + err.message);
@@ -1550,32 +1555,52 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
   }
 
   if (activeSubTab === 'analytics') {
-    const analytics = brandAnalytics || {
-      averageDispatchLatencyHours: 1.2,
-      totalEscrowSecured: activeCampaigns.reduce((sum, c) => sum + c.budget, 0),
-      geotargetedDensity: (creators || CREATORS).length,
-      matchAccuracyByGrid: [
-        { grid: 'Connaught Place (Main Grid)', value: 0, percent: 'w-[0%]', color: 'bg-zinc-950' },
-        { grid: 'Gurgaon DLF CyberHub Sector', value: 0, percent: 'w-[0%]', color: 'bg-zinc-800' },
-        { grid: 'South Delhi Parks & Markets', value: 0, percent: 'w-[0%]', color: 'bg-indigo-600' },
-        { grid: 'Noida Electronic City', value: 0, percent: 'w-[0%]', color: 'bg-zinc-500' },
-      ],
-    };
+    const allCampaigns = activeCampaigns || [];
+    const totalCampaigns = allCampaigns.length;
+    const totalEscrow = allCampaigns.reduce((sum, c) => sum + c.budget, 0);
 
-    // Give default colors to boosts
-    const colors = ['bg-zinc-950', 'bg-zinc-800', 'bg-indigo-600', 'bg-zinc-500'];
-    const accuracyStats = analytics.matchAccuracyByGrid && analytics.matchAccuracyByGrid.length > 0 
-      ? analytics.matchAccuracyByGrid.map((b: any, i: number) => ({ ...b, color: colors[i % colors.length] }))
-      : analytics.matchAccuracyByGrid || [];
+    // Calculate dynamic PPV based on real budget and an estimated 10k views per spot
+    const totalExpectedViews = allCampaigns.reduce((sum, c) => sum + (c.spotsTotal * 10000), 0);
+    const avgPpv = totalExpectedViews > 0 ? (totalEscrow / totalExpectedViews).toFixed(2) : "0.00";
+
+    const realPastCampaigns = allCampaigns.map(c => {
+      const views = c.spotsTotal * 10000;
+      const ppv = views > 0 ? (c.budget / views).toFixed(2) : "0.00";
+      return {
+        id: c._id,
+        title: c.title,
+        ppv: ppv,
+        views: views,
+        date: new Date(c._creationTime).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+      };
+    }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    const brandCampaignIds = allCampaigns.map(c => c._id);
+    const frequentCreators = (creators || CREATORS)
+      .map((creator: any) => {
+        const overlap = (creator.acceptedCampaignIds || []).filter((id: string) => brandCampaignIds.includes(id)).length;
+        return { ...creator, overlap };
+      })
+      .filter((c: any) => c.overlap > 0)
+      .sort((a: any, b: any) => b.overlap - a.overlap)
+      .slice(0, 5);
+
+    const analytics = {
+      campaignsLaunched: totalCampaigns,
+      totalEscrowSecured: totalEscrow,
+      averagePayPerView: avgPpv,
+      pastCampaigns: realPastCampaigns,
+      ...((brandAnalytics as any) || {}),
+    };
 
     return (
       <div className="flex flex-col gap-6">
         {/* Quick Insights Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-2">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">Delhi-NCR Dispatch Latency</span>
-            <span className="text-3xl font-display font-black text-zinc-950">{analytics.averageDispatchLatencyHours} Hours</span>
-            <p className="text-xs text-zinc-400">Average time to unlock localized escrow release across all grids.</p>
+            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">Campaigns Launched</span>
+            <span className="text-3xl font-display font-black text-zinc-950">{analytics.campaignsLaunched} Total</span>
+            <p className="text-xs text-zinc-400">Total localized flash activations currently deployed.</p>
           </div>
           <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-2">
             <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">Total Escrow Funds Secured</span>
@@ -1583,59 +1608,76 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             <p className="text-xs text-zinc-400">100% cryptographic protection active for campaign matching.</p>
           </div>
           <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-2">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">Geotargeted Density</span>
-            <span className="text-3xl font-display font-black text-indigo-600">{analytics.geotargetedDensity} Active</span>
-            <p className="text-xs text-zinc-400">Partners online with verified locations in matched regions.</p>
+            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">Average Pay Per View</span>
+            <span className="text-3xl font-display font-black text-indigo-600">₹{analytics.averagePayPerView}</span>
+            <p className="text-xs text-zinc-400">Overall cost efficiency based on historic campaign performance.</p>
           </div>
         </div>
 
         {/* Chart + Roster Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Chart Card */}
+          {/* Past Campaigns */}
           <div className="lg:col-span-7 bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-6">
             <div>
-              <h3 className="text-base font-display font-semibold text-zinc-900">Profile Geo-Match Accuracy</h3>
-              <p className="text-xs text-zinc-500 mt-0.5">Average proximity of creator profiles to campaign geofences by grid.</p>
+              <h3 className="text-base font-display font-semibold text-zinc-900">Past Campaigns</h3>
+              <p className="text-xs text-zinc-500 mt-0.5">Historical pay per view and performance metrics.</p>
             </div>
 
-            <div className="flex flex-col gap-4">
-              {accuracyStats.map((bar: any, i: number) => (
-                <div key={i} className="flex flex-col gap-1.5">
-                  <div className="flex justify-between text-sm font-medium">
-                    <span className="text-zinc-700 font-mono text-xs">{bar.grid}</span>
-                    <span className="text-zinc-900 font-bold">{bar.value}% accuracy</span>
-                  </div>
-                  <div className="w-full bg-zinc-100 rounded-md h-5 overflow-hidden border border-zinc-200/30">
-                    <div className={`${bar.color} ${bar.percent} h-full rounded-r-sm transition-all duration-1000`} />
-                  </div>
+            <div className="flex flex-col gap-4 max-h-[400px] overflow-y-auto pr-2 font-sans">
+              {analytics.pastCampaigns.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-10 text-center bg-zinc-50 rounded-xl border border-dashed border-zinc-200">
+                  <span className="text-sm font-medium text-zinc-500 mb-1">No Past Campaigns</span>
+                  <span className="text-[11px] text-zinc-400">Launch a new campaign to see performance metrics.</span>
                 </div>
-              ))}
-            </div>
-            <div className="text-[11px] font-mono text-zinc-400 leading-normal border-t border-zinc-100 pt-4">
-              * Based on physical GPS check-ins matched within the geofence boundaries.
+              ) : (
+                analytics.pastCampaigns.map((camp: any) => (
+                  <div key={camp.id} className="p-4 border border-zinc-150 rounded-xl flex items-center justify-between hover:bg-zinc-50 transition-colors">
+                    <div className="flex flex-col">
+                      <span className="text-base font-bold text-zinc-800">{camp.title}</span>
+                      <span className="text-xs text-zinc-400 font-mono mt-1">{camp.date} • {(camp.views / 1000).toFixed(1)}k views</span>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <span className="text-[10px] text-zinc-400 font-mono uppercase tracking-wider mb-1">PPV</span>
+                      <span className="text-sm font-mono font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">
+                        ₹{camp.ppv}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
-          {/* Matches Roster */}
+          {/* Frequent Creators */}
           <div className="lg:col-span-5 bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-4">
             <div>
-              <h3 className="text-base font-display font-semibold text-zinc-900">Local Verified Roster</h3>
-              <p className="text-xs text-zinc-500 mt-0.5">Physical representatives available in current active radius.</p>
+              <h3 className="text-base font-display font-semibold text-zinc-900">Frequent Creators</h3>
+              <p className="text-xs text-zinc-500 mt-0.5">Top-performing partners in your network.</p>
             </div>
 
-            <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-1 font-sans">
-              {(creators || CREATORS).map((creator) => (
-                <div key={creator.id} className="p-3 border border-zinc-150 rounded-xl flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <img src={creator.avatar} alt={creator.name} className="w-8 h-8 rounded-full object-cover border border-zinc-100 referrerPolicy='no-referrer'" />
-                    <div className="flex flex-col">
-                      <span className="text-sm font-bold text-zinc-800">{creator.name}</span>
-                      <span className="text-[11px] text-zinc-400 font-mono">{creator.locality}</span>
+            <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto pr-1 font-sans">
+              {frequentCreators.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-10 text-center bg-zinc-50 rounded-xl border border-dashed border-zinc-200">
+                  <span className="text-sm font-medium text-zinc-500 mb-1">No Frequent Creators</span>
+                  <span className="text-[11px] text-zinc-400">Launch campaigns to build your network.</span>
+                </div>
+              ) : (
+                frequentCreators.map((creator: any) => (
+                  <div key={creator.id || creator._id} className="p-3 border border-zinc-150 rounded-xl flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <img src={creator.avatar || creator.avatarUrl} alt={creator.name} className="w-8 h-8 rounded-full object-cover border border-zinc-100 referrerPolicy='no-referrer'" />
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-zinc-800">{creator.name}</span>
+                        <span className="text-[11px] text-zinc-400 font-mono">{creator.locality}</span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <span className="text-[10px] text-zinc-400 font-mono uppercase tracking-wider mb-0.5">Worked on</span>
+                      <span className="text-sm font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">{creator.overlap} {creator.overlap === 1 ? 'camp' : 'camps'}</span>
                     </div>
                   </div>
-                  <span className="text-sm font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">{creator.followers}</span>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>

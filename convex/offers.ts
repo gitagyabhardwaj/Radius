@@ -1,5 +1,26 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { internal } from "./_generated/api";
+
+async function checkBatchExhaustion(ctx: any, campaignId: any, batchId: any) {
+  const campaign = await ctx.db.get(campaignId);
+  if (!campaign || campaign.spotsFilled >= campaign.spotsTotal) return;
+
+  const offers = await ctx.db
+    .query("campaignOffers")
+    .withIndex("by_batch", (q: any) => q.eq("batchId", batchId))
+    .collect();
+
+  // If there are no pending or brand_review offers left, the batch is exhausted
+  const hasActiveOffers = offers.some((o: any) => o.status === "pending" || o.status === "brand_review");
+  
+  if (!hasActiveOffers) {
+    await ctx.scheduler.runAfter(0, internal.batches.checkAndCascade, {
+      campaignId,
+      immediate: true,
+    });
+  }
+}
 
 /**
  * Get all offers for the currently authenticated creator,
@@ -138,6 +159,8 @@ export const brandApprove = mutation({
       if (batch && batch.status === "dispatched") {
         await ctx.db.patch(offer.batchId, { status: "completed" });
       }
+    } else {
+      await checkBatchExhaustion(ctx, offer.campaignId, offer.batchId);
     }
 
     return args.offerId;
@@ -180,6 +203,8 @@ export const brandReject = mutation({
       respondedAt: Date.now(),
     });
 
+    await checkBatchExhaustion(ctx, offer.campaignId, offer.batchId);
+
     return args.offerId;
   },
 });
@@ -215,6 +240,8 @@ export const decline = mutation({
       status: "declined",
       respondedAt: Date.now(),
     });
+
+    await checkBatchExhaustion(ctx, offer.campaignId, offer.batchId);
 
     return args.offerId;
   },

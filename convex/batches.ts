@@ -57,7 +57,10 @@ export const dispatchBatch = internalMutation({
  * If the active batch has timed out (not enough accepts), cascade to next batch.
  */
 export const checkAndCascade = internalMutation({
-  args: { campaignId: v.id("campaigns") },
+  args: { 
+    campaignId: v.id("campaigns"),
+    immediate: v.optional(v.boolean()),
+  },
   handler: async (ctx, args) => {
     const campaign = await ctx.db.get(args.campaignId);
     if (!campaign) return;
@@ -80,17 +83,19 @@ export const checkAndCascade = internalMutation({
     const activeBatch = batches.find((b) => b.status === "dispatched");
     if (!activeBatch) return;
 
-    // Check if the cascade window has elapsed
-    const elapsed = Date.now() - (activeBatch.dispatchedAt ?? 0);
-    if (elapsed < activeBatch.cascadeAfterMs) {
-      // Not yet time — reschedule
-      const remaining = activeBatch.cascadeAfterMs - elapsed;
-      await ctx.scheduler.runAfter(
-        remaining,
-        internal.batches.checkAndCascade,
-        { campaignId: args.campaignId }
-      );
-      return;
+    // Check if the cascade window has elapsed (unless forced immediately)
+    if (!args.immediate) {
+      const elapsed = Date.now() - (activeBatch.dispatchedAt ?? 0);
+      if (elapsed < activeBatch.cascadeAfterMs) {
+        // Not yet time — reschedule
+        const remaining = activeBatch.cascadeAfterMs - elapsed;
+        await ctx.scheduler.runAfter(
+          remaining,
+          internal.batches.checkAndCascade,
+          { campaignId: args.campaignId }
+        );
+        return;
+      }
     }
 
     // Expire any pending offers in the current batch

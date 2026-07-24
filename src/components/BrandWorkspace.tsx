@@ -583,18 +583,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
     });
   };
 
-  // Handle Dummy Escrow Deposit
-  const handleDeposit = async (amountRequired: number) => {
-    setIsDepositing(true);
-    try {
-      await creditEscrow({ amount: amountRequired });
-    } catch (err: any) {
-      console.error('Failed to Dummy deposit:', err);
-      alert('Failed to deposit: ' + (err.message || err.toString()));
-    } finally {
-      setIsDepositing(false);
-    }
-  };
+  // Deposit handled automatically by backend now
 
   const currentMatches = matchingCreators();
 
@@ -1129,51 +1118,27 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
           </div>
 
           {/* Action Buttons */}
-          {(currentUser?.escrowBalance || 0) < budget ? (
-            <button
-              onClick={() => handleDeposit(budget - (currentUser?.escrowBalance || 0))}
-              disabled={isDepositing}
-              className={`w-full py-3 px-4 rounded-xl font-display font-medium text-base flex items-center justify-center gap-2 transition-all ${
-                isDepositing
-                  ? 'bg-indigo-100 text-indigo-400 cursor-not-allowed border border-indigo-200'
-                  : 'bg-indigo-600 text-white hover:bg-indigo-500 active:scale-[0.98] cursor-pointer shadow-md shadow-indigo-200/50'
-              }`}
-            >
-              {isDepositing ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/25 border-t-white rounded-full animate-spin" />
-                  <span>Processing Deposit...</span>
-                </>
-              ) : (
-                <>
-                  <DollarSign className="w-4 h-4 fill-current" />
-                  <span>Deposit ₹{budget - (currentUser?.escrowBalance || 0)} to Escrow Account</span>
-                </>
-              )}
-            </button>
-          ) : (
-            <button
-              onClick={handleLaunchCampaign}
-              disabled={isActivating}
-              className={`w-full py-3 px-4 rounded-xl font-display font-medium text-base flex items-center justify-center gap-2 transition-all ${
-                isActivating
-                  ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200'
-                  : 'bg-zinc-950 text-white hover:bg-zinc-900 active:scale-[0.98] cursor-pointer shadow-md shadow-zinc-200'
-              }`}
-            >
-              {isActivating ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/25 border-t-white rounded-full animate-spin" />
-                  <span>Locking Budget & Dispersing Batches...</span>
-                </>
-              ) : (
-                <>
-                  <Play className="w-4 h-4 fill-current" />
-                  <span>Lock ₹{budget} in Escrow & Launch Campaign</span>
-                </>
-              )}
-            </button>
-          )}
+          <button
+            onClick={handleLaunchCampaign}
+            disabled={isActivating}
+            className={`w-full py-3 px-4 rounded-xl font-display font-medium text-base flex items-center justify-center gap-2 transition-all ${
+              isActivating
+                ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200'
+                : 'bg-zinc-950 text-white hover:bg-zinc-900 active:scale-[0.98] cursor-pointer shadow-md shadow-zinc-200'
+            }`}
+          >
+            {isActivating ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/25 border-t-white rounded-full animate-spin" />
+                <span>Locking Budget & Dispersing Batches...</span>
+              </>
+            ) : (
+              <>
+                <Play className="w-4 h-4 fill-current" />
+                <span>Lock ₹{budget} in Escrow & Launch Campaign</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
     );

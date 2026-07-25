@@ -254,6 +254,7 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
   const brandApprove = useMutation(api.offers.brandApprove);
   const brandReject = useMutation(api.offers.brandReject);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [selectedProfileCreator, setSelectedProfileCreator] = useState<any>(null);
 
   if (!campaignOffers || campaignOffers.length === 0) return null;
 
@@ -324,6 +325,13 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <button
+                    onClick={() => setSelectedProfileCreator(creator)}
+                    className="py-1.5 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    View Profile
+                  </button>
+                  <button
                     onClick={async () => {
                       setBusyId(offer._id);
                       try { await brandApprove({ offerId: offer._id }); } catch (err) { console.error('Approve failed:', err); }
@@ -366,7 +374,7 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
               const creator = offer.creator;
               if (!creator) return null;
               return (
-                <div key={offer._id} className="flex items-center gap-2 bg-emerald-50/50 border border-emerald-100 rounded-lg px-3 py-1.5">
+                <div key={offer._id} className="flex items-center gap-2 bg-emerald-50/50 border border-emerald-100 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-emerald-100/50 transition-colors" onClick={() => setSelectedProfileCreator(creator)}>
                   <img
                     src={creator.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=random`}
                     alt={creator.name}
@@ -381,6 +389,124 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
           </div>
         </div>
       )}
+
+      {/* Creator Profile Modal */}
+      <AnimatePresence>
+        {selectedProfileCreator && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/40 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white w-full max-w-3xl max-h-[90vh] rounded-2xl shadow-xl flex flex-col overflow-hidden"
+            >
+              <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 bg-zinc-50">
+                <h3 className="text-lg font-bold text-zinc-900">Creator Profile</h3>
+                <button
+                  onClick={() => setSelectedProfileCreator(null)}
+                  className="p-2 text-zinc-400 hover:text-zinc-600 bg-white rounded-full shadow-sm border border-zinc-200 transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-6 overflow-y-auto flex flex-col gap-6">
+                <div className="flex flex-col md:flex-row gap-6 items-start">
+                  <img
+                    src={selectedProfileCreator.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedProfileCreator.name)}&background=random`}
+                    alt={selectedProfileCreator.name}
+                    className="w-24 h-24 rounded-full object-cover border-4 border-zinc-100 shadow-sm"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="flex flex-col gap-2 flex-1 min-w-0">
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-2xl font-black text-zinc-900">{selectedProfileCreator.name}</h2>
+                      {selectedProfileCreator.velocityTier === 'Velocity' && (
+                        <span className="text-[10px] font-mono bg-amber-100 text-amber-700 px-2 py-0.5 rounded border border-amber-200 font-bold tracking-wider">VELOCITY CREATOR</span>
+                      )}
+                    </div>
+                    <span className="text-sm text-indigo-600 font-mono font-medium">{selectedProfileCreator.handle || 'No handle'}</span>
+                    
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-500 mt-1">
+                      <div className="flex items-center gap-1.5"><Users className="w-4 h-4" />{selectedProfileCreator.followers || '0'} followers</div>
+                      <div className="flex items-center gap-1.5"><MapPin className="w-4 h-4" />{selectedProfileCreator.locality || 'Unknown location'}</div>
+                      <div className="flex items-center gap-1.5"><Briefcase className="w-4 h-4" />{selectedProfileCreator.niche || 'No niche'}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="flex flex-col gap-1.5 p-4 bg-zinc-50 rounded-xl border border-zinc-100">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-bold">Match Score</span>
+                    <span className="text-2xl font-black text-indigo-600">{selectedProfileCreator.matchScore || 90}%</span>
+                  </div>
+                  <div className="flex flex-col gap-1.5 p-4 bg-zinc-50 rounded-xl border border-zinc-100">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-bold">Local Audience</span>
+                    <span className="text-2xl font-black text-emerald-600">{selectedProfileCreator.audienceInLocality || 75}%</span>
+                  </div>
+                  <div className="flex flex-col gap-1.5 p-4 bg-zinc-50 rounded-xl border border-zinc-100">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-bold">Avg Response</span>
+                    <span className="text-2xl font-black text-zinc-800">{selectedProfileCreator.latencyHours || 2}h</span>
+                  </div>
+                  <div className="flex flex-col gap-1.5 p-4 bg-zinc-50 rounded-xl border border-zinc-100">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-bold">Collabs</span>
+                    <span className="text-2xl font-black text-zinc-800">{selectedProfileCreator.acceptedCampaignIds?.length || 0}</span>
+                  </div>
+                </div>
+
+                {selectedProfileCreator.bio && (
+                  <div className="flex flex-col gap-2">
+                    <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold">About</span>
+                    <p className="text-sm text-zinc-700 leading-relaxed bg-zinc-50/50 p-4 rounded-xl border border-zinc-100 whitespace-pre-wrap">
+                      {selectedProfileCreator.bio}
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-3">
+                  <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold">Portfolio & Past Work</span>
+                  {selectedProfileCreator.pastWork && selectedProfileCreator.pastWork.length > 0 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {selectedProfileCreator.pastWork.map((work: any, idx: number) => (
+                        <div key={idx} className="flex flex-col group overflow-hidden rounded-xl border border-zinc-200 bg-white hover:border-indigo-300 hover:shadow-md transition-all">
+                          <div className="w-full h-40 overflow-hidden bg-zinc-100">
+                            <img
+                              src={work.imgUrl}
+                              alt={work.brand}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(work.brand)}&background=f1f5f9&color=6366f1&size=200`;
+                              }}
+                            />
+                          </div>
+                          <div className="p-3 flex flex-col">
+                            <span className="text-sm font-bold text-zinc-900 truncate">{work.brand}</span>
+                            <span className="text-[11px] text-zinc-500 font-mono uppercase mt-0.5 truncate">{work.type}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-8 border-2 border-dashed border-zinc-100 rounded-xl bg-zinc-50 flex flex-col items-center justify-center text-center">
+                      <Briefcase className="w-8 h-8 text-zinc-300 mb-2" />
+                      <span className="text-sm font-bold text-zinc-600">No Portfolio Yet</span>
+                      <span className="text-xs text-zinc-500 max-w-xs mt-1">This creator hasn't uploaded any past work examples.</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <ReviewsCard userId={selectedProfileCreator._id} label="Creator Reviews" dark={false} />
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

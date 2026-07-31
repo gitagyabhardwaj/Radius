@@ -1693,15 +1693,15 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
       const views = c.spotsTotal * 10000;
       const ppv = views > 0 ? (c.budget / views).toFixed(2) : "0.00";
       return {
-        id: c._id,
+        id: (c as any)._id || c.id,
         title: c.title,
         ppv: ppv,
         views: views,
-        date: new Date(c._creationTime).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+        date: new Date((c as any)._creationTime || c.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
       };
     }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-    const brandCampaignIds = allCampaigns.map(c => c._id);
+    const brandCampaignIds = allCampaigns.map(c => (c as any)._id || c.id);
     const frequentCreators = (creators || CREATORS)
       .map((creator: any) => {
         const overlap = (creator.acceptedCampaignIds || []).filter((id: string) => brandCampaignIds.includes(id)).length;

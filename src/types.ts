@@ -34,6 +34,8 @@ export interface Batch {
 
 export interface Campaign {
   id: string;
+  _id?: string;
+  _creationTime?: number;
   title: string;
   brandName: string;
   niche: string;

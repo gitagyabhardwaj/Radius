@@ -18,17 +18,17 @@ const ICONS: Record<string, React.ElementType> = {
 };
 
 const COLORS: Record<string, string> = {
-  batch_dispatched: 'text-indigo-500 bg-indigo-50 border-indigo-100',
-  batch_cascaded: 'text-amber-600 bg-amber-50 border-amber-100',
-  offer_accepted: 'text-emerald-600 bg-emerald-50 border-emerald-100',
-  offer_declined: 'text-zinc-500 bg-zinc-100 border-zinc-200',
-  offer_expired: 'text-zinc-500 bg-zinc-100 border-zinc-200',
-  submission_uploaded: 'text-indigo-500 bg-indigo-50 border-indigo-100',
-  submission_approved: 'text-emerald-600 bg-emerald-50 border-emerald-100',
-  submission_rejected: 'text-rose-600 bg-rose-50 border-rose-100',
-  escrow_locked: 'text-zinc-600 bg-zinc-100 border-zinc-200',
-  escrow_released: 'text-emerald-600 bg-emerald-50 border-emerald-100',
-  escrow_refunded: 'text-amber-600 bg-amber-50 border-amber-100',
+  batch_dispatched:   'text-indigo-400 bg-[rgba(99,102,241,0.12)] border-[rgba(99,102,241,0.3)]',
+  batch_cascaded:     'text-amber-400 bg-[rgba(245,158,11,0.10)] border-[rgba(245,158,11,0.3)]',
+  offer_accepted:     'text-emerald-400 bg-[rgba(16,185,129,0.12)] border-[rgba(16,185,129,0.3)]',
+  offer_declined:     'text-zinc-500 bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.08)]',
+  offer_expired:      'text-zinc-500 bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.08)]',
+  submission_uploaded:'text-indigo-400 bg-[rgba(99,102,241,0.12)] border-[rgba(99,102,241,0.3)]',
+  submission_approved:'text-emerald-400 bg-[rgba(16,185,129,0.12)] border-[rgba(16,185,129,0.3)]',
+  submission_rejected:'text-rose-400 bg-[rgba(239,68,68,0.10)] border-[rgba(239,68,68,0.25)]',
+  escrow_locked:      'text-zinc-400 bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.08)]',
+  escrow_released:    'text-emerald-400 bg-[rgba(16,185,129,0.12)] border-[rgba(16,185,129,0.3)]',
+  escrow_refunded:    'text-amber-400 bg-[rgba(245,158,11,0.10)] border-[rgba(245,158,11,0.3)]',
 };
 
 function timeAgo(ts: number, now: number): string {
@@ -67,12 +67,9 @@ export default function DispatchFeed({ campaignId }: { campaignId: string }) {
   if (!events || events.length === 0) return null;
 
   return (
-    <div className="mt-2 pt-5 border-t border-zinc-100 flex flex-col gap-3">
-      <span className="text-[11px] font-mono uppercase tracking-wide text-zinc-400 font-bold flex items-center gap-1.5">
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-        </span>
+    <div className="mt-2 pt-5 border-t border-[rgba(255,255,255,0.07)] flex flex-col gap-3">
+      <span className="text-[11px] font-mono uppercase tracking-wide font-bold flex items-center gap-1.5" style={{ color: 'var(--color-text-tertiary)' }}>
+        <span className="live-dot" />
         Live Dispatch Feed
       </span>
 
@@ -88,7 +85,7 @@ export default function DispatchFeed({ campaignId }: { campaignId: string }) {
                 <Icon className="w-3.5 h-3.5" />
               </div>
               <div className="flex-1 min-w-0 flex items-baseline justify-between gap-2">
-                <span className="text-xs text-zinc-700 leading-snug">{ev.message}</span>
+                <span className="text-xs leading-snug" style={{ color: 'var(--color-text-secondary)' }}>{ev.message}</span>
                 <span className="text-[10px] text-zinc-400 font-mono whitespace-nowrap shrink-0">
                   {timeAgo(ev.time, now)}
                 </span>

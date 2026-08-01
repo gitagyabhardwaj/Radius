@@ -55,6 +55,28 @@ interface BrandWorkspaceProps {
   creators?: Creator[];
 }
 
+function useCountUp(target: number, duration: number = 1200) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (target === 0) return;
+    const start = Date.now();
+    const tick = () => {
+      const elapsed = Date.now() - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(target * eased));
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [target, duration]);
+  return count;
+}
+
+function AnimatedNumber({ value, prefix = '', suffix = '' }: { value: number, prefix?: string, suffix?: string }) {
+  const count = useCountUp(value);
+  return <>{prefix}{count}{suffix}</>;
+}
+
 function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
   const submissions = useQuery(api.submissions.getByCampaign, { campaignId: campaignId as any });
   const startDraftReview = useMutation(api.submissions.startDraftReview);
@@ -70,8 +92,8 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
   const isVideo = (url?: string | null) => !!url && /\.(mp4|mov|webm)(\?|$)/i.test(url);
 
   return (
-    <div className="mt-2 pt-5 border-t border-zinc-100 flex flex-col gap-3">
-      <span className="text-[11px] font-mono uppercase tracking-wide text-zinc-400 font-bold">
+    <div className="mt-2 pt-5 border-t border-[rgba(255,255,255,0.08)] flex flex-col gap-3">
+      <span className="text-[11px] font-mono uppercase tracking-wide text-zinc-500 font-bold">
         Deliverables To Review ({submissions.length})
       </span>
 
@@ -79,9 +101,9 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
         {submissions.map((sub: any) => (
           <div
             key={sub._id}
-            className="border border-zinc-150 rounded-xl p-4 flex flex-col md:flex-row gap-4 items-start bg-zinc-50/40"
+            className="border border-[rgba(255,255,255,0.08)] rounded-xl p-4 flex flex-col md:flex-row gap-4 items-start" style={{ background: 'rgba(255,255,255,0.02)' }}
           >
-            <div className="w-20 h-20 rounded-lg overflow-hidden border border-zinc-200/70 shrink-0 bg-zinc-100 flex items-center justify-center">
+            <div className="w-20 h-20 rounded-lg overflow-hidden border border-zinc-200/70 shrink-0 flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
               {sub.fileUrl ? (
                 isVideo(sub.fileUrl) ? (
                   <video src={sub.fileUrl} className="w-full h-full object-cover" muted />
@@ -95,14 +117,14 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
 
             <div className="flex-1 flex flex-col gap-1.5 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm font-bold text-zinc-800">{sub.creator?.name || 'Creator'}</span>
+                <span className="text-sm font-bold text-zinc-100">{sub.creator?.name || 'Creator'}</span>
                 <span
                   className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded border ${
                     sub.status === 'approved' || sub.status === 'draft_approved'
-                      ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                      ? 'bg-[rgba(16,185,129,0.08)] border-[rgba(16,185,129,0.3)] text-emerald-400'
                       : sub.status === 'rejected' || sub.status === 'draft_rejected'
-                      ? 'bg-rose-50 border-rose-200 text-rose-700'
-                      : 'bg-indigo-50 border-indigo-150 text-indigo-700'
+                      ? 'bg-[rgba(239,68,68,0.08)] border-[rgba(239,68,68,0.2)] text-rose-400'
+                      : 'bg-[rgba(99,102,241,0.08)] border-[rgba(99,102,241,0.2)] text-indigo-400'
                   }`}
                 >
                   {sub.status === 'draft_uploaded' ? 'Draft Awaiting Review' : 
@@ -120,7 +142,7 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
                   href={sub.contentUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-xs text-indigo-600 hover:underline flex items-center gap-1 w-max"
+                  className="text-xs text-indigo-400 hover:underline flex items-center gap-1 w-max"
                 >
                   <ExternalLink className="w-3 h-3" />
                   Open live post
@@ -132,7 +154,7 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
                   href={sub.fileUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-xs text-indigo-600 hover:underline flex items-center gap-1 w-max"
+                  className="text-xs text-indigo-400 hover:underline flex items-center gap-1 w-max"
                 >
                   <ExternalLink className="w-3 h-3" />
                   Open full-size upload
@@ -140,7 +162,7 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
               )}
 
               {sub.rejectionReason && (
-                <span className="text-[11px] text-rose-500">Reason: {sub.rejectionReason}</span>
+                <span className="text-[11px] text-rose-400">Reason: {sub.rejectionReason}</span>
               )}
 
               {sub.status === 'approved' && (
@@ -169,7 +191,7 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
                     }
                   }}
                   disabled={busyId === sub._id}
-                  className="py-1.5 px-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                  className="py-1.5 px-3 btn-primary disabled:opacity-50 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <Check className="w-3.5 h-3.5" />
                   Approve Draft
@@ -188,7 +210,7 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
                     }
                   }}
                   disabled={busyId === sub._id}
-                  className="py-1.5 px-3 bg-white hover:bg-zinc-50 disabled:opacity-50 border border-zinc-200 text-zinc-600 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                  className="py-1.5 px-3 bg-transparent hover:bg-[rgba(255,255,255,0.03)] disabled:opacity-50 border border-[rgba(255,255,255,0.08)] text-zinc-400 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <X className="w-3.5 h-3.5" />
                   Reject Draft
@@ -212,7 +234,7 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
                     }
                   }}
                   disabled={busyId === sub._id}
-                  className="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                  className="py-1.5 px-3 btn-mint disabled:opacity-50 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <Check className="w-3.5 h-3.5" />
                   Approve Final & Release
@@ -231,7 +253,7 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
                     }
                   }}
                   disabled={busyId === sub._id}
-                  className="py-1.5 px-3 bg-white hover:bg-zinc-50 disabled:opacity-50 border border-zinc-200 text-zinc-600 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                  className="py-1.5 px-3 bg-transparent hover:bg-[rgba(255,255,255,0.03)] disabled:opacity-50 border border-[rgba(255,255,255,0.08)] text-zinc-400 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <X className="w-3.5 h-3.5" />
                   Reject Final
@@ -264,11 +286,11 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
   if (pendingReview.length === 0 && accepted.length === 0) return null;
 
   return (
-    <div className="mt-2 pt-5 border-t border-zinc-100 flex flex-col gap-4">
+    <div className="mt-2 pt-5 border-t border-[rgba(255,255,255,0.08)] flex flex-col gap-4">
       {/* Pending Creator Applications */}
       {pendingReview.length > 0 && (
         <div className="flex flex-col gap-3">
-          <span className="text-[11px] font-mono uppercase tracking-wide text-amber-600 font-bold flex items-center gap-1.5">
+          <span className="text-[11px] font-mono uppercase tracking-wide text-amber-400 font-bold flex items-center gap-1.5">
             <UserPlus className="w-3.5 h-3.5" />
             Creator Applications ({pendingReview.length})
           </span>
@@ -276,7 +298,7 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
             const creator = offer.creator;
             if (!creator) return null;
             return (
-              <div key={offer._id} className="border border-amber-100 bg-amber-50/30 rounded-xl p-4 flex flex-col md:flex-row gap-4 items-start">
+              <div key={offer._id} className="border border-[rgba(245,158,11,0.2)] rounded-xl p-4 flex flex-col md:flex-row gap-4 items-start" style={{ background: 'rgba(245,158,11,0.08)' }}>
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <img
                     src={creator.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=random`}
@@ -286,12 +308,12 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                   />
                   <div className="flex flex-col gap-0.5 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-zinc-800">{creator.name}</span>
+                      <span className="text-sm font-bold text-zinc-100">{creator.name}</span>
                       {creator.velocityTier === 'Velocity' && (
-                        <span className="text-[9px] font-mono bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded border border-amber-200 font-bold">VELOCITY</span>
+                        <span className="text-[9px] font-mono bg-[rgba(245,158,11,0.1)] text-amber-400 px-1.5 py-0.5 rounded border border-[rgba(245,158,11,0.2)] font-bold">VELOCITY</span>
                       )}
                     </div>
-                    <span className="text-[11px] text-indigo-600 font-mono">{creator.handle || 'No handle'}</span>
+                    <span className="text-[11px] text-indigo-400 font-mono">{creator.handle || 'No handle'}</span>
                     <div className="flex items-center gap-3 text-[11px] text-zinc-500 mt-0.5">
                       <span>{creator.followers || '0'} followers</span>
                       <span>•</span>
@@ -300,7 +322,7 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                       <span>{creator.locality || 'Unknown location'}</span>
                     </div>
                     {creator.bio && (
-                      <p className="text-[11px] text-zinc-400 mt-1 line-clamp-2">{creator.bio}</p>
+                      <p className="text-[11px] text-zinc-500 mt-1 line-clamp-2">{creator.bio}</p>
                     )}
                     {/* Past work preview */}
                     {creator.pastWork && creator.pastWork.length > 0 && (
@@ -310,14 +332,14 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                             key={idx}
                             src={work.imgUrl}
                             alt={work.brand}
-                            className="w-8 h-8 rounded object-cover border border-zinc-200/80"
+                            className="w-8 h-8 rounded object-cover border border-[rgba(255,255,255,0.08)]"
                             onError={(e) => {
                               (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(work.brand)}&background=f1f5f9&color=6366f1&size=32`;
                             }}
                           />
                         ))}
                         {creator.pastWork.length > 3 && (
-                          <span className="text-[9px] font-mono text-zinc-400">+{creator.pastWork.length - 3}</span>
+                          <span className="text-[9px] font-mono text-zinc-500">+{creator.pastWork.length - 3}</span>
                         )}
                       </div>
                     )}
@@ -326,7 +348,7 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => setSelectedProfileCreator(creator)}
-                    className="py-1.5 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                    className="py-1.5 px-3 bg-[rgba(99,102,241,0.08)] hover:bg-[rgba(99,102,241,0.1)] text-indigo-400 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
                   >
                     <Eye className="w-3.5 h-3.5" />
                     View Profile
@@ -338,7 +360,7 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                       finally { setBusyId(null); }
                     }}
                     disabled={busyId === offer._id}
-                    className="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                    className="py-1.5 px-3 btn-mint disabled:opacity-50 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
                   >
                     <Check className="w-3.5 h-3.5" />
                     Approve
@@ -350,7 +372,7 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                       finally { setBusyId(null); }
                     }}
                     disabled={busyId === offer._id}
-                    className="py-1.5 px-3 bg-white hover:bg-zinc-50 disabled:opacity-50 border border-zinc-200 text-zinc-600 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                    className="py-1.5 px-3 bg-transparent hover:bg-[rgba(255,255,255,0.03)] disabled:opacity-50 border border-[rgba(255,255,255,0.08)] text-zinc-400 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
                   >
                     <X className="w-3.5 h-3.5" />
                     Reject
@@ -365,7 +387,7 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
       {/* Accepted Creators */}
       {accepted.length > 0 && (
         <div className="flex flex-col gap-2">
-          <span className="text-[11px] font-mono uppercase tracking-wide text-emerald-600 font-bold flex items-center gap-1.5">
+          <span className="text-[11px] font-mono uppercase tracking-wide text-emerald-400 font-bold flex items-center gap-1.5">
             <Check className="w-3.5 h-3.5" />
             Approved Creators ({accepted.length})
           </span>
@@ -374,15 +396,15 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
               const creator = offer.creator;
               if (!creator) return null;
               return (
-                <div key={offer._id} className="flex items-center gap-2 bg-emerald-50/50 border border-emerald-100 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-emerald-100/50 transition-colors" onClick={() => setSelectedProfileCreator(creator)}>
+                <div key={offer._id} className="flex items-center gap-2 border border-[rgba(16,185,129,0.2)] rounded-lg px-3 py-1.5 cursor-pointer hover:bg-[rgba(16,185,129,0.1)] transition-colors" style={{ background: 'rgba(16,185,129,0.08)' }} onClick={() => setSelectedProfileCreator(creator)}>
                   <img
                     src={creator.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=random`}
                     alt={creator.name}
                     className="w-6 h-6 rounded-full object-cover"
                     referrerPolicy="no-referrer"
                   />
-                  <span className="text-xs font-bold text-emerald-800">{creator.name}</span>
-                  <span className="text-[9px] font-mono text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded">WORKING</span>
+                  <span className="text-xs font-bold text-emerald-400">{creator.name}</span>
+                  <span className="text-[9px] font-mono text-emerald-400 bg-[rgba(16,185,129,0.1)] px-1.5 py-0.5 rounded">WORKING</span>
                 </div>
               );
             })}
@@ -397,19 +419,21 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/40 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-4"
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white w-full max-w-3xl max-h-[90vh] rounded-2xl shadow-xl flex flex-col overflow-hidden"
+              initial={{ scale: 0.93, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.93, y: 20, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              className="w-full max-w-3xl max-h-[90vh] rounded-2xl shadow-xl flex flex-col overflow-hidden"
+              style={{ background: 'var(--color-obsidian-panel)' }}
             >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 bg-zinc-50">
-                <h3 className="text-lg font-bold text-zinc-900">Creator Profile</h3>
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(255,255,255,0.08)]">
+                <h3 className="text-lg font-bold text-zinc-100">Creator Profile</h3>
                 <button
                   onClick={() => setSelectedProfileCreator(null)}
-                  className="p-2 text-zinc-400 hover:text-zinc-600 bg-white rounded-full shadow-sm border border-zinc-200 transition-colors cursor-pointer"
+                  className="p-2 text-zinc-500 hover:text-zinc-400 bg-transparent rounded-full shadow-sm border border-[rgba(255,255,255,0.1)] transition-colors cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -419,17 +443,17 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                   <img
                     src={selectedProfileCreator.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedProfileCreator.name)}&background=random`}
                     alt={selectedProfileCreator.name}
-                    className="w-24 h-24 rounded-full object-cover border-4 border-zinc-100 shadow-sm"
+                    className="w-24 h-24 rounded-full object-cover border-4 border-[rgba(255,255,255,0.08)] shadow-sm"
                     referrerPolicy="no-referrer"
                   />
                   <div className="flex flex-col gap-2 flex-1 min-w-0">
                     <div className="flex items-center gap-3">
-                      <h2 className="text-2xl font-black text-zinc-900">{selectedProfileCreator.name}</h2>
+                      <h2 className="text-2xl font-black text-zinc-100">{selectedProfileCreator.name}</h2>
                       {selectedProfileCreator.velocityTier === 'Velocity' && (
-                        <span className="text-[10px] font-mono bg-amber-100 text-amber-700 px-2 py-0.5 rounded border border-amber-200 font-bold tracking-wider">VELOCITY CREATOR</span>
+                        <span className="text-[10px] font-mono bg-[rgba(245,158,11,0.1)] text-amber-400 px-2 py-0.5 rounded border border-[rgba(245,158,11,0.2)] font-bold tracking-wider">VELOCITY CREATOR</span>
                       )}
                     </div>
-                    <span className="text-sm text-indigo-600 font-mono font-medium">{selectedProfileCreator.handle || 'No handle'}</span>
+                    <span className="text-sm text-indigo-400 font-mono font-medium">{selectedProfileCreator.handle || 'No handle'}</span>
                     
                     <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-500 mt-1">
                       <div className="flex items-center gap-1.5"><Users className="w-4 h-4" />{selectedProfileCreator.followers || '0'} followers</div>
@@ -440,40 +464,40 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="flex flex-col gap-1.5 p-4 bg-zinc-50 rounded-xl border border-zinc-100">
+                  <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-[rgba(255,255,255,0.08)]" style={{ background: 'rgba(255,255,255,0.04)' }}>
                     <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-bold">Match Score</span>
-                    <span className="text-2xl font-black text-indigo-600">{selectedProfileCreator.matchScore || 90}%</span>
+                    <span className="text-2xl font-black text-indigo-400">{selectedProfileCreator.matchScore || 90}%</span>
                   </div>
-                  <div className="flex flex-col gap-1.5 p-4 bg-zinc-50 rounded-xl border border-zinc-100">
+                  <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-[rgba(255,255,255,0.08)]" style={{ background: 'rgba(255,255,255,0.04)' }}>
                     <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-bold">Local Audience</span>
-                    <span className="text-2xl font-black text-emerald-600">{selectedProfileCreator.audienceInLocality || 75}%</span>
+                    <span className="text-2xl font-black text-emerald-400">{selectedProfileCreator.audienceInLocality || 75}%</span>
                   </div>
-                  <div className="flex flex-col gap-1.5 p-4 bg-zinc-50 rounded-xl border border-zinc-100">
+                  <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-[rgba(255,255,255,0.08)]" style={{ background: 'rgba(255,255,255,0.04)' }}>
                     <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-bold">Avg Response</span>
-                    <span className="text-2xl font-black text-zinc-800">{selectedProfileCreator.latencyHours || 2}h</span>
+                    <span className="text-2xl font-black text-zinc-100">{selectedProfileCreator.latencyHours || 2}h</span>
                   </div>
-                  <div className="flex flex-col gap-1.5 p-4 bg-zinc-50 rounded-xl border border-zinc-100">
+                  <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-[rgba(255,255,255,0.08)]" style={{ background: 'rgba(255,255,255,0.04)' }}>
                     <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-bold">Collabs</span>
-                    <span className="text-2xl font-black text-zinc-800">{selectedProfileCreator.acceptedCampaignIds?.length || 0}</span>
+                    <span className="text-2xl font-black text-zinc-100">{selectedProfileCreator.acceptedCampaignIds?.length || 0}</span>
                   </div>
                 </div>
 
                 {selectedProfileCreator.bio && (
                   <div className="flex flex-col gap-2">
-                    <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold">About</span>
-                    <p className="text-sm text-zinc-700 leading-relaxed bg-zinc-50/50 p-4 rounded-xl border border-zinc-100 whitespace-pre-wrap">
+                    <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-bold">About</span>
+                    <p className="text-sm text-zinc-300 leading-relaxed glass-card-elevated p-6 whitespace-pre-wrap">
                       {selectedProfileCreator.bio}
                     </p>
                   </div>
                 )}
 
                 <div className="flex flex-col gap-3">
-                  <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold">Portfolio & Past Work</span>
+                  <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-bold">Portfolio & Past Work</span>
                   {selectedProfileCreator.pastWork && selectedProfileCreator.pastWork.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       {selectedProfileCreator.pastWork.map((work: any, idx: number) => (
-                        <div key={idx} className="flex flex-col group overflow-hidden rounded-xl border border-zinc-200 bg-white hover:border-indigo-300 hover:shadow-md transition-all">
-                          <div className="w-full h-40 overflow-hidden bg-zinc-100">
+                        <div key={idx} className="flex flex-col group overflow-hidden rounded-xl border border-[rgba(255,255,255,0.08)] bg-transparent hover:border-indigo-300 hover:shadow-md transition-all">
+                          <div className="w-full h-40 overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
                             <img
                               src={work.imgUrl}
                               alt={work.brand}
@@ -484,23 +508,23 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                             />
                           </div>
                           <div className="p-3 flex flex-col">
-                            <span className="text-sm font-bold text-zinc-900 truncate">{work.brand}</span>
+                            <span className="text-sm font-bold text-zinc-100 truncate">{work.brand}</span>
                             <span className="text-[11px] text-zinc-500 font-mono uppercase mt-0.5 truncate">{work.type}</span>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="p-8 border-2 border-dashed border-zinc-100 rounded-xl bg-zinc-50 flex flex-col items-center justify-center text-center">
+                    <div className="p-8 border-2 border-dashed border-[rgba(255,255,255,0.08)] rounded-xl flex flex-col items-center justify-center text-center" style={{ background: 'rgba(255,255,255,0.02)' }}>
                       <Briefcase className="w-8 h-8 text-zinc-300 mb-2" />
-                      <span className="text-sm font-bold text-zinc-600">No Portfolio Yet</span>
+                      <span className="text-sm font-bold text-zinc-400">No Portfolio Yet</span>
                       <span className="text-xs text-zinc-500 max-w-xs mt-1">This creator hasn't uploaded any past work examples.</span>
                     </div>
                   )}
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <ReviewsCard userId={selectedProfileCreator._id} label="Creator Reviews" dark={false} />
+                  <ReviewsCard userId={selectedProfileCreator._id} label="Creator Reviews" dark={true} />
                 </div>
               </div>
             </motion.div>
@@ -521,65 +545,65 @@ function CampaignDetailPanel({ camp }: { camp: Campaign }) {
     <div className="flex flex-col gap-2">
       <button
         onClick={() => setShowDetails(!showDetails)}
-        className="flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wide text-indigo-600 font-bold hover:text-indigo-700 transition-colors cursor-pointer w-max"
+        className="flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wide text-indigo-400 font-bold hover:text-indigo-400 transition-colors cursor-pointer w-max"
       >
         <Eye className="w-3.5 h-3.5" />
         {showDetails ? 'Hide Campaign Details' : 'View Campaign Details'}
       </button>
 
       {showDetails && (
-        <div className="border border-zinc-100 bg-zinc-50/50 rounded-xl p-4 flex flex-col gap-4 animate-fade-in">
+        <div className="border border-[rgba(255,255,255,0.08)] rounded-xl p-4 flex flex-col gap-4 animate-fade-in" style={{ background: 'rgba(255,255,255,0.03)' }}>
           {/* Deliverable / Description */}
           <div className="flex flex-col gap-1">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Deliverable</span>
-            <p className="text-sm text-zinc-700">{camp.deliverable}</p>
+            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-500 font-bold">Deliverable</span>
+            <p className="text-sm text-zinc-300">{camp.deliverable}</p>
           </div>
 
           {/* Grid of details */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {camp.contentFormat && (
-              <div className="flex flex-col gap-0.5 p-3 bg-white rounded-lg border border-zinc-100">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Format</span>
-                <span className="text-sm font-medium text-zinc-800">{camp.contentFormat}</span>
+              <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Format</span>
+                <span className="text-sm font-medium text-zinc-100">{camp.contentFormat}</span>
               </div>
             )}
             {camp.targetAudience && (
-              <div className="flex flex-col gap-0.5 p-3 bg-white rounded-lg border border-zinc-100">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Target Audience</span>
-                <span className="text-sm font-medium text-zinc-800">{camp.targetAudience}</span>
+              <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Target Audience</span>
+                <span className="text-sm font-medium text-zinc-100">{camp.targetAudience}</span>
               </div>
             )}
             {camp.submissionDeadlineDays && (
-              <div className="flex flex-col gap-0.5 p-3 bg-white rounded-lg border border-zinc-100">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Submission Deadline</span>
-                <span className="text-sm font-medium text-zinc-800">{camp.submissionDeadlineDays} days</span>
+              <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Submission Deadline</span>
+                <span className="text-sm font-medium text-zinc-100">{camp.submissionDeadlineDays} days</span>
               </div>
             )}
-            <div className="flex flex-col gap-0.5 p-3 bg-white rounded-lg border border-zinc-100">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Niche</span>
-              <span className="text-sm font-medium text-zinc-800">{camp.niche}</span>
+            <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Niche</span>
+              <span className="text-sm font-medium text-zinc-100">{camp.niche}</span>
             </div>
-            <div className="flex flex-col gap-0.5 p-3 bg-white rounded-lg border border-zinc-100">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Budget</span>
-              <span className="text-sm font-medium text-emerald-700">₹{camp.budget}</span>
+            <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Budget</span>
+              <span className="text-sm font-medium text-emerald-400">₹{camp.budget}</span>
             </div>
-            <div className="flex flex-col gap-0.5 p-3 bg-white rounded-lg border border-zinc-100">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Spots</span>
-              <span className="text-sm font-medium text-zinc-800">{camp.spotsFilled}/{camp.spotsTotal} filled</span>
+            <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Spots</span>
+              <span className="text-sm font-medium text-zinc-100">{camp.spotsFilled}/{camp.spotsTotal} filled</span>
             </div>
           </div>
 
           {/* Creative Guidelines */}
           {camp.creativeGuidelines && (
-            <div className="flex flex-col gap-1 pt-2 border-t border-zinc-100">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Creative Guidelines</span>
-              <p className="text-sm text-zinc-600 italic">"{camp.creativeGuidelines}"</p>
+            <div className="flex flex-col gap-1 pt-2 border-t border-[rgba(255,255,255,0.08)]">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-500 font-bold">Creative Guidelines</span>
+              <p className="text-sm text-zinc-400 italic">"{camp.creativeGuidelines}"</p>
             </div>
           )}
 
           {/* Location */}
-          <div className="flex items-center gap-2 pt-2 border-t border-zinc-100">
-            <MapPin className="w-3.5 h-3.5 text-zinc-400" />
+          <div className="flex items-center gap-2 pt-2 border-t border-[rgba(255,255,255,0.08)]">
+            <MapPin className="w-3.5 h-3.5 text-zinc-500" />
             <span className="text-[11px] text-zinc-500 font-mono">
               {camp.centerLocality} ({camp.centerLat.toFixed(4)}N, {camp.centerLng.toFixed(4)}E)
             </span>
@@ -867,19 +891,77 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
     }
   };
 
-  if (activeSubTab === 'profile') {
-    return (
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-fade-in">
+  const allCampaigns = activeCampaigns || [];
+  const totalCampaigns = allCampaigns.length;
+  const totalEscrow = allCampaigns.reduce((sum, c) => sum + c.budget, 0);
+
+  // Calculate dynamic PPV based on real budget and an estimated 10k views per spot
+  const totalExpectedViews = allCampaigns.reduce((sum, c) => sum + (c.spotsTotal * 10000), 0);
+  const avgPpv = totalExpectedViews > 0 ? (totalEscrow / totalExpectedViews).toFixed(2) : "0.00";
+
+  const realPastCampaigns = allCampaigns.map(c => {
+    const views = c.spotsTotal * 10000;
+    const ppv = views > 0 ? (c.budget / views).toFixed(2) : "0.00";
+    return {
+      id: c.id,
+      title: c.title,
+      ppv: ppv,
+      views: views,
+      date: new Date(c.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+    };
+  }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  const brandCampaignIds = allCampaigns.map(c => c.id);
+  const frequentCreators = (creators || CREATORS)
+    .map((creator: any) => {
+      const overlap = (creator.acceptedCampaignIds || []).filter((id: string) => brandCampaignIds.includes(id)).length;
+      return { ...creator, overlap };
+    })
+    .filter((c: any) => c.overlap > 0)
+    .sort((a: any, b: any) => b.overlap - a.overlap)
+    .slice(0, 5);
+
+  const analytics = {
+    campaignsLaunched: totalCampaigns,
+    totalEscrowSecured: totalEscrow,
+    averagePayPerView: avgPpv,
+    pastCampaigns: realPastCampaigns,
+    ...((brandAnalytics as any) || {}),
+  };
+
+  const tabOrder = ['setup', 'dispatch', 'analytics', 'profile'];
+  const [prevTab, setPrevTab] = useState(activeSubTab);
+  const [direction, setDirection] = useState(1);
+  
+  if (activeSubTab !== prevTab) {
+    setDirection(tabOrder.indexOf(activeSubTab) > tabOrder.indexOf(prevTab) ? 1 : -1);
+    setPrevTab(activeSubTab);
+  }
+
+  return (
+    <div className="relative w-full h-full">
+      <AnimatePresence mode="wait" custom={direction}>
+        <motion.div
+          key={activeSubTab}
+          custom={direction}
+          initial={{ opacity: 0, x: direction * 20, filter: 'blur(4px)' }}
+          animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+          exit={{ opacity: 0, x: direction * -20, filter: 'blur(4px)' }}
+          transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
+          className="w-full"
+        >
+          {activeSubTab === 'profile' && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Brand Profile Editor Card */}
-        <div className="lg:col-span-7 bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-6">
-          <div className="flex items-center justify-between border-b border-zinc-100 pb-4">
+        <div className="lg:col-span-7 glass-card p-6 flex flex-col gap-6">
+          <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] pb-4">
             <div>
-              <h2 className="text-xl font-display font-semibold text-zinc-900">Brand Identity & Node Settings</h2>
-              <p className="text-sm text-zinc-500 mt-0.5">
+              <h2 className="text-xl font-bold tracking-tight" style={{ color: 'var(--color-text-primary)' }}>Brand Identity & Node Settings</h2>
+              <p className="text-sm mt-0.5" style={{ color: 'var(--color-text-secondary)' }}>
                 Manage your public brand workspace details, authorized contacts, and cryptographically linked release settings.
               </p>
             </div>
-            <span className="bg-emerald-50 text-emerald-700 text-sm px-2.5 py-1 rounded-full font-semibold border border-emerald-100 flex items-center gap-1.5">
+            <span className="bg-[rgba(16,185,129,0.08)] text-emerald-400 text-sm px-2.5 py-1 rounded-full font-semibold border border-[rgba(16,185,129,0.2)] flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5" />
               Verified Node
             </span>
@@ -887,7 +969,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Brand Corporate Name</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Brand Corporate Name</label>
               <input
                 id="brand-profile-name-input"
                 type="text"
@@ -896,29 +978,29 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                   setCustomBrandName(e.target.value);
                   setBrandName(e.target.value);
                 }}
-                className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors font-medium"
+                className="input-field w-full font-medium"
                 placeholder="e.g. Blue Tokai Coffee"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Corporate Domain</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Corporate Domain</label>
               <input
                 id="brand-profile-domain-input"
                 type="text"
                 defaultValue={currentUser?.domain || ''}
-                className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
+                className="input-field w-full"
                 placeholder="e.g. brand.com"
               />
             </div>
             
             <div className="flex flex-col gap-1.5 md:col-span-2">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Brand Instagram Handle</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Brand Instagram Handle</label>
               <input
                 id="brand-profile-handle-input"
                 type="text"
                 defaultValue={currentUser?.handle || ''}
-                className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
+                className="input-field w-full"
                 placeholder="e.g. @bluetokaicoffee"
               />
             </div>
@@ -926,23 +1008,23 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Authorized Administrator Email</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Authorized Administrator Email</label>
               <input
                 id="brand-profile-email-input"
                 type="email"
                 defaultValue={currentUser?.email || ''}
                 readOnly
-                className="w-full bg-zinc-100 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-500 focus:outline-none cursor-not-allowed"
+                className="input-field w-full opacity-60 cursor-not-allowed"
                 placeholder="e.g. admin@brand.com"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Primary Market Sector</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Primary Market Sector</label>
               <select
                 id="brand-profile-sector-select"
                 defaultValue={currentUser?.sector || "Food & Lifestyle"}
-                className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
+                className="input-field w-full"
               >
                 <option value="Food & Lifestyle">Food & Lifestyle</option>
                 <option value="Fashion & Aesthetics">Fashion & Aesthetics</option>
@@ -961,38 +1043,38 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Brand Bio / Mission Statement</label>
+            <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Brand Bio / Mission Statement</label>
             <textarea
               id="brand-profile-bio-textarea"
               rows={3}
               defaultValue={currentUser?.bio || ''}
-              className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors resize-none leading-relaxed"
+              className="input-field w-full resize-none leading-relaxed"
               placeholder="Tell creators who you are..."
             />
           </div>
 
-          <div className="border-t border-zinc-100 pt-5 flex flex-col gap-4">
-            <h3 className="text-sm font-mono uppercase tracking-wider text-zinc-400 font-bold">Secure Escrow Settings</h3>
+          <div className="border-t border-[rgba(255,255,255,0.08)] pt-5 flex flex-col gap-4">
+            <h3 className="text-sm font-mono uppercase tracking-wider text-zinc-500 font-bold">Secure Escrow Settings</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium flex items-center gap-1">
-                  <span className="text-zinc-400">₹</span> Funding Escrow Wallet
+                <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium flex items-center gap-1">
+                  <span className="text-zinc-500">₹</span> Funding Escrow Wallet
                 </label>
                 <input
                   id="brand-profile-wallet-input"
                   type="text"
                   defaultValue=""
-                  className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-sm text-zinc-800 font-mono focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
+                  className="input-field w-full font-mono"
                   placeholder="0x..."
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Escrow Release Mechanism</label>
-                <div className="flex items-center justify-between p-2.5 bg-zinc-50 rounded-xl border border-zinc-200">
-                  <span className="text-sm text-zinc-600 font-medium">Manual Brand Verification</span>
-                  <span className="bg-amber-100 text-amber-800 border border-amber-200 font-mono text-[11px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Escrow Release Mechanism</label>
+                <div className="flex items-center justify-between p-2.5 rounded-xl border border-[rgba(255,255,255,0.08)]" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                  <span className="text-sm text-zinc-400 font-medium">Manual Brand Verification</span>
+                  <span className="bg-[rgba(245,158,11,0.1)] text-amber-400 border border-[rgba(245,158,11,0.2)] font-mono text-[11px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">
                     MANUAL
                   </span>
                 </div>
@@ -1000,9 +1082,9 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             </div>
           </div>
 
-          <div className="border-t border-zinc-100 pt-4 flex justify-end items-center gap-3">
+          <div className="border-t border-[rgba(255,255,255,0.08)] pt-4 flex justify-end items-center gap-3">
             {profileSaveStatus === 'saved' && (
-              <span className="text-sm text-emerald-600 font-medium animate-fade-in">Settings saved successfully!</span>
+              <span className="text-sm text-emerald-400 font-medium animate-fade-in">Settings saved successfully!</span>
             )}
             {profileSaveStatus === 'error' && (
               <span className="text-sm text-red-600 font-medium animate-fade-in">Failed to save. Try again.</span>
@@ -1034,17 +1116,34 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                   setTimeout(() => setProfileSaveStatus('idle'), 3000);
                 }
               }}
-              className="py-2.5 px-5 bg-zinc-950 hover:bg-zinc-900 text-white font-mono text-sm rounded-xl font-bold tracking-wider uppercase transition-all cursor-pointer"
+              className="py-2.5 px-5 btn-primary font-mono text-sm rounded-xl font-bold tracking-wider uppercase transition-all cursor-pointer"
             >
               {profileSaveStatus === 'saving' ? 'SAVING...' : 'SAVE SETTINGS & DEPLOY'}
             </button>
           </div>
           
-          <div className="border-t border-rose-100/50 pt-6 mt-4 flex flex-col gap-3">
-            <h3 className="text-sm font-mono uppercase tracking-wider text-rose-600 font-bold">Danger Zone</h3>
-            <div className="flex items-center justify-between bg-rose-50/50 border border-rose-100 p-4 rounded-xl">
+          <div className="border-t border-[rgba(239,68,68,0.15)] pt-6 mt-4 flex flex-col gap-3">
+            <h3 className="text-sm font-mono uppercase tracking-wider text-rose-400 font-bold">Danger Zone</h3>
+            
+            <div className="flex items-center justify-between border border-[rgba(255,255,255,0.08)] p-4 rounded-xl mb-3 hover:bg-[rgba(255,255,255,0.02)] transition-colors">
               <div className="flex flex-col">
-                <span className="text-sm font-bold text-zinc-900">Delete Account</span>
+                <span className="text-sm font-bold text-zinc-100">Sign Out</span>
+                <span className="text-xs text-zinc-500">Securely disconnect this device from your node.</span>
+              </div>
+              <button
+                onClick={async () => {
+                  await signOut();
+                  window.location.reload();
+                }}
+                className="py-2 px-4 border border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.05)] text-zinc-300 font-mono text-xs rounded-lg font-bold transition-all"
+              >
+                SIGN OUT
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between border border-[rgba(239,68,68,0.2)] p-4 rounded-xl" style={{ background:'rgba(239,68,68,0.06)' }}>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-zinc-100">Delete Account</span>
                 <span className="text-xs text-zinc-500">Permanently delete your profile and reset your role.</span>
               </div>
               <button
@@ -1054,7 +1153,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                     signOut(); // Sign out to clear the session so they can restart fresh
                   }
                 }}
-                className="py-2 px-4 bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 font-mono text-xs rounded-lg font-bold transition-all"
+                className="py-2 px-4 btn-secondary style={{ borderColor:'rgba(239,68,68,0.3)' }} text-rose-400 hover:bg-[rgba(239,68,68,0.1)] font-mono text-xs rounded-lg font-bold transition-all"
               >
                 DELETE PROFILE
               </button>
@@ -1065,8 +1164,8 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
         {/* Brand Stats Sidebar Card */}
         <div className="lg:col-span-5 flex flex-col gap-6">
-          <div className="bg-zinc-950 text-zinc-300 rounded-2xl p-6 shadow-xl flex flex-col gap-5 border border-zinc-800">
-            <div className="flex items-center gap-3 border-b border-zinc-900 pb-4">
+          <div className="glass-card-elevated p-6 flex flex-col gap-5">
+            <div className="flex items-center gap-3 border-b border-[rgba(255,255,255,0.06)] pb-4">
               <div className="w-12 h-12 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-display font-black text-xl">
                 {customBrandName.substring(0, 2).toUpperCase()}
               </div>
@@ -1081,7 +1180,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 <ShieldCheck className="w-4 h-4 text-indigo-400" />
                 Audit Trail Credentials
               </span>
-              <p className="text-xs text-zinc-400 leading-relaxed">
+              <p className="text-xs text-zinc-500 leading-relaxed">
                 Your corporate node is currently integrated into the Delhi NCR cryptographic router. All campaigns automatically deploy automated multi-modal smart escrows.
               </p>
             </div>
@@ -1092,22 +1191,20 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
           </div>
         </div>
       </div>
-    );
-  }
+          )}
 
-  if (activeSubTab === 'setup') {
-    return (
-      <div className="flex flex-col gap-8 items-start">
+          {activeSubTab === 'setup' && (
+            <div className="grid grid-cols-1 gap-8 items-start">
         {/* Campaign Builder Form */}
-        <div className="w-full bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-5">
-          <div className="flex items-center justify-between border-b border-zinc-100 pb-4">
+        <div className="w-full glass-card p-6 flex flex-col gap-5">
+          <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] pb-4">
             <div>
-              <h2 className="text-xl font-display font-semibold text-zinc-900">1. Define Campaign Radius</h2>
-              <p className="text-sm text-zinc-500 mt-0.5">
+              <h2 className="text-xl font-bold tracking-tight" style={{ color: 'var(--color-text-primary)' }}>1. Define Campaign Radius</h2>
+              <p className="text-sm mt-0.5" style={{ color: 'var(--color-text-secondary)' }}>
                 Set localized radius. Creators in this geofence will be programmatically dispatched.
               </p>
             </div>
-            <span className="bg-indigo-50 text-indigo-700 text-sm px-2.5 py-1 rounded-full font-semibold border border-indigo-100 flex items-center gap-1.5 animate-pulse">
+            <span className="bg-[rgba(99,102,241,0.08)] text-indigo-400 text-sm px-2.5 py-1 rounded-full font-semibold border border-[rgba(99,102,241,0.2)] flex items-center gap-1.5 animate-pulse">
               <Radio className="w-3.5 h-3.5" />
               Geo-targeted
             </span>
@@ -1115,22 +1212,22 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Brand Name</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Brand Name</label>
               <input
                 type="text"
                 value={brandName || ''}
                 readOnly
-                className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2 text-base text-zinc-500 cursor-not-allowed focus:outline-none focus:border-indigo-500 transition-colors"
+                className="input-field w-full opacity-60 cursor-not-allowed"
                 placeholder="e.g. Blue Tokai"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Campaign Title</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Campaign Title</label>
               <input
                 type="text"
                 value={title || ''}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2 text-base text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
+                className="input-field w-full"
                 placeholder="e.g. South Delhi Buzz"
               />
             </div>
@@ -1138,11 +1235,11 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Target Niche</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Target Niche</label>
               <select
                 value={niche}
                 onChange={(e) => setNiche(e.target.value)}
-                className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
+                className="input-field w-full"
               >
                 <option value="Food & Lifestyle">Food & Lifestyle</option>
                 <option value="Fashion & Aesthetics">Fashion & Aesthetics</option>
@@ -1159,12 +1256,12 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               </select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Deliverable</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Deliverable</label>
               <input
                 type="text"
                 value={deliverable || ''}
                 onChange={(e) => setDeliverable(e.target.value)}
-                className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2 text-base text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
+                className="input-field w-full"
                 placeholder="e.g. 1 Instagram Story highlighting local patio dining"
               />
             </div>
@@ -1172,11 +1269,11 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Content Format</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Content Format</label>
               <select
                 value={contentFormat}
                 onChange={(e) => setContentFormat(e.target.value)}
-                className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
+                className="input-field w-full"
               >
                 <option value="Instagram Story">Instagram Story</option>
                 <option value="Instagram Reel">Instagram Reel</option>
@@ -1186,19 +1283,19 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               </select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Target Audience</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Target Audience</label>
               <input
                 type="text"
                 value={targetAudience || ''}
                 onChange={(e) => setTargetAudience(e.target.value)}
                 placeholder="e.g. Gen Z / Millennials"
-                className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2 text-base text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
+                className="input-field w-full"
               />
             </div>
           </div>
           
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Creative Guidelines</label>
+            <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Creative Guidelines</label>
             <textarea
               value={creativeGuidelines || ''}
               onChange={(e) => {
@@ -1208,12 +1305,12 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               }}
               placeholder="e.g. Must show product clearly in first 3 seconds. No competitor logos."
               rows={4}
-              className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2 text-base text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors resize-none overflow-hidden"
+              className="input-field w-full resize-none overflow-hidden"
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Submission Deadline (Days)</label>
+            <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Submission Deadline (Days)</label>
             <div className="flex items-center gap-3">
               <input
                 type="range"
@@ -1221,31 +1318,34 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 max="14"
                 value={submissionDeadlineDays}
                 onChange={(e) => setSubmissionDeadlineDays(Number(e.target.value))}
-                className="w-full accent-zinc-800 cursor-pointer flex-1"
+                className="w-full cursor-pointer flex-1"
+                style={{ '--pct': `${((submissionDeadlineDays - 1) / 13) * 100}%` } as React.CSSProperties}
               />
-              <div className="bg-white border border-zinc-200 rounded-lg px-2 py-1 font-mono text-sm font-bold text-zinc-800 flex items-center shrink-0">
-                <input
-                  type="number"
-                  min="1"
-                  max="14"
-                  value={isNaN(submissionDeadlineDays) || submissionDeadlineDays === 0 ? '' : submissionDeadlineDays}
-                  onChange={(e) => setSubmissionDeadlineDays(Number(e.target.value))}
-                  className="w-10 focus:outline-none text-right font-mono"
-                />
+              <div className="bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] rounded-lg px-3 py-1 font-mono text-sm font-bold text-zinc-100 flex items-center shrink-0 min-w-[70px] justify-center">
+                <AnimatePresence mode="popLayout">
+                  <motion.span
+                    key={submissionDeadlineDays}
+                    initial={{ scale: 0.8, opacity: 0, y: 5 }}
+                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                    exit={{ scale: 0.8, opacity: 0, y: -5 }}
+                  >
+                    {submissionDeadlineDays}
+                  </motion.span>
+                </AnimatePresence>
                 <span className="ml-1 text-zinc-500 font-normal">days</span>
               </div>
             </div>
           </div>
 
           {/* Map Location Coordinates indicator */}
-          <div className="bg-zinc-50/60 border border-zinc-100 rounded-xl p-3.5 flex items-center justify-between">
+          <div className=" border border-[rgba(255,255,255,0.08)] rounded-xl p-3.5 flex items-center justify-between" style={{ background: 'rgba(255,255,255,0.04)' }}>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+              <div className="w-8 h-8 rounded-lg bg-[rgba(99,102,241,0.08)] flex items-center justify-center text-indigo-400">
                 <Navigation className="w-4 h-4" />
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-mono font-bold text-zinc-700">{resolvedLocalityLabel()}</span>
-                <span className="text-[11px] text-zinc-400">Centered at: {centerLat.toFixed(4)}N, {centerLng.toFixed(4)}E</span>
+                <span className="text-sm font-mono font-bold text-zinc-300">{resolvedLocalityLabel()}</span>
+                <span className="text-[11px] text-zinc-500">Centered at: {centerLat.toFixed(4)}N, {centerLng.toFixed(4)}E</span>
               </div>
             </div>
 
@@ -1256,7 +1356,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
             <div className="flex flex-col gap-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-semibold text-zinc-700">Target Quota (Spots)</span>
+                <span className="text-sm font-semibold text-zinc-300">Target Quota (Spots)</span>
               </div>
               <div className="flex items-center gap-3">
                 <input
@@ -1266,33 +1366,36 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                   step="1"
                   value={spotsTotal}
                   onChange={(e) => setSpotsTotal(Number(e.target.value))}
-                  className="w-full accent-zinc-800 cursor-pointer flex-1"
+                  className="w-full cursor-pointer flex-1"
+                  style={{ '--pct': `${((spotsTotal - 1) / 99) * 100}%` } as React.CSSProperties}
                 />
-                <div className="bg-white border border-zinc-200 rounded-lg px-2 py-1 font-mono text-sm font-bold text-zinc-800 flex items-center shrink-0">
-                  <input
-                    type="number"
-                    min="1"
-                    max="100"
-                    value={isNaN(spotsTotal) || spotsTotal === 0 ? '' : spotsTotal}
-                    onChange={(e) => setSpotsTotal(Number(e.target.value))}
-                    className="w-12 focus:outline-none text-right font-mono"
-                  />
+                <div className="bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] rounded-lg px-3 py-1 font-mono text-sm font-bold text-zinc-100 flex items-center shrink-0 min-w-[95px] justify-center">
+                  <AnimatePresence mode="popLayout">
+                    <motion.span
+                      key={spotsTotal}
+                      initial={{ scale: 0.8, opacity: 0, y: 5 }}
+                      animate={{ scale: 1, opacity: 1, y: 0 }}
+                      exit={{ scale: 0.8, opacity: 0, y: -5 }}
+                    >
+                      {spotsTotal}
+                    </motion.span>
+                  </AnimatePresence>
                   <span className="ml-1 text-zinc-500 font-normal">creators</span>
                 </div>
               </div>
-              <span className="text-[11px] text-zinc-400">Platform automatically sends offers to next batch until filled</span>
+              <span className="text-[11px] text-zinc-500">Platform automatically sends offers to next batch until filled</span>
             </div>
           </div>
 
           {/* Smart Budget Estimator Widget */}
-          <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-4 flex flex-col gap-3">
+          <div className=" border border-slate-200/80 rounded-xl p-4 flex flex-col gap-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-indigo-600" />
-                <span className="text-sm font-semibold text-zinc-700">Smart Budget Recommender</span>
+                <Sparkles className="w-4 h-4 text-indigo-400" />
+                <span className="text-sm font-semibold text-zinc-300">Smart Budget Recommender</span>
               </div>
               <span className="text-xs font-mono text-zinc-500">
-                Estimated range: <span className="text-zinc-800 font-bold">₹{estMin} - ₹{estMax}</span>
+                Estimated range: <span className="text-zinc-100 font-bold">₹{estMin} - ₹{estMax}</span>
               </span>
             </div>
 
@@ -1305,51 +1408,76 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                   step="50"
                   value={budget}
                   onChange={(e) => setBudget(Number(e.target.value))}
-                  className="w-full accent-indigo-600 cursor-pointer"
+                  className="w-full cursor-pointer"
+                  style={{ '--pct': `${((budget - 1000) / 9000) * 100}%` } as React.CSSProperties}
                 />
               </div>
-              <div className="bg-white border border-zinc-200 rounded-lg px-3 py-1.5 font-mono text-base font-bold text-zinc-800 flex items-center">
-                ₹<input
-                  type="number"
-                  value={isNaN(budget) || budget === 0 ? '' : budget}
-                  onChange={(e) => setBudget(Number(e.target.value))}
-                  className="w-14 focus:outline-none text-right font-mono"
-                />
+              <div className="bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] rounded-lg px-3 py-1.5 font-mono text-base font-bold text-zinc-100 flex items-center min-w-[80px] justify-center">
+                ₹
+                <AnimatePresence mode="popLayout">
+                  <motion.span
+                    key={budget}
+                    initial={{ scale: 0.8, opacity: 0, y: 5 }}
+                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                    exit={{ scale: 0.8, opacity: 0, y: -5 }}
+                  >
+                    {budget}
+                  </motion.span>
+                </AnimatePresence>
               </div>
             </div>
           </div>
 
           {/* Cost Summary Widget */}
-          <div className="bg-white border border-zinc-200/80 rounded-xl p-4 flex flex-col gap-3 shadow-sm">
+          <div className="bg-transparent border border-[rgba(255,255,255,0.08)] rounded-xl p-4 flex flex-col gap-3 shadow-sm">
             <div className="flex justify-between items-center">
-              <span className="text-sm font-semibold text-zinc-700">Cost Summary</span>
+              <span className="text-sm font-semibold text-zinc-300">Cost Summary</span>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1 p-3 bg-zinc-50 rounded-lg border border-zinc-100">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Total Campaign Budget</span>
-                <span className="text-lg font-black text-zinc-800">₹{budget}</span>
+              <div className="flex flex-col gap-1 p-3 rounded-lg border border-[rgba(255,255,255,0.08)]" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Total Campaign Budget</span>
+                <AnimatePresence mode="popLayout">
+                  <motion.span
+                    key={budget}
+                    initial={{ opacity: 0, scale: 0.9, filter: 'brightness(2)' }}
+                    animate={{ opacity: 1, scale: 1, filter: 'brightness(1)' }}
+                    transition={{ duration: 0.3 }}
+                    className="text-lg font-black text-transparent bg-clip-text text-gradient-mint font-mono"
+                  >
+                    <AnimatedNumber prefix="₹" value={budget} />
+                  </motion.span>
+                </AnimatePresence>
               </div>
-              <div className="flex flex-col gap-1 p-3 bg-indigo-50/50 rounded-lg border border-indigo-100/50">
+              <div className="flex flex-col gap-1 p-3 rounded-lg border border-[rgba(99,102,241,0.2)]" style={{ background: 'rgba(99,102,241,0.10)' }}>
                 <span className="text-[10px] font-mono uppercase tracking-wider text-indigo-400">Final Cost Per Creator</span>
-                <span className="text-lg font-black text-indigo-700">₹{spotsTotal > 0 ? Math.round(budget / spotsTotal) : 0}</span>
+                <AnimatePresence mode="popLayout">
+                  <motion.span
+                    key={spotsTotal > 0 ? Math.round(budget / spotsTotal) : 0}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-lg font-black text-indigo-400 font-mono"
+                  >
+                    <AnimatedNumber prefix="₹" value={spotsTotal > 0 ? Math.round(budget / spotsTotal) : 0} />
+                  </motion.span>
+                </AnimatePresence>
               </div>
             </div>
           </div>
 
           {/* Escrow Contract Terms Notice & Balance */}
-          <div className="border border-zinc-150 rounded-xl p-4 bg-zinc-50/35 flex flex-col gap-3">
+          <div className="border border-[rgba(255,255,255,0.08)] rounded-xl p-4 flex flex-col gap-3" style={{ background: 'rgba(255,255,255,0.02)' }}>
             <div className="flex items-start gap-3">
-              <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+              <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
               <div className="flex flex-col gap-0.5 flex-1">
                 <div className="flex justify-between items-center w-full">
-                  <span className="text-sm font-bold text-zinc-800">Automated Escrow Protocol</span>
-                  <div className="bg-white border border-zinc-200 px-2 py-1 rounded-md flex items-center gap-1.5">
+                  <span className="text-sm font-bold text-zinc-100">Automated Escrow Protocol</span>
+                  <div className="bg-transparent border border-[rgba(255,255,255,0.08)] px-2 py-1 rounded-md flex items-center gap-1.5">
                     <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">Wallet Balance:</span>
-                    <span className="text-sm font-mono font-bold text-emerald-600">₹{currentUser?.escrowBalance || 0}</span>
+                    <span className="text-sm font-mono font-bold text-emerald-400">₹{currentUser?.escrowBalance || 0}</span>
                   </div>
                 </div>
                 <p className="text-xs text-zinc-500 leading-normal mt-1">
-                  Your budget of <span className="font-semibold text-zinc-800">₹{budget}</span> will be locked in smart escrow. A 5% platform fee is deducted — creators share <span className="font-semibold text-zinc-800">₹{Math.round(budget * 0.95)}</span> equally, so each creator receives <span className="font-semibold text-emerald-700">₹{spotsTotal > 0 ? Math.round((budget * 0.95) / spotsTotal) : '—'}</span>.
+                  Your budget of <span className="font-semibold text-zinc-100">₹{budget}</span> will be locked in smart escrow. A 5% platform fee is deducted — creators share <span className="font-semibold text-zinc-100">₹{Math.round(budget * 0.95)}</span> equally, so each creator receives <span className="font-semibold text-emerald-400">₹{spotsTotal > 0 ? Math.round((budget * 0.95) / spotsTotal) : '—'}</span>.
                 </p>
               </div>
             </div>
@@ -1360,15 +1488,15 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             <button
               onClick={() => handleDeposit(budget - (currentUser?.escrowBalance || 0))}
               disabled={isDepositing}
-              className={`w-full py-3 px-4 rounded-xl font-display font-medium text-base flex items-center justify-center gap-2 transition-all ${
+              className={`w-full py-4 px-8 rounded-xl font-display font-medium text-base flex items-center justify-center gap-2 transition-all ${
                 isDepositing
-                  ? 'bg-indigo-100 text-indigo-400 cursor-not-allowed border border-indigo-200'
-                  : 'bg-indigo-600 text-white hover:bg-indigo-500 active:scale-[0.98] cursor-pointer shadow-md shadow-indigo-200/50'
+                  ? 'bg-[rgba(255,255,255,0.05)] text-zinc-500 cursor-not-allowed border border-[rgba(255,255,255,0.08)]'
+                  : 'btn-primary active:scale-[0.97] cursor-pointer'
               }`}
             >
               {isDepositing ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white/25 border-t-white rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-zinc-500/30 border-t-zinc-300 rounded-full animate-spin" />
                   <span>Processing Deposit...</span>
                 </>
               ) : (
@@ -1379,51 +1507,53 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               )}
             </button>
           ) : (
-            <button
+            <motion.button
+              whileHover={{ scale: isActivating ? 1 : 1.01, y: isActivating ? 0 : -1, boxShadow: isActivating ? 'none' : '0 0 40px rgba(99,102,241,0.6)' }}
+              whileTap={{ scale: 0.97 }}
               onClick={handleLaunchCampaign}
               disabled={isActivating}
-              className={`w-full py-3 px-4 rounded-xl font-display font-medium text-base flex items-center justify-center gap-2 transition-all ${
+              className={`relative overflow-hidden w-full py-4 px-8 rounded-xl font-bold text-base flex items-center justify-center gap-2.5 transition-all ${
                 isActivating
-                  ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed border border-zinc-200'
-                  : 'bg-zinc-950 text-white hover:bg-zinc-900 active:scale-[0.98] cursor-pointer shadow-md shadow-zinc-200'
+                  ? 'opacity-70 cursor-not-allowed'
+                  : 'btn-primary cursor-pointer'
               }`}
+              style={isActivating ? { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'var(--color-text-tertiary)' } : {}}
             >
+              {!isActivating && <div className="absolute inset-0 w-[200%] opacity-20 pointer-events-none" style={{ backgroundImage: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent)', animation: 'shimmer-fill 3s linear infinite' }} />}
               {isActivating ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white/25 border-t-white rounded-full animate-spin" />
-                  <span>Locking Budget & Dispersing Batches...</span>
+                  <div className="w-5 h-5 border-2 border-white/25 border-t-white rounded-full animate-spin relative z-10" />
+                  <span className="relative z-10">Activating Node...</span>
                 </>
               ) : (
                 <>
-                  <Play className="w-4 h-4 fill-current" />
-                  <span>Lock ₹{budget} in Escrow & Launch Campaign</span>
+                  <Radio className="w-5 h-5 animate-pulse relative z-10" />
+                  <span className="relative z-10 text-white drop-shadow-md">LAUNCH CAMPAIGN</span>
                 </>
               )}
-            </button>
+            </motion.button>
           )}
         </div>
       </div>
-    );
-  }
+          )}
 
-  if (activeSubTab === 'dispatch') {
-    return (
-      <>
-      <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-zinc-100 pb-4 mb-6">
+          {activeSubTab === 'dispatch' && (
+            <>
+            <div className="flex flex-col gap-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-[rgba(255,255,255,0.08)] pb-4 mb-6">
           <div>
-            <h3 className="text-lg font-display font-semibold text-zinc-900">Campaign Dispatch Tracking Room</h3>
-            <p className="text-sm text-zinc-500 mt-0.5">
+            <h3 className="text-lg font-bold tracking-tight" style={{ color: 'var(--color-text-primary)' }}>Campaign Dispatch Tracking Room</h3>
+            <p className="text-sm mt-0.5" style={{ color: 'var(--color-text-secondary)' }}>
               Watch programmatic queues send offers to Batch A (Priority), then Batch B, then Batch C.
             </p>
           </div>
         </div>
 
         {activeCampaigns.length === 0 ? (
-          <div className="text-center py-16 flex flex-col items-center justify-center border border-dashed border-zinc-200 rounded-xl bg-zinc-50/50">
+          <div className="text-center py-16 flex flex-col items-center justify-center border border-dashed border-zinc-200 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)' }}>
             <Radio className="w-8 h-8 text-zinc-300 animate-pulse mb-3" />
             <span className="text-sm font-medium text-zinc-500">No active localized flash activations running.</span>
-            <p className="text-xs text-zinc-400 mt-1 max-w-[280px]">
+            <p className="text-xs text-zinc-500 mt-1 max-w-[280px]">
               Use the campaign setup card above to lock budget and launch one.
             </p>
           </div>
@@ -1432,20 +1562,20 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             {activeCampaigns.map((camp) => {
               const isCollapsed = collapsedCampaigns[camp.id] ?? true;
               return (
-              <div key={camp.id} className="border border-zinc-150 rounded-xl flex flex-col transition-all bg-white overflow-hidden">
+              <div key={camp.id} className="border border-[rgba(255,255,255,0.08)] rounded-xl flex flex-col transition-all bg-transparent overflow-hidden">
                 {/* Header info */}
                 <div 
-                  className={`p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-zinc-50/50 transition-colors ${!isCollapsed ? 'border-b border-zinc-100' : ''}`}
+                  className={`p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer transition-colors ${!isCollapsed ? 'border-b border-[rgba(255,255,255,0.08)]' : ''}`}
                   onClick={() => setCollapsedCampaigns(prev => ({ ...prev, [camp.id]: !(prev[camp.id] ?? true) }))}
                 >
                   <div className="flex flex-col">
                     <div className="flex items-center gap-2">
-                      <h4 className="text-base font-bold text-zinc-800">{camp.title}</h4>
-                      <span className="bg-zinc-100 text-zinc-600 font-mono text-[11px] px-2 py-0.5 rounded border border-zinc-200">
+                      <h4 className="text-base font-bold text-zinc-100">{camp.title}</h4>
+                      <span className=" text-zinc-400 font-mono text-[11px] px-2 py-0.5 rounded border border-zinc-200" style={{ background: 'rgba(255,255,255,0.05)' }}>
                         {camp.brandName}
                       </span>
                     </div>
-                    <span className="text-xs text-zinc-400 font-mono mt-0.5">
+                    <span className="text-xs text-zinc-500 font-mono mt-0.5">
                       LOC: {camp.centerLocality} • deliverable: {camp.deliverable}
                       {isCollapsed && ` • Spots: ${camp.spotsFilled}/${camp.spotsTotal}`}
                     </span>
@@ -1453,16 +1583,16 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
                   <div className="flex items-center gap-4">
                     <div className="flex flex-col items-end">
-                      <span className="text-[11px] uppercase font-mono tracking-wider text-zinc-400">Escrow Locked</span>
-                      <span className="text-sm font-bold text-emerald-600 font-mono flex items-center gap-1">
+                      <span className="text-[11px] uppercase font-mono tracking-wider text-zinc-500">Escrow Locked</span>
+                      <span className="text-sm font-bold text-emerald-400 font-mono flex items-center gap-1">
                         <ShieldCheck className="w-3.5 h-3.5" />
                         ₹{camp.budget}
                       </span>
                     </div>
 
                     <div className="flex flex-col items-end">
-                      <span className="text-[11px] uppercase font-mono tracking-wider text-zinc-400">Campaign Status</span>
-                      <span className="text-sm font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
+                      <span className="text-[11px] uppercase font-mono tracking-wider text-zinc-500">Campaign Status</span>
+                      <span className="text-sm font-bold text-indigo-400 bg-[rgba(99,102,241,0.08)] px-2 py-0.5 rounded border border-[rgba(99,102,241,0.2)]">
                         {camp.batches.length > 0 
                           ? `Batch ${String.fromCharCode(65 + camp.activeBatchIndex)} Active` 
                           : (now - camp.createdAt > 3000 ? 'No Matches' : 'Initializing')}
@@ -1480,29 +1610,29 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                           }
                         }
                       }}
-                      className="ml-4 text-zinc-400 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center w-8 h-8 rounded-full transition-colors"
+                      className="ml-4 text-zinc-500 hover:text-rose-400 hover:bg-[rgba(239,68,68,0.08)] flex items-center justify-center w-8 h-8 rounded-full transition-colors"
                       title="Delete Campaign"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
 
-                    <div className="ml-2 text-zinc-400 flex items-center justify-center w-8 h-8 rounded-full hover:bg-zinc-100 transition-colors">
+                    <div className="ml-2 text-zinc-500 flex items-center justify-center w-8 h-8 rounded-full hover: transition-colors" style={{ background: 'rgba(255,255,255,0.05)' }}>
                       {isCollapsed ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
                     </div>
                   </div>
                 </div>
 
                 {!isCollapsed && (
-                  <div className="p-5 flex flex-col gap-6 bg-white">
+                  <div className="p-5 flex flex-col gap-6 bg-transparent">
                     {/* Programmatic Batch Timeline Track */}
                 {camp.batches.length === 0 ? (
                   (now - camp.createdAt > 3000) ? (
-                    <div className="border border-rose-100 bg-rose-50/30 rounded-xl p-8 flex flex-col items-center justify-center gap-3">
-                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border border-rose-100">
-                        <AlertTriangle className="w-5 h-5 text-rose-500" />
+                    <div className="border border-rose-100 rounded-xl p-8 flex flex-col items-center justify-center gap-3" style={{ background: 'rgba(239,68,68,0.08)' }}>
+                      <div className="w-12 h-12 bg-transparent rounded-full flex items-center justify-center shadow-sm border border-rose-100">
+                        <AlertTriangle className="w-5 h-5 text-rose-400" />
                       </div>
-                      <span className="text-sm font-bold text-rose-900">Zero Target Nodes Located</span>
-                      <p className="text-xs text-rose-600/80 text-center max-w-sm">
+                      <span className="text-sm font-bold text-rose-200">Zero Target Nodes Located</span>
+                      <p className="text-xs text-rose-400/80 text-center max-w-sm">
                         Our matching engine scanned {camp.centerLocality} but found no creators that match your niche requirements and coordinates. Try expanding your parameters or re-deploying in another hub.
                       </p>
                       <button
@@ -1513,16 +1643,16 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                             console.error('Failed to rerun matching:', err);
                           }
                         }}
-                        className="mt-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold font-mono uppercase tracking-wider rounded-xl transition-colors"
+                        className="mt-2 px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold font-mono uppercase tracking-wider rounded-xl transition-colors"
                       >
                         Rerun Engine
                       </button>
                     </div>
                   ) : (
-                    <div className="border border-indigo-100 bg-indigo-50/30 rounded-xl p-8 flex flex-col items-center justify-center gap-3">
-                      <div className="w-6 h-6 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
-                      <span className="text-sm font-bold text-indigo-900">Matching Engine Running...</span>
-                      <p className="text-xs text-indigo-600/70 text-center max-w-sm">
+                    <div className="border border-[rgba(99,102,241,0.2)] rounded-xl p-8 flex flex-col items-center justify-center gap-3" style={{ background: 'rgba(99,102,241,0.06)' }}>
+                      <div className="w-6 h-6 border-2 border-[rgba(99,102,241,0.3)] border-t-indigo-600 rounded-full animate-spin" />
+                      <span className="text-sm font-bold text-indigo-200">Matching Engine Running...</span>
+                      <p className="text-xs text-indigo-400/70 text-center max-w-sm">
                         Analyzing creator density and computing alignment scores for {camp.centerLocality}. Batches will populate shortly.
                       </p>
                     </div>
@@ -1538,27 +1668,34 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                         key={batch.id}
                         className={`border rounded-xl p-4 flex flex-col gap-3 transition-all ${
                           isCurrent
-                            ? 'border-indigo-500 bg-indigo-50/20 shadow-sm ring-1 ring-indigo-500/10'
+                            ? 'border-indigo-500/60'
                             : isPassed
-                            ? 'border-zinc-200 bg-zinc-50/50 opacity-60'
-                            : 'border-zinc-100 bg-white opacity-40'
+                            ? 'border-[rgba(255,255,255,0.06)] opacity-50'
+                            : 'border-[rgba(255,255,255,0.04)] opacity-30'
                         }`}
+                        style={{
+                          background: isCurrent
+                            ? 'rgba(99,102,241,0.1)'
+                            : isPassed
+                            ? 'rgba(255,255,255,0.02)'
+                            : 'rgba(255,255,255,0.01)'
+                        }}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-bold text-zinc-800 flex items-center gap-1.5">
+                          <span className="text-sm font-bold text-zinc-100 flex items-center gap-1.5">
                             <span
                               className={`w-2 h-2 rounded-full ${
                                 isCurrent
                                   ? 'bg-indigo-600 animate-pulse'
                                   : isPassed
-                                  ? 'bg-zinc-400'
-                                  : 'bg-zinc-300'
+                                  ? 'bg-zinc-500'
+                                  : 'bg-zinc-600'
                               }`}
                             />
                             {batch.name}
                           </span>
                           {isCurrent ? (
-                            <span className="bg-indigo-100 text-indigo-700 text-[11px] font-mono px-2 py-0.5 rounded font-bold animate-pulse">
+                            <span className="bg-indigo-100 text-indigo-400 text-[11px] font-mono px-2 py-0.5 rounded font-bold animate-pulse">
                               DISPATCHED
                             </span>
                           ) : isPassed ? (
@@ -1566,7 +1703,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                               PASSED
                             </span>
                           ) : (
-                            <span className="text-zinc-400 text-[11px] font-mono">
+                            <span className="text-zinc-500 text-[11px] font-mono">
                               QUEUED
                             </span>
                           )}
@@ -1574,7 +1711,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
                         {/* Profiles matched in this batch */}
                         <div className="flex flex-col gap-1.5 my-1">
-                          <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wide">Target Creators</span>
+                          <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-wide">Target Creators</span>
                           <div className="flex items-center gap-1.5">
                             {batch.creatorIds.map((cid) => {
                               const creator = (creators || CREATORS).find((c) => c.id === cid);
@@ -1583,7 +1720,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                                 <div
                                   key={cid}
                                   onClick={() => setSelectedCreator(creator)}
-                                  className="flex items-center gap-1 bg-white border border-zinc-200/80 hover:border-zinc-300 px-1.5 py-0.5 rounded-lg text-[11px] cursor-pointer transition-all shrink-0"
+                                  className="flex items-center gap-1 bg-transparent border border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.08)] px-1.5 py-0.5 rounded-lg text-[11px] cursor-pointer transition-all shrink-0"
                                   title={`Click to view ${creator.name}`}
                                 >
                                   <img
@@ -1591,7 +1728,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                                     alt={creator.name}
                                     className="w-4.5 h-4.5 rounded-full object-cover referrerPolicy='no-referrer'"
                                   />
-                                  <span className="font-medium text-zinc-700">{creator.name.split(' ')[0]}</span>
+                                  <span className="font-medium text-zinc-300">{creator.name.split(' ')[0]}</span>
                                 </div>
                               );
                             })}
@@ -1602,7 +1739,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                           <div className="mt-2 flex flex-col gap-2">
                             <div className="flex justify-between items-center text-[11px]">
                               <span className="text-zinc-500 font-medium">Remaining Priority Window:</span>
-                              <span className="text-indigo-600 font-mono font-bold animate-pulse">
+                              <span className="text-indigo-400 font-mono font-bold animate-pulse">
                                 {batch.dispatchedAt && (batch.cascadeAfterMs - (now - batch.dispatchedAt)) > 0
                                   ? `Moves to next batch in ${Math.floor(Math.max(0, batch.cascadeAfterMs - (now - batch.dispatchedAt)) / 1000 / 3600)}h ${Math.floor((Math.max(0, batch.cascadeAfterMs - (now - batch.dispatchedAt)) / 1000 % 3600) / 60)}m ${Math.floor(Math.max(0, batch.cascadeAfterMs - (now - batch.dispatchedAt)) / 1000 % 60)}s`
                                   : 'Moving...'}
@@ -1634,12 +1771,12 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
       {/* Fake Razorpay Checkout Modal for Demo */}
       {fakeRazorpayData && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-transparent w-full max-w-sm rounded-2xl shadow-xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
             {/* Header */}
             <div className="bg-[#3366cc] px-5 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-white rounded flex items-center justify-center">
+                <div className="w-6 h-6 bg-transparent rounded flex items-center justify-center">
                   <div className="w-3 h-3 bg-[#3366cc] rounded-sm transform rotate-45"></div>
                 </div>
                 <span className="text-white font-bold tracking-wide text-lg">Razorpay</span>
@@ -1653,23 +1790,23 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             <div className="p-8 flex flex-col items-center gap-4">
               <div className="w-12 h-12 border-4 border-blue-100 border-t-[#3366cc] rounded-full animate-spin mb-2" />
               <div className="text-center">
-                <h4 className="text-lg font-bold text-zinc-900 mb-1">Processing Payment</h4>
+                <h4 className="text-lg font-bold text-zinc-100 mb-1">Processing Payment</h4>
                 <p className="text-sm text-zinc-500">Please wait while we secure your escrow...</p>
               </div>
-              <div className="w-full bg-zinc-50 rounded-xl border border-zinc-200 p-4 mt-2">
+              <div className="w-full rounded-xl border border-[rgba(255,255,255,0.08)] p-4 mt-2" style={{ background: 'rgba(255,255,255,0.04)' }}>
                 <div className="flex justify-between text-sm mb-1.5">
                   <span className="text-zinc-500">Amount payable</span>
-                  <span className="font-bold text-zinc-900 font-mono">₹{fakeRazorpayData.amount}</span>
+                  <span className="font-bold text-zinc-100 font-mono">₹{fakeRazorpayData.amount}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-zinc-500">Order</span>
-                  <span className="font-mono text-zinc-600 text-xs mt-0.5">{fakeRazorpayData.orderId.split('_').slice(-1)}</span>
+                  <span className="font-mono text-zinc-400 text-xs mt-0.5">{fakeRazorpayData.orderId.split('_').slice(-1)}</span>
                 </div>
               </div>
             </div>
             
             {/* Footer */}
-            <div className="bg-zinc-50 px-5 py-3 border-t border-zinc-100 flex items-center justify-center gap-1.5 text-xs text-zinc-400 font-medium">
+            <div className="px-5 py-3 border-t border-[rgba(255,255,255,0.08)] flex items-center justify-center gap-1.5 text-xs text-zinc-500 font-medium" style={{ background: 'rgba(255,255,255,0.02)' }}>
               <ShieldCheck className="w-3.5 h-3.5" /> 100% Secure Checkout (Demo Mode)
             </div>
           </div>
@@ -1677,94 +1814,78 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
       )}
 
       </>
-    );
-  }
+          )}
 
-  if (activeSubTab === 'analytics') {
-    const allCampaigns = activeCampaigns || [];
-    const totalCampaigns = allCampaigns.length;
-    const totalEscrow = allCampaigns.reduce((sum, c) => sum + c.budget, 0);
-
-    // Calculate dynamic PPV based on real budget and an estimated 10k views per spot
-    const totalExpectedViews = allCampaigns.reduce((sum, c) => sum + (c.spotsTotal * 10000), 0);
-    const avgPpv = totalExpectedViews > 0 ? (totalEscrow / totalExpectedViews).toFixed(2) : "0.00";
-
-    const realPastCampaigns = allCampaigns.map(c => {
-      const views = c.spotsTotal * 10000;
-      const ppv = views > 0 ? (c.budget / views).toFixed(2) : "0.00";
-      return {
-        id: c._id,
-        title: c.title,
-        ppv: ppv,
-        views: views,
-        date: new Date(c._creationTime).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-      };
-    }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-    const brandCampaignIds = allCampaigns.map(c => c._id);
-    const frequentCreators = (creators || CREATORS)
-      .map((creator: any) => {
-        const overlap = (creator.acceptedCampaignIds || []).filter((id: string) => brandCampaignIds.includes(id)).length;
-        return { ...creator, overlap };
-      })
-      .filter((c: any) => c.overlap > 0)
-      .sort((a: any, b: any) => b.overlap - a.overlap)
-      .slice(0, 5);
-
-    const analytics = {
-      campaignsLaunched: totalCampaigns,
-      totalEscrowSecured: totalEscrow,
-      averagePayPerView: avgPpv,
-      pastCampaigns: realPastCampaigns,
-      ...((brandAnalytics as any) || {}),
-    };
-
-    return (
-      <div className="flex flex-col gap-6">
+          {activeSubTab === 'analytics' && (
+            <div className="flex flex-col gap-6">
         {/* Quick Insights Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-2">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">Campaigns Launched</span>
-            <span className="text-3xl font-display font-black text-zinc-950">{analytics.campaignsLaunched} Total</span>
-            <p className="text-xs text-zinc-400">Total localized flash activations currently deployed.</p>
-          </div>
-          <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-2">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">Total Escrow Funds Secured</span>
-            <span className="text-3xl font-display font-black text-emerald-600">₹{analytics.totalEscrowSecured}</span>
-            <p className="text-xs text-zinc-400">100% cryptographic protection active for campaign matching.</p>
-          </div>
-          <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-2">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400">Average Pay Per View</span>
-            <span className="text-3xl font-display font-black text-indigo-600">₹{analytics.averagePayPerView}</span>
-            <p className="text-xs text-zinc-400">Overall cost efficiency based on historic campaign performance.</p>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0, duration: 0.35 }}
+            className="glass-2 rounded-2xl p-6 flex flex-col gap-3 card-hover"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase tracking-widest" style={{ color: 'var(--color-text-tertiary)' }}>Campaigns Launched</span>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)' }}>
+                <Activity className="w-4 h-4 text-indigo-400" />
+              </div>
+            </div>
+            <span className="text-4xl font-bold tracking-tight" style={{ color: 'var(--color-text-primary)' }}><AnimatedNumber value={analytics.campaignsLaunched} /></span>
+            <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>Localized flash activations deployed.</p>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.07, duration: 0.35 }}
+            className="glass-2 rounded-2xl p-6 flex flex-col gap-3 card-hover"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase tracking-widest" style={{ color: 'var(--color-text-tertiary)' }}>Total Escrow Secured</span>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)' }}>
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              </div>
+            </div>
+            <span className="text-4xl font-bold tracking-tight font-mono" style={{ color: 'var(--color-mint-bright)' }}><AnimatedNumber prefix="₹" value={analytics.totalEscrowSecured} /></span>
+            <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>100% cryptographic protection active.</p>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14, duration: 0.35 }}
+            className="glass-2 rounded-2xl p-6 flex flex-col gap-3 card-hover"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase tracking-widest" style={{ color: 'var(--color-text-tertiary)' }}>Avg Pay Per View</span>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)' }}>
+                <TrendingUp className="w-4 h-4 text-indigo-400" />
+              </div>
+            </div>
+            <span className="text-4xl font-bold tracking-tight font-mono" style={{ color: 'var(--color-violet-bright)' }}>₹{analytics.averagePayPerView}</span>
+            <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>Cost efficiency by campaign history.</p>
+          </motion.div>
         </div>
 
         {/* Chart + Roster Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Past Campaigns */}
-          <div className="lg:col-span-7 bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-6">
+          <div className="lg:col-span-7 glass-card p-6 flex flex-col gap-6">
             <div>
-              <h3 className="text-base font-display font-semibold text-zinc-900">Past Campaigns</h3>
-              <p className="text-xs text-zinc-500 mt-0.5">Historical pay per view and performance metrics.</p>
+              <h3 className="text-base font-bold tracking-tight" style={{ color: 'var(--color-text-primary)' }}>Past Campaigns</h3>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>Historical pay per view and performance metrics.</p>
             </div>
 
             <div className="flex flex-col gap-4 max-h-[400px] overflow-y-auto pr-2 font-sans">
               {analytics.pastCampaigns.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-10 text-center bg-zinc-50 rounded-xl border border-dashed border-zinc-200">
+                <div className="flex flex-col items-center justify-center py-10 text-center rounded-xl border border-dashed border-[rgba(255,255,255,0.1)]" style={{ background: 'rgba(255,255,255,0.02)' }}>
                   <span className="text-sm font-medium text-zinc-500 mb-1">No Past Campaigns</span>
-                  <span className="text-[11px] text-zinc-400">Launch a new campaign to see performance metrics.</span>
+                  <span className="text-[11px] text-zinc-500">Launch a new campaign to see performance metrics.</span>
                 </div>
               ) : (
                 analytics.pastCampaigns.map((camp: any) => (
-                  <div key={camp.id} className="p-4 border border-zinc-150 rounded-xl flex items-center justify-between hover:bg-zinc-50 transition-colors">
+                  <div key={camp.id} className="p-4 border border-[rgba(255,255,255,0.08)] rounded-xl flex items-center justify-between hover:bg-[rgba(255,255,255,0.04)] transition-colors">
                     <div className="flex flex-col">
-                      <span className="text-base font-bold text-zinc-800">{camp.title}</span>
-                      <span className="text-xs text-zinc-400 font-mono mt-1">{camp.date} • {(camp.views / 1000).toFixed(1)}k views</span>
+                      <span className="text-base font-bold text-zinc-100">{camp.title}</span>
+                      <span className="text-xs text-zinc-500 font-mono mt-1">{camp.date} • {(camp.views / 1000).toFixed(1)}k views</span>
                     </div>
                     <div className="flex flex-col items-end">
-                      <span className="text-[10px] text-zinc-400 font-mono uppercase tracking-wider mb-1">PPV</span>
-                      <span className="text-sm font-mono font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">
+                      <span className="text-[10px] text-zinc-500 font-mono uppercase tracking-wider mb-1">PPV</span>
+                      <span className="text-sm font-mono font-bold text-emerald-400 bg-[rgba(16,185,129,0.08)] px-2.5 py-1 rounded-lg border border-[rgba(16,185,129,0.2)]">
                         ₹{camp.ppv}
                       </span>
                     </div>
@@ -1775,31 +1896,31 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
           </div>
 
           {/* Frequent Creators */}
-          <div className="lg:col-span-5 bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-4">
+          <div className="lg:col-span-5 glass-card p-6 flex flex-col gap-4">
             <div>
-              <h3 className="text-base font-display font-semibold text-zinc-900">Frequent Creators</h3>
-              <p className="text-xs text-zinc-500 mt-0.5">Top-performing partners in your network.</p>
+              <h3 className="text-base font-bold tracking-tight" style={{ color: 'var(--color-text-primary)' }}>Frequent Creators</h3>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>Top-performing partners in your network.</p>
             </div>
 
             <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto pr-1 font-sans">
               {frequentCreators.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-10 text-center bg-zinc-50 rounded-xl border border-dashed border-zinc-200">
+                <div className="flex flex-col items-center justify-center py-10 text-center rounded-xl border border-dashed border-[rgba(255,255,255,0.1)]" style={{ background: 'rgba(255,255,255,0.02)' }}>
                   <span className="text-sm font-medium text-zinc-500 mb-1">No Frequent Creators</span>
-                  <span className="text-[11px] text-zinc-400">Launch campaigns to build your network.</span>
+                  <span className="text-[11px] text-zinc-500">Launch campaigns to build your network.</span>
                 </div>
               ) : (
                 frequentCreators.map((creator: any) => (
-                  <div key={creator.id || creator._id} className="p-3 border border-zinc-150 rounded-xl flex items-center justify-between">
+                  <div key={creator.id || creator._id} className="p-3 border border-[rgba(255,255,255,0.08)] rounded-xl flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <img src={creator.avatar || creator.avatarUrl} alt={creator.name} className="w-8 h-8 rounded-full object-cover border border-zinc-100 referrerPolicy='no-referrer'" />
+                      <img src={creator.avatar || creator.avatarUrl} alt={creator.name} className="w-8 h-8 rounded-full object-cover border border-[rgba(255,255,255,0.08)] referrerPolicy='no-referrer'" />
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-zinc-800">{creator.name}</span>
-                        <span className="text-[11px] text-zinc-400 font-mono">{creator.locality}</span>
+                        <span className="text-sm font-bold text-zinc-100">{creator.name}</span>
+                        <span className="text-[11px] text-zinc-500 font-mono">{creator.locality}</span>
                       </div>
                     </div>
                     <div className="flex flex-col items-end">
-                      <span className="text-[10px] text-zinc-400 font-mono uppercase tracking-wider mb-0.5">Worked on</span>
-                      <span className="text-sm font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">{creator.overlap} {creator.overlap === 1 ? 'camp' : 'camps'}</span>
+                      <span className="text-[10px] text-zinc-500 font-mono uppercase tracking-wider mb-0.5">Worked on</span>
+                      <span className="text-sm font-mono font-bold text-indigo-400 bg-[rgba(99,102,241,0.08)] px-2 py-0.5 rounded border border-[rgba(99,102,241,0.2)]">{creator.overlap} {creator.overlap === 1 ? 'camp' : 'camps'}</span>
                     </div>
                   </div>
                 ))
@@ -1808,8 +1929,9 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
           </div>
         </div>
       </div>
-    );
-  }
-
-  return null;
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
 }

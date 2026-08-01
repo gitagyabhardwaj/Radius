@@ -31,7 +31,8 @@ export const CampaignAcceptModal: React.FC<CampaignAcceptModalProps> = ({ campai
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-2xl bg-zinc-950 border border-white/10 rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+            className="relative w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+            style={{ background: 'var(--color-obsidian-surface)', border: '1px solid rgba(255,255,255,0.1)', borderTopColor: 'rgba(255,255,255,0.16)' }}
           >
             {/* Dynamic glow */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none" />
@@ -40,7 +41,7 @@ export const CampaignAcceptModal: React.FC<CampaignAcceptModalProps> = ({ campai
             {/* Header */}
             <div className="relative z-10 p-6 sm:p-8 flex items-center justify-between border-b border-white/5">
               <div className="flex flex-col gap-1">
-                <h3 className="text-2xl font-display font-black text-white flex items-center gap-2">
+                <h3 className="text-xl font-bold tracking-tight flex items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
                   <FileText className="w-6 h-6 text-indigo-400" />
                   Campaign Brief
                 </h3>
@@ -78,7 +79,7 @@ export const CampaignAcceptModal: React.FC<CampaignAcceptModalProps> = ({ campai
                   </div>
                   <div className="flex flex-col items-end">
                     <span className="text-[10px] font-mono tracking-widest text-emerald-500/70 uppercase">Escrow Value</span>
-                    <span className="text-2xl font-display font-black text-emerald-400">₹{campaign.budget}</span>
+                    <span className="text-2xl font-bold font-mono" style={{ color: 'var(--color-mint-bright)' }}>₹{campaign.budget}</span>
                   </div>
                 </div>
 

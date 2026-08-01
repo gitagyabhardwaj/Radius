@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useUser, useClerk } from '@clerk/clerk-react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../convex/_generated/api';
@@ -10,17 +10,32 @@ import EntryGate from './components/EntryGate';
 import { Campaign, Creator } from './types';
 import {
   Compass,
-  Briefcase,
   User,
-  ShieldCheck,
-  HelpCircle,
-  Activity,
   LogOut,
   Radio,
   DollarSign,
   Image,
+  Activity,
+  ShieldCheck,
+  BarChart2,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+
+// ─── ANIMATION VARIANTS ───
+const sidebarVariants = {
+  collapsed: { width: 64, transition: { type: 'spring', stiffness: 500, damping: 42 } },
+  expanded:  { width: 240, transition: { type: 'spring', stiffness: 500, damping: 42 } },
+};
+
+const labelVariants = {
+  collapsed: { opacity: 0, x: -6, transition: { duration: 0.12 } },
+  expanded:  { opacity: 1, x: 0,  transition: { duration: 0.18, delay: 0.08 } },
+};
+
+const wordmarkVariants = {
+  collapsed: { opacity: 0, width: 0, overflow: 'hidden', transition: { duration: 0.12 } },
+  expanded:  { opacity: 1, width: 'auto', transition: { duration: 0.18, delay: 0.08 } },
+};
 
 // Adapter: Convert Convex user document to frontend Creator type for backward compatibility
 function convexUserToCreator(user: any): Creator {
@@ -71,11 +86,9 @@ function convexToCampaign(campaign: any, batches: any[]): Campaign {
     centerLocality: campaign.centerLocality,
     centerLat: campaign.centerLat,
     centerLng: campaign.centerLng,
-
     budget: campaign.budget,
     spotsTotal: campaign.spotsTotal,
     spotsFilled: campaign.spotsFilled,
-    
     contentFormat: campaign.contentFormat,
     creativeGuidelines: campaign.creativeGuidelines,
     targetAudience: campaign.targetAudience,
@@ -87,6 +100,48 @@ function convexToCampaign(campaign: any, batches: any[]): Campaign {
     batches: campaignBatches,
     activeBatchIndex: campaign.activeBatchIndex,
   };
+}
+
+// ─── NAV ITEM COMPONENT ───
+function NavItem({
+  icon: Icon,
+  label,
+  isActive,
+  onClick,
+  id,
+  imgUrl,
+}: {
+  icon: React.ElementType;
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
+  id: string;
+  imgUrl?: string;
+}) {
+  return (
+    <button
+      id={id}
+      onClick={onClick}
+      className={`relative flex flex-col items-center justify-center w-16 h-14 rounded-[16px] transition-all duration-300 outline-none ${
+        isActive ? 'text-indigo-400' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'
+      }`}
+    >
+      {isActive && (
+        <motion.div
+          layoutId="bottom-nav-pill"
+          className="absolute inset-0 rounded-[16px]"
+          style={{ background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.25)', zIndex: 0 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+        />
+      )}
+      {imgUrl ? (
+        <img src={imgUrl} alt={label} className={`w-[20px] h-[20px] mb-1 rounded-full relative z-10 transition-transform duration-300 object-cover border border-[rgba(255,255,255,0.1)] ${isActive ? 'scale-110 border-indigo-400/50' : ''}`} referrerPolicy="no-referrer" />
+      ) : (
+        <Icon className={`w-[18px] h-[18px] mb-1 relative z-10 transition-transform duration-300 ${isActive ? 'scale-110' : ''}`} />
+      )}
+      <span className="text-[9px] font-medium tracking-wide relative z-10">{label}</span>
+    </button>
+  );
 }
 
 export default function App() {
@@ -117,10 +172,25 @@ export default function App() {
   const [centerLng, setCenterLng] = useState<number>(77.2197);
   const [centerAddress, setCenterAddress] = useState<string | null>(null);
 
-
   // Active sub-tab states for navigation sidebar
   const [activeBrandSubTab, setActiveBrandSubTab] = useState<'setup' | 'dispatch' | 'analytics' | 'profile'>('setup');
   const [activeCreatorSubTab, setActiveCreatorSubTab] = useState<'radar' | 'escrow' | 'wallet' | 'portfolio' | 'profile'>('radar');
+
+  // Sidebar expanded state
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
+
+  // Header scroll state
+  const [headerScrolled, setHeaderScrolled] = useState(false);
+  const mainRef = useRef<HTMLDivElement>(null);
+
+  // Track scroll for header style
+  useEffect(() => {
+    const el = mainRef.current;
+    if (!el) return;
+    const handleScroll = () => setHeaderScrolled(el.scrollTop > 8);
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Determine role and view from Convex user
   const userRole = currentUser?.role || null;
@@ -164,7 +234,6 @@ export default function App() {
       if (camp) {
         setCenterLat(camp.centerLat);
         setCenterLng(camp.centerLng);
-
       }
     }
   }, [selectedCampaignId, activeCampaigns]);
@@ -192,8 +261,6 @@ export default function App() {
     setActiveBrandSubTab('dispatch');
   };
 
-
-
   // Handle role selection after Clerk sign-in (onboarding)
   const handleRoleSelection = async (role: 'brand' | 'creator', profileData?: any) => {
     try {
@@ -217,42 +284,51 @@ export default function App() {
     }
   };
 
-  // --- LOADING STATE ---
+  // ── LOADING STATE ──
   if (!isAuthLoaded) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-zinc-950 font-display font-black tracking-tighter text-base animate-pulse">
+      <div className="min-h-screen app-bg flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          className="flex flex-col items-center gap-5"
+        >
+          <div className="w-12 h-12 rounded-xl sidebar-logo-bg flex items-center justify-center font-display font-black tracking-tighter text-base text-white animate-pulse">
             R.
           </div>
-          <span className="text-zinc-500 font-mono text-sm">Initializing Radius...</span>
-        </div>
+          <span className="font-mono text-xs tracking-widest uppercase" style={{ color: 'var(--color-text-tertiary)' }}>Initializing Radius...</span>
+        </motion.div>
       </div>
     );
   }
 
-  // --- NOT SIGNED IN: Show EntryGate (Clerk auth) ---
+  // ── NOT SIGNED IN: Show EntryGate ──
   if (!isSignedIn) {
     return <EntryGate creators={creators} onSignIn={() => {}} />;
   }
 
-  // --- SIGNED IN BUT NO CONVEX USER: Show onboarding ---
+  // ── SIGNED IN BUT NO CONVEX USER: Loading ──
   if (currentUser === undefined) {
-    // Still loading from Convex
     return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-zinc-950 font-display font-black tracking-tighter text-base animate-pulse">
+      <div className="min-h-screen app-bg flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          className="flex flex-col items-center gap-5"
+        >
+          <div className="w-12 h-12 rounded-xl sidebar-logo-bg flex items-center justify-center font-display font-black tracking-tighter text-base text-white animate-pulse">
             R.
           </div>
-          <span className="text-zinc-500 font-mono text-sm">Loading profile...</span>
-        </div>
+          <span className="font-mono text-xs tracking-widest uppercase" style={{ color: 'var(--color-text-tertiary)' }}>Loading profile...</span>
+        </motion.div>
       </div>
     );
   }
 
+  // ── ONBOARDING: Convex user not yet created ──
   if (currentUser === null) {
-    // User authenticated with Clerk but no Convex record — show role onboarding
     return (
       <EntryGate
         creators={creators}
@@ -263,260 +339,70 @@ export default function App() {
     );
   }
 
-  // --- FULLY AUTHENTICATED: Main App ---
+  // ── FULLY AUTHENTICATED: Main App ──
   const brandDisplayName = currentUser.brandName || currentUser.name || 'Brand';
   const showMap = view === 'brand' && activeBrandSubTab === 'setup';
 
+  const brandNavItems = [
+    { id: 'nav-launch',   icon: Compass,    label: 'Launch Engine',  tab: 'setup' as const },
+    { id: 'nav-dispatch', icon: Activity,   label: 'Dispatch Room',  tab: 'dispatch' as const },
+    { id: 'nav-analytics',icon: BarChart2,  label: 'Analytics Logs', tab: 'analytics' as const },
+    { id: 'nav-profile',  icon: User,       label: 'Brand Profile',  tab: 'profile' as const },
+  ];
+
+  const creatorNavItems = [
+    { id: 'nav-radar',     icon: Radio,      label: 'Active Radar',    tab: 'radar' as const },
+    { id: 'nav-escrow',    icon: ShieldCheck,label: 'Active Campaigns', tab: 'escrow' as const },
+    { id: 'nav-wallet',    icon: DollarSign, label: 'Secure Wallet',   tab: 'wallet' as const },
+    { id: 'nav-portfolio', icon: Image,      label: 'Portfolio',       tab: 'portfolio' as const },
+    { id: 'nav-creator-profile', icon: User, label: 'Creator Profile', tab: 'profile' as const },
+  ];
+
   return (
-    <div className="h-screen overflow-hidden bg-gradient-to-br from-indigo-50/60 via-[#f2f5f9] to-slate-100 text-zinc-900 selection:bg-indigo-100 selection:text-indigo-900 flex flex-row">
-      
-      {/* MINIMALIST PERSISTENT SIDEBAR NAVIGATION */}
-      <aside className="w-64 bg-zinc-950 text-zinc-300 border-r border-zinc-800 flex flex-col justify-between shrink-0 h-screen overflow-y-auto">
-        <div className="flex flex-col">
-          {/* Logo Brand Header */}
-          <div className="p-5 border-b border-zinc-900 flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-zinc-950 font-display font-black tracking-tighter text-base">
-              R.
-            </div>
-            <div className="flex flex-col">
-              <span className="font-display font-bold text-base tracking-tight text-white uppercase leading-none">
-                RADIUS
-              </span>
-              <span className="text-[11px] font-mono tracking-wider text-zinc-500 mt-0.5 uppercase leading-none">
-                Hyperlocal Escrow
-              </span>
-            </div>
-          </div>
-          <div className="px-5 py-4 border-b border-zinc-900 bg-zinc-900/20 flex flex-col gap-3">
-            <div className="flex items-center gap-3">
-              <img src={currentUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name || 'U')}&background=random`} alt="User" className="w-8 h-8 rounded-full" />
-              <div className="flex flex-col">
-                <span className="font-medium text-sm text-zinc-200">{currentUser.name}</span>
-                <span className="text-[10px] uppercase font-mono text-zinc-500">{currentUser.role}</span>
-              </div>
-            </div>
-            <div className="bg-zinc-950 rounded-lg p-2.5 border border-zinc-800 flex justify-between items-center">
-              <span className="text-xs font-mono text-zinc-400">Wallet</span>
-              <span className="text-sm font-bold text-emerald-500 font-mono">₹{currentUser.escrowBalance || 0}</span>
-            </div>
-          </div>
-          {/* Subtab Navigation */}
-          <div className="p-4 flex flex-col gap-2">
-            <span className="text-[11px] font-mono uppercase tracking-widest text-zinc-500 font-bold px-1.5">Navigation Features</span>
-            <nav className="flex flex-col gap-1">
-              {view === 'brand' ? (
-                <>
-                  <button
-                    onClick={() => setActiveBrandSubTab('setup')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
-                      activeBrandSubTab === 'setup'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
-                    }`}
-                  >
-                    <Compass className="w-4 h-4" />
-                    <span>1. Launch Engine</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveBrandSubTab('dispatch')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
-                      activeBrandSubTab === 'dispatch'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
-                    }`}
-                  >
-                    <Activity className="w-4 h-4" />
-                    <span>2. Dispatch Room</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveBrandSubTab('analytics')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
-                      activeBrandSubTab === 'analytics'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
-                    }`}
-                  >
-                    <ShieldCheck className="w-4 h-4" />
-                    <span>3. Analytics Logs</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveBrandSubTab('profile')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
-                      activeBrandSubTab === 'profile'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
-                    }`}
-                  >
-                    <User className="w-4 h-4" />
-                    <span>4. Brand Profile</span>
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => setActiveCreatorSubTab('radar')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
-                      activeCreatorSubTab === 'radar'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
-                    }`}
-                  >
-                    <Radio className="w-4 h-4" />
-                    <span>1. Active Radar</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveCreatorSubTab('escrow')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
-                      activeCreatorSubTab === 'escrow'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
-                    }`}
-                  >
-                    <Compass className="w-4 h-4" />
-                    <span className="truncate">2. Active Campaigns</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveCreatorSubTab('wallet')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
-                      activeCreatorSubTab === 'wallet'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
-                    }`}
-                  >
-                    <DollarSign className="w-4 h-4" />
-                    <span>3. Secure Wallet</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveCreatorSubTab('portfolio')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
-                      activeCreatorSubTab === 'portfolio'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
-                    }`}
-                  >
-                    <Image className="w-4 h-4" />
-                    <span>4. Portfolio</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveCreatorSubTab('profile')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
-                      activeCreatorSubTab === 'profile'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
-                    }`}
-                  >
-                    <User className="w-4 h-4" />
-                    <span>5. Creator Profile</span>
-                  </button>
-                </>
-              )}
-            </nav>
-          </div>
-        </div>
+    <div className="h-screen overflow-hidden app-bg text-zinc-200 flex flex-row">
 
-        {/* Bottom profile info */}
-        <div className="p-4 border-t border-zinc-900 flex flex-col gap-3">
-          <div className="flex items-center gap-2.5 px-1">
-            {clerkUser?.imageUrl ? (
-              <img
-                src={clerkUser.imageUrl}
-                alt="Profile"
-                className="w-8 h-8 rounded-full object-cover border border-zinc-800"
-                referrerPolicy="no-referrer"
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center font-bold text-sm text-indigo-400 uppercase">
-                {view === 'brand' ? brandDisplayName.substring(0, 2) : '?'}
-              </div>
-            )}
-            <div className="flex flex-col">
-              <span className="text-xs font-bold text-white tracking-tight line-clamp-1 leading-none">
-                {view === 'brand' ? brandDisplayName : currentCreatorProfile?.name || 'Creator'}
-              </span>
-              <span className="text-[10px] font-mono text-zinc-400 mt-1 leading-none truncate max-w-[120px]" title={clerkUser?.primaryEmailAddress?.emailAddress || ''}>
-                {clerkUser?.primaryEmailAddress?.emailAddress || (view === 'brand' ? 'Active Brand Admin' : 'Grid Operator')}
-              </span>
-            </div>
-          </div>
-          <button
-            onClick={async () => {
-              await signOut();
-              window.location.reload();
-            }}
-            className="w-full py-2 border border-zinc-850 rounded-xl text-[11px] font-mono font-bold tracking-wider uppercase text-zinc-400 hover:text-white hover:bg-zinc-900/50 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Sign Out</span>
-          </button>
-        </div>
-      </aside>
+      {/* ── MAIN CONTENT ── */}
+      <div ref={mainRef} className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto relative pb-32">
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto relative custom-scrollbar">
-        
-        {/* Dynamic header status bar */}
-        <header className="border-b border-zinc-200/60 bg-white/85 backdrop-blur-md sticky top-0 z-30 px-6 py-4">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <span className="text-sm font-mono font-bold text-zinc-400 uppercase">Current Node:</span>
-              <span className="text-sm font-mono font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded uppercase">
-                {view === 'brand' ? `${brandDisplayName} Admin` : `${currentCreatorProfile?.name || 'Creator'} Terminal`}
-              </span>
-            </div>
 
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 text-sm font-mono font-medium text-zinc-500">
-                <Activity className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
-                <span className="hidden sm:inline">{view === 'brand' ? 'Escrow Node: Connected' : 'Radar Status: Listening for Offers'}</span>
-              </div>
-              <div className="flex items-center justify-center p-2 rounded-full hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white border border-zinc-800">
-                <button 
-                  className="flex items-center justify-center" 
-                  aria-label="Sign out"
-                  onClick={async () => {
-                    await signOut();
-                    window.location.reload();
-                  }}
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </header>
 
-        <main className="max-w-7xl w-full mx-auto px-6 py-6 flex flex-col gap-6">
-          
-          {/* Unified Map Grid */}
-          {showMap && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-fade-in">
-              <div className="lg:col-span-12 flex flex-col gap-3">
+        <main className={`${view === 'brand' && activeBrandSubTab === 'setup' ? 'max-w-5xl' : 'max-w-7xl'} w-full mx-auto px-6 py-6 flex flex-col gap-6`}>
+
+          {/* Map section */}
+          <AnimatePresence>
+            {showMap && (
+              <motion.div
+                initial={{ opacity: 0, height: 0, scale: 0.98, filter: 'blur(10px)' }}
+                animate={{ opacity: 1, height: 'auto', scale: 1, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, height: 0, scale: 0.98, filter: 'blur(10px)', overflow: 'hidden', marginTop: 0, marginBottom: 0 }}
+                transition={{ duration: 0.35, ease: [0.25, 1, 0.5, 1] }}
+                className="flex flex-col gap-4 origin-top"
+              >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h1 className="text-base font-display font-bold text-zinc-900 tracking-tight">
+                    <h1 className="text-lg font-bold tracking-tight" style={{ color: 'var(--color-text-primary)' }}>
                       Hyperlocal Match Engine
                     </h1>
-                    <p className="text-sm text-zinc-500 mt-0.5 mb-4">
+                    <p className="text-sm mt-1 mb-4" style={{ color: 'var(--color-text-secondary)' }}>
                       Search an address or place the target pin to visualize creator match density.
                     </p>
-                    <AddressSearch 
+                    <AddressSearch
                       onLocationFound={(lat, lng, address) => {
                         setCenterLat(lat);
                         setCenterLng(lng);
                         setCenterAddress(address);
-                      }} 
+                      }}
                     />
                   </div>
-                  <div className="flex items-center gap-2 text-sm font-mono font-medium text-zinc-500 mt-1">
-                    <Compass className="w-4 h-4 text-indigo-500 animate-spin-slow" />
-                    <span>Delhi Grid (CP Centered)</span>
+                  <div className="flex items-center gap-2 mt-1 ml-6">
+                    <Compass className="w-4 h-4 text-indigo-400 animate-spin-slow" />
+                    <span className="text-[11px] font-mono" style={{ color: 'var(--color-text-tertiary)' }}>Delhi Grid · CP Origin</span>
                   </div>
                 </div>
 
                 <MinimalMap
                   centerLat={centerLat}
                   centerLng={centerLng}
-
                   onMapClick={(lat, lng) => {
                     setCenterLat(lat);
                     setCenterLng(lng);
@@ -527,32 +413,29 @@ export default function App() {
                   activeCampaignId={selectedCampaignId}
                   creators={creators}
                 />
-              </div>
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          {/* Dynamic Portal view viewport */}
+          {/* Workspace */}
           <AnimatePresence mode="wait">
             {view === 'brand' ? (
               <motion.div
                 key="brand"
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.2 }}
+                exit={{ opacity: 0, y: -14 }}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
               >
                 <BrandWorkspace
                   centerLat={centerLat}
                   centerLng={centerLng}
                   centerAddress={centerAddress}
-
                   setCenterLat={setCenterLat}
                   setCenterLng={setCenterLng}
                   onCampaignCreated={handleCampaignCreated}
                   activeCampaigns={activeCampaigns}
-                  setSelectedCreator={(creator) => {
-                    setSelectedCreatorId(creator.id);
-                  }}
+                  setSelectedCreator={(creator) => { setSelectedCreatorId(creator.id); }}
                   setView={() => {}}
                   setSelectedCampaignId={setSelectedCampaignId}
                   activeSubTab={activeBrandSubTab}
@@ -564,10 +447,10 @@ export default function App() {
             ) : (
               <motion.div
                 key="creator"
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.2 }}
+                exit={{ opacity: 0, y: -14 }}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
               >
                 <CreatorWorkspace
                   activeCampaigns={activeCampaigns}
@@ -576,9 +459,7 @@ export default function App() {
                   selectedCampaignId={selectedCampaignId}
                   setSelectedCampaignId={(id) => {
                     setSelectedCampaignId(id);
-                    if (id) {
-                      setActiveCreatorSubTab('escrow');
-                    }
+                    if (id) setActiveCreatorSubTab('escrow');
                   }}
                   activeSubTab={activeCreatorSubTab}
                   creators={creators}
@@ -587,7 +468,36 @@ export default function App() {
             )}
           </AnimatePresence>
         </main>
+      
+      {/* ── FLOATING BOTTOM NAV ── */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex items-center justify-center pointer-events-none">
+        <div className="glass-4 p-2 rounded-[24px] flex items-center gap-1 pointer-events-auto border border-[rgba(255,255,255,0.08)] shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+          {view === 'brand'
+            ? brandNavItems.map(({ tab, ...item }) => (
+                <NavItem
+                  key={tab}
+                  id={item.id}
+                  icon={item.icon}
+                  imgUrl={tab === 'profile' ? (currentUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name || 'U')}&background=4F46E5&color=fff`) : undefined}
+                  label={item.label}
+                  isActive={activeBrandSubTab === tab}
+                  onClick={() => setActiveBrandSubTab(tab)}
+                />
+              ))
+            : creatorNavItems.map(({ tab, ...item }) => (
+                <NavItem
+                  key={tab}
+                  id={item.id}
+                  icon={item.icon}
+                  imgUrl={tab === 'profile' ? (currentUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name || 'U')}&background=4F46E5&color=fff`) : undefined}
+                  label={item.label}
+                  isActive={activeCreatorSubTab === tab}
+                  onClick={() => setActiveCreatorSubTab(tab as any)}
+                />
+              ))}
+        </div>
       </div>
+</div>
     </div>
   );
 }

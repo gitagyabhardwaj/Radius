@@ -463,9 +463,29 @@ export default function CreatorWorkspace({
   };
   if (!currentCreator) return null;
 
-  if (activeSubTab === 'profile') {
-    return (
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-fade-in">
+  const tabOrder = ['radar', 'escrow', 'wallet', 'portfolio', 'profile'];
+  const [prevTab, setPrevTab] = React.useState(activeSubTab);
+  const [direction, setDirection] = React.useState(1);
+  
+  if (activeSubTab !== prevTab) {
+    setDirection(tabOrder.indexOf(activeSubTab) > tabOrder.indexOf(prevTab) ? 1 : -1);
+    setPrevTab(activeSubTab);
+  }
+
+  return (
+    <div className="relative w-full h-full">
+      <AnimatePresence mode="wait" custom={direction}>
+        <motion.div
+          key={activeSubTab}
+          custom={direction}
+          initial={{ opacity: 0, x: direction * 20, filter: 'blur(4px)' }}
+          animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+          exit={{ opacity: 0, x: direction * -20, filter: 'blur(4px)' }}
+          transition={{ duration: 0.25, ease: [0.25, 1, 0.5, 1] }}
+          className="w-full"
+        >
+          {activeSubTab === 'profile' && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Creator Profile Editor Card */}
         <div className="lg:col-span-7 bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-6">
           <div className="flex items-center justify-between border-b border-zinc-100 pb-4">
@@ -711,6 +731,23 @@ export default function CreatorWorkspace({
           
           <div className="border-t border-rose-100/50 pt-6 mt-2 flex flex-col gap-3">
             <h3 className="text-sm font-mono uppercase tracking-wider text-rose-600 font-bold">Danger Zone</h3>
+            
+            <div className="flex items-center justify-between border border-zinc-200 p-4 rounded-xl mb-3 hover:bg-zinc-50 transition-colors">
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-zinc-900">Sign Out</span>
+                <span className="text-xs text-zinc-500">Securely disconnect this device from your node.</span>
+              </div>
+              <button
+                onClick={async () => {
+                  await signOut();
+                  window.location.reload();
+                }}
+                className="py-2 px-4 border border-zinc-200 hover:bg-zinc-100 text-zinc-600 font-mono text-xs rounded-lg font-bold transition-all"
+              >
+                SIGN OUT
+              </button>
+            </div>
+
             <div className="flex items-center justify-between bg-rose-50/50 border border-rose-100 p-4 rounded-xl">
               <div className="flex flex-col">
                 <span className="text-sm font-bold text-zinc-900">Delete Account</span>
@@ -832,13 +869,11 @@ export default function CreatorWorkspace({
           </div>
         </div>
       </div>
-    );
-  }
+          )}
 
-  if (activeSubTab === 'radar') {
-    return (
-      <>
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-fade-in">
+          {activeSubTab === 'radar' && (
+            <>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Pane: Profiles, Subscriptions and Available feeds */}
         <div className="lg:col-span-4 flex flex-col gap-6">
           {/* Node Analytics / Health */}
@@ -1053,11 +1088,10 @@ export default function CreatorWorkspace({
           }}
         />
       </>
-    );
-  }
+          )}
 
-  if (activeSubTab === 'escrow') {
-    const acceptedCampaigns = creatorCampaigns.filter(camp => {
+          {activeSubTab === 'escrow' && (() => {
+            const acceptedCampaigns = creatorCampaigns.filter(camp => {
       const hasBrandReviewOffer = creatorOffers?.some((o: any) => o.campaignId === camp.id && o.status === 'brand_review');
       const hasAcceptedOffer = creatorOffers?.some((o: any) => o.campaignId === camp.id && o.status === 'accepted');
       const hasSubmission = mySubmissions?.some((s: any) => s.campaignId === camp.id);
@@ -1528,12 +1562,11 @@ export default function CreatorWorkspace({
           </div>
         )}
       </div>
-    );
-  }
+            );
+          })()}
 
-  if (activeSubTab === 'wallet') {
-    return (
-      <div className="flex flex-col gap-6 animate-fade-in">
+          {activeSubTab === 'wallet' && (
+            <div className="flex flex-col gap-6">
         {/* Quick Balance Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-3">
@@ -1621,12 +1654,10 @@ export default function CreatorWorkspace({
           </div>
         </div>
       </div>
-    );
-  }
+          )}
 
-  if (activeSubTab === 'portfolio') {
-    return (
-      <div className="max-w-5xl mx-auto flex flex-col gap-8 animate-fade-in">
+          {activeSubTab === 'portfolio' && (
+            <div className="max-w-5xl mx-auto flex flex-col gap-8">
         {/* Portfolio Header */}
         <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm">
           <div className="flex items-start gap-5">
@@ -1722,8 +1753,9 @@ export default function CreatorWorkspace({
           <ReviewsCard userId={currentCreator.id} label="Reviews from brands" />
         </div>
       </div>
-    );
-  }
-
-  return null;
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
 }

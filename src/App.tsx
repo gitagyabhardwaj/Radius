@@ -379,7 +379,12 @@ export default function App() {
       )}
 
       {!isLoading && isSignedIn && currentUser !== null && currentUser !== undefined && (
-        <div className="h-screen overflow-hidden app-bg text-zinc-200 flex flex-row relative">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          className="h-screen overflow-hidden app-bg text-zinc-200 flex flex-row relative"
+        >
           <WorkspaceBackdrop />
 
       {/* ── MAIN CONTENT ── */}
@@ -387,7 +392,12 @@ export default function App() {
 
 
 
-        <main className={`${view === 'brand' && activeBrandSubTab === 'setup' ? 'max-w-5xl' : 'max-w-7xl'} w-full mx-auto px-6 py-6 flex flex-col gap-6`}>
+        <motion.main 
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+          className={`${view === 'brand' && activeBrandSubTab === 'setup' ? 'max-w-5xl' : 'max-w-7xl'} w-full mx-auto px-6 py-6 flex flex-col gap-6`}
+        >
 
           {/* Map section */}
           <AnimatePresence>
@@ -402,7 +412,7 @@ export default function App() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <h1 className="text-lg font-bold tracking-tight" style={{ color: 'var(--color-text-primary)' }}>
-                      Match Engine
+                      Launch Engine
                     </h1>
                     <p className="text-sm mt-1 mb-4" style={{ color: 'var(--color-text-secondary)' }}>
                       Search an address or place the target pin to visualize creator match density.
@@ -488,10 +498,15 @@ export default function App() {
               </motion.div>
             )}
           </AnimatePresence>
-        </main>
+        </motion.main>
       
       {/* ── FLOATING BOTTOM NAV ── */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex items-center justify-center pointer-events-none">
+      <motion.div 
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex items-center justify-center pointer-events-none"
+      >
         <div className="glass-4 p-2 rounded-[24px] flex items-center gap-1 pointer-events-auto border border-[rgba(255,255,255,0.08)] shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl">
           {view === 'brand'
             ? brandNavItems.map(({ tab, ...item }) => (
@@ -517,9 +532,9 @@ export default function App() {
                 />
               ))}
         </div>
-      </div>
+      </motion.div>
 </div>
-        </div>
+        </motion.div>
       )}
     </>
   );

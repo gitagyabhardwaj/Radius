@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Campaign, Creator } from '../types';
 import { REGIONS, CREATORS } from '../data';
 import { getDistanceKm } from './MinimalMap';
@@ -92,7 +93,12 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
   const isVideo = (url?: string | null) => !!url && /\.(mp4|mov|webm)(\?|$)/i.test(url);
 
   return (
-    <div className="mt-2 pt-5 border-t border-[rgba(255,255,255,0.08)] flex flex-col gap-3">
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: 'auto' }}
+      transition={{ duration: 0.3, ease: 'easeOut', delay: 0.1 }}
+      className="mt-2 pt-5 border-t border-[rgba(255,255,255,0.08)] flex flex-col gap-3 overflow-hidden"
+    >
       <span className="text-[11px] font-mono uppercase tracking-wide text-zinc-400 font-bold">
         Deliverables To Review ({submissions.length})
       </span>
@@ -263,7 +269,7 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
           </div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -286,7 +292,12 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
   if (pendingReview.length === 0 && accepted.length === 0) return null;
 
   return (
-    <div className="mt-2 pt-5 border-t border-[rgba(255,255,255,0.08)] flex flex-col gap-4">
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: 'auto' }}
+      transition={{ duration: 0.3, ease: 'easeOut', delay: 0.15 }}
+      className="mt-2 pt-5 border-t border-[rgba(255,255,255,0.08)] flex flex-col gap-4 overflow-hidden"
+    >
       {/* Pending Creator Applications */}
       {pendingReview.length > 0 && (
         <div className="flex flex-col gap-3">
@@ -413,10 +424,11 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
       )}
 
       {/* Creator Profile Modal */}
-      <AnimatePresence>
-        {selectedProfileCreator && (
-          <motion.div
-            initial={{ opacity: 0 }}
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {selectedProfileCreator && (
+            <motion.div
+              initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-4"
@@ -529,9 +541,11 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
               </div>
             </motion.div>
           </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+    </motion.div>
   );
 }
 
@@ -551,65 +565,74 @@ function CampaignDetailPanel({ camp }: { camp: Campaign }) {
         {showDetails ? 'Hide Campaign Details' : 'View Campaign Details'}
       </button>
 
-      {showDetails && (
-        <div className="border border-[rgba(255,255,255,0.08)] rounded-xl p-4 flex flex-col gap-4 animate-fade-in" style={{ background: 'rgba(255,255,255,0.03)' }}>
-          {/* Deliverable / Description */}
-          <div className="flex flex-col gap-1">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Deliverable</span>
-            <p className="text-sm text-zinc-300">{camp.deliverable}</p>
-          </div>
+      <AnimatePresence>
+        {showDetails && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="border border-[rgba(255,255,255,0.08)] rounded-xl p-4 flex flex-col gap-4 overflow-hidden" 
+            style={{ background: 'rgba(255,255,255,0.03)' }}
+          >
+            {/* Deliverable / Description */}
+            <div className="flex flex-col gap-1">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Deliverable</span>
+              <p className="text-sm text-zinc-300">{camp.deliverable}</p>
+            </div>
 
-          {/* Grid of details */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {camp.contentFormat && (
+            {/* Grid of details */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {camp.contentFormat && (
+                <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Format</span>
+                  <span className="text-sm font-medium text-zinc-100">{camp.contentFormat}</span>
+                </div>
+              )}
+              {camp.targetAudience && (
+                <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Target Audience</span>
+                  <span className="text-sm font-medium text-zinc-100">{camp.targetAudience}</span>
+                </div>
+              )}
+              {camp.submissionDeadlineDays && (
+                <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Submission Deadline</span>
+                  <span className="text-sm font-medium text-zinc-100">{camp.submissionDeadlineDays} days</span>
+                </div>
+              )}
               <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Format</span>
-                <span className="text-sm font-medium text-zinc-100">{camp.contentFormat}</span>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Niche</span>
+                <span className="text-sm font-medium text-zinc-100">{camp.niche}</span>
+              </div>
+              <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Budget</span>
+                <span className="text-sm font-medium text-emerald-400">₹{camp.budget}</span>
+              </div>
+              <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Spots</span>
+                <span className="text-sm font-medium text-zinc-100">{camp.spotsFilled}/{camp.spotsTotal} filled</span>
+              </div>
+            </div>
+
+            {/* Creative Guidelines */}
+            {camp.creativeGuidelines && (
+              <div className="flex flex-col gap-1 pt-2 border-t border-[rgba(255,255,255,0.08)]">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Creative Guidelines</span>
+                <p className="text-sm text-zinc-400 italic">"{camp.creativeGuidelines}"</p>
               </div>
             )}
-            {camp.targetAudience && (
-              <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Target Audience</span>
-                <span className="text-sm font-medium text-zinc-100">{camp.targetAudience}</span>
-              </div>
-            )}
-            {camp.submissionDeadlineDays && (
-              <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Submission Deadline</span>
-                <span className="text-sm font-medium text-zinc-100">{camp.submissionDeadlineDays} days</span>
-              </div>
-            )}
-            <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Niche</span>
-              <span className="text-sm font-medium text-zinc-100">{camp.niche}</span>
-            </div>
-            <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Budget</span>
-              <span className="text-sm font-medium text-emerald-400">₹{camp.budget}</span>
-            </div>
-            <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Spots</span>
-              <span className="text-sm font-medium text-zinc-100">{camp.spotsFilled}/{camp.spotsTotal} filled</span>
-            </div>
-          </div>
 
-          {/* Creative Guidelines */}
-          {camp.creativeGuidelines && (
-            <div className="flex flex-col gap-1 pt-2 border-t border-[rgba(255,255,255,0.08)]">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Creative Guidelines</span>
-              <p className="text-sm text-zinc-400 italic">"{camp.creativeGuidelines}"</p>
+            {/* Location */}
+            <div className="flex items-center gap-2 pt-2 border-t border-[rgba(255,255,255,0.08)]">
+              <MapPin className="w-3.5 h-3.5 text-zinc-400" />
+              <span className="text-[11px] text-zinc-400 font-mono">
+                {camp.centerLocality} ({camp.centerLat.toFixed(4)}N, {camp.centerLng.toFixed(4)}E)
+              </span>
             </div>
-          )}
-
-          {/* Location */}
-          <div className="flex items-center gap-2 pt-2 border-t border-[rgba(255,255,255,0.08)]">
-            <MapPin className="w-3.5 h-3.5 text-zinc-400" />
-            <span className="text-[11px] text-zinc-400 font-mono">
-              {camp.centerLocality} ({camp.centerLat.toFixed(4)}N, {camp.centerLng.toFixed(4)}E)
-            </span>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -1624,7 +1647,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                   </div>
                 </div>
 
-                <AnimatePresence initial={false}>
+                <AnimatePresence>
                   {!isCollapsed && (
                     <motion.div 
                       initial={{ height: 0, opacity: 0 }}

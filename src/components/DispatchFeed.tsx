@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { Activity, UserCheck, UserX, Clock3, Upload, CheckCircle2, XCircle, Lock, Banknote, RotateCcw } from 'lucide-react';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
@@ -67,7 +68,12 @@ export default function DispatchFeed({ campaignId }: { campaignId: string }) {
   if (!events || events.length === 0) return null;
 
   return (
-    <div className="mt-2 pt-5 border-t border-[rgba(255,255,255,0.07)] flex flex-col gap-3">
+    <motion.div 
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: 'auto' }}
+      transition={{ duration: 0.3, ease: 'easeOut', delay: 0.2 }}
+      className="mt-2 pt-5 border-t border-[rgba(255,255,255,0.07)] flex flex-col gap-3 overflow-hidden"
+    >
       <span className="text-[11px] font-mono uppercase tracking-wide font-bold flex items-center gap-1.5" style={{ color: 'var(--color-text-tertiary)' }}>
         <span className="live-dot" />
         Live Dispatch Feed
@@ -94,6 +100,6 @@ export default function DispatchFeed({ campaignId }: { campaignId: string }) {
           );
         })}
       </div>
-    </div>
+    </motion.div>
   );
 }

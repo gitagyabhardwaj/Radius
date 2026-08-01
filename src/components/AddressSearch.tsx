@@ -57,7 +57,7 @@ export default function AddressSearch({ onLocationFound }: AddressSearchProps) {
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             placeholder="Search address or brand location..."
-            className="input-field w-full pl-10 pr-4"
+            className="input-field w-full !pl-10 pr-4"
             disabled={loading}
           />
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />

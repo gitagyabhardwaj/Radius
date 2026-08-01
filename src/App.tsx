@@ -7,6 +7,7 @@ import AddressSearch from './components/AddressSearch';
 import BrandWorkspace from './components/BrandWorkspace';
 import CreatorWorkspace from './components/CreatorWorkspace';
 import EntryGate from './components/EntryGate';
+import { NeuralStream } from './components/Loaders';
 import { Campaign, Creator } from './types';
 import {
   Compass,
@@ -144,6 +145,47 @@ function NavItem({
   );
 }
 
+// ─── WORKSPACE BACKDROP ───
+const WorkspaceBackdrop = () => (
+  <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
+    {/* Nebula gradient blobs */}
+    <motion.div 
+      animate={{ x: [0, 40, -20, 0], y: [0, -20, 20, 0] }}
+      transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+      className="absolute top-[-10%] left-[-10%] w-3/4 h-3/4 rounded-full opacity-[0.15]" 
+      style={{ background: 'radial-gradient(ellipse at center, rgba(79,70,229,0.3) 0%, transparent 60%)', filter: 'blur(80px)' }} 
+    />
+    <motion.div 
+      animate={{ x: [0, -40, 20, 0], y: [0, 20, -20, 0] }}
+      transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
+      className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full opacity-[0.1]" 
+      style={{ background: 'radial-gradient(ellipse at center, rgba(16,185,129,0.2) 0%, transparent 60%)', filter: 'blur(70px)' }} 
+    />
+
+    {/* Spectral lines (runners) */}
+    {[...Array(12)].map((_, i) => (
+      <motion.div
+        key={`h-runner-${i}`}
+        className="absolute h-[1px] w-64 bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent shadow-[0_0_12px_rgba(99,102,241,0.4)] opacity-25"
+        style={{ top: `${8 + i * 8}%` }}
+        initial={{ left: '-20%' }}
+        animate={{ left: '120%' }}
+        transition={{ duration: 8 + (i % 3) * 4, repeat: Infinity, delay: i * 2.5, ease: 'linear' }}
+      />
+    ))}
+    {[...Array(16)].map((_, i) => (
+      <motion.div
+        key={`v-runner-${i}`}
+        className="absolute w-[1px] h-64 bg-gradient-to-b from-transparent via-emerald-500/50 to-transparent shadow-[0_0_12px_rgba(16,185,129,0.4)] opacity-25"
+        style={{ left: `${5 + i * 6}%` }}
+        initial={{ top: '-20%' }}
+        animate={{ top: '120%' }}
+        transition={{ duration: 10 + (i % 4) * 3, repeat: Infinity, delay: i * 1.8, ease: 'linear' }}
+      />
+    ))}
+  </div>
+);
+
 export default function App() {
   // Clerk auth
   const { isSignedIn, isLoaded: isAuthLoaded, user: clerkUser } = useUser();
@@ -167,7 +209,7 @@ export default function App() {
   const [selectedCreatorId, setSelectedCreatorId] = useState<string>('');
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
 
-  // Interactive Map Geofence Center (South Delhi default)
+  // Interactive Map Geofence Center (Local default)
   const [centerLat, setCenterLat] = useState<number>(28.5276);
   const [centerLng, setCenterLng] = useState<number>(77.2197);
   const [centerAddress, setCenterAddress] = useState<string | null>(null);
@@ -285,62 +327,10 @@ export default function App() {
   };
 
   // ── LOADING STATE ──
-  if (!isAuthLoaded) {
-    return (
-      <div className="min-h-screen app-bg flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-          className="flex flex-col items-center gap-5"
-        >
-          <div className="w-12 h-12 rounded-xl sidebar-logo-bg flex items-center justify-center font-display font-black tracking-tighter text-base text-white animate-pulse">
-            R.
-          </div>
-          <span className="font-mono text-xs tracking-widest uppercase" style={{ color: 'var(--color-text-tertiary)' }}>Initializing Radius...</span>
-        </motion.div>
-      </div>
-    );
-  }
-
-  // ── NOT SIGNED IN: Show EntryGate ──
-  if (!isSignedIn) {
-    return <EntryGate creators={creators} onSignIn={() => {}} />;
-  }
-
-  // ── SIGNED IN BUT NO CONVEX USER: Loading ──
-  if (currentUser === undefined) {
-    return (
-      <div className="min-h-screen app-bg flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-          className="flex flex-col items-center gap-5"
-        >
-          <div className="w-12 h-12 rounded-xl sidebar-logo-bg flex items-center justify-center font-display font-black tracking-tighter text-base text-white animate-pulse">
-            R.
-          </div>
-          <span className="font-mono text-xs tracking-widest uppercase" style={{ color: 'var(--color-text-tertiary)' }}>Loading profile...</span>
-        </motion.div>
-      </div>
-    );
-  }
-
-  // ── ONBOARDING: Convex user not yet created ──
-  if (currentUser === null) {
-    return (
-      <EntryGate
-        creators={creators}
-        onSignIn={(role, profileData) => {
-          handleRoleSelection(role, profileData);
-        }}
-      />
-    );
-  }
+  const isLoading = !isAuthLoaded || (isSignedIn && currentUser === undefined);
 
   // ── FULLY AUTHENTICATED: Main App ──
-  const brandDisplayName = currentUser.brandName || currentUser.name || 'Brand';
+  const brandDisplayName = currentUser?.brandName || currentUser?.name || 'Brand';
   const showMap = view === 'brand' && activeBrandSubTab === 'setup';
 
   const brandNavItems = [
@@ -359,10 +349,41 @@ export default function App() {
   ];
 
   return (
-    <div className="h-screen overflow-hidden app-bg text-zinc-200 flex flex-row">
+    <>
+      <AnimatePresence>
+        {isLoading && (
+          <motion.div
+            key="app-loader"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ y: "-100%" }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed inset-0 z-[100]"
+          >
+            <NeuralStream text={!isAuthLoaded ? "INITIALIZING" : "SYNCING"} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {!isLoading && !isSignedIn && (
+        <EntryGate creators={creators} onSignIn={() => {}} />
+      )}
+
+      {!isLoading && isSignedIn && currentUser === null && (
+        <EntryGate
+          creators={creators}
+          onSignIn={(role, profileData) => {
+            handleRoleSelection(role, profileData);
+          }}
+        />
+      )}
+
+      {!isLoading && isSignedIn && currentUser !== null && currentUser !== undefined && (
+        <div className="h-screen overflow-hidden app-bg text-zinc-200 flex flex-row relative">
+          <WorkspaceBackdrop />
 
       {/* ── MAIN CONTENT ── */}
-      <div ref={mainRef} className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto relative pb-32">
+      <div ref={mainRef} className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto relative pb-32 z-10">
 
 
 
@@ -381,7 +402,7 @@ export default function App() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <h1 className="text-lg font-bold tracking-tight" style={{ color: 'var(--color-text-primary)' }}>
-                      Hyperlocal Match Engine
+                      Match Engine
                     </h1>
                     <p className="text-sm mt-1 mb-4" style={{ color: 'var(--color-text-secondary)' }}>
                       Search an address or place the target pin to visualize creator match density.
@@ -396,7 +417,7 @@ export default function App() {
                   </div>
                   <div className="flex items-center gap-2 mt-1 ml-6">
                     <Compass className="w-4 h-4 text-indigo-400 animate-spin-slow" />
-                    <span className="text-[11px] font-mono" style={{ color: 'var(--color-text-tertiary)' }}>Delhi Grid · CP Origin</span>
+                    <span className="text-[11px] font-mono" style={{ color: 'var(--color-text-tertiary)' }}>Local Grid · CP Origin</span>
                   </div>
                 </div>
 
@@ -498,6 +519,8 @@ export default function App() {
         </div>
       </div>
 </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 }

@@ -1029,3 +1029,64 @@ input[type="range"]::-webkit-slider-thumb:hover {
   transform: scale(1.2);
   box-shadow: 0 0 20px rgba(99,102,241,0.8);
 }
+
+/* ══════════════════════════════════════════
+   CLERK UI OVERRIDES (Aggressive Transparent)
+   ══════════════════════════════════════════ */
+.clerk-card-transparent,
+.clerk-card-transparent * {
+  /* Only apply to wrappers, don't break buttons */
+}
+
+.clerk-card-transparent {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* Target the internal Clerk card and cardBox if the custom class isn't enough */
+.cl-card, .cl-cardBox, .cl-rootBox {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.clerk-footer-transparent {
+  background: transparent !important;
+  border: none !important;
+}
+
+.cl-footer {
+  background: transparent !important;
+}
+
+/* Hide the development mode badge and footer gradients */
+.clerk-footer-transparent::before,
+.clerk-footer-transparent::after,
+.cl-footer::before,
+.cl-footer::after {
+  display: none !important;
+}
+
+.clerk-footer-transparent [data-localization-key="developmentMode"],
+.cl-footer [data-localization-key="developmentMode"] {
+  display: none !important;
+}
+
+/* Force social buttons to inherit our styles */
+.cl-socialButtonsBlockButton {
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  color: white !important;
+}
+.cl-socialButtonsBlockButton:hover {
+  background: rgba(255,255,255,0.1) !important;
+}
+
+/* Force form inputs to inherit our styles */
+.cl-formFieldInput {
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  color: white !important;
+}

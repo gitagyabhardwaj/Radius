@@ -791,7 +791,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
         amount: order.amount,
         currency: order.currency,
         name: 'Radius',
-        description: 'Escrow Deposit',
+        description: 'Wallet Deposit',
         handler: async (response: any) => {
           try {
             const result = await verifyAndCreditEscrow({
@@ -958,7 +958,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             <div>
               <h2 className="text-xl font-bold tracking-tight" style={{ color: 'var(--color-text-primary)' }}>Brand Identity & Node Settings</h2>
               <p className="text-sm mt-0.5" style={{ color: 'var(--color-text-secondary)' }}>
-                Manage your public brand workspace details, authorized contacts, and cryptographically linked release settings.
+                Manage your public brand workspace details, authorized contacts, and securely linked release settings.
               </p>
             </div>
             <span className="bg-[rgba(16,185,129,0.08)] text-emerald-400 text-sm px-2.5 py-1 rounded-full font-semibold border border-[rgba(16,185,129,0.2)] flex items-center gap-1.5">
@@ -1054,12 +1054,12 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
           </div>
 
           <div className="border-t border-[rgba(255,255,255,0.08)] pt-5 flex flex-col gap-4">
-            <h3 className="text-sm font-mono uppercase tracking-wider text-zinc-400 font-bold">Secure Escrow Settings</h3>
+            <h3 className="text-sm font-mono uppercase tracking-wider text-zinc-400 font-bold">Secure Payment Settings</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium flex items-center gap-1">
-                  <span className="text-zinc-400">₹</span> Funding Escrow Wallet
+                  <span className="text-zinc-400">₹</span> Funding Wallet
                 </label>
                 <input
                   id="brand-profile-wallet-input"
@@ -1071,7 +1071,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Escrow Release Mechanism</label>
+                <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Payment Release Mechanism</label>
                 <div className="flex items-center justify-between p-2.5 rounded-xl border border-[rgba(255,255,255,0.08)]" style={{ background: 'rgba(255,255,255,0.04)' }}>
                   <span className="text-sm text-zinc-400 font-medium">Manual Brand Verification</span>
                   <span className="bg-[rgba(245,158,11,0.1)] text-amber-400 border border-[rgba(245,158,11,0.2)] font-mono text-[11px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">
@@ -1181,7 +1181,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 Audit Trail Credentials
               </span>
               <p className="text-xs text-zinc-400 leading-relaxed">
-                Your corporate node is currently integrated into the Delhi NCR cryptographic router. All campaigns automatically deploy automated multi-modal smart escrows.
+                Your corporate node is currently integrated into the Local Region secure router. All campaigns automatically deploy automated multi-modal secure vaults.
               </p>
             </div>
 
@@ -1206,7 +1206,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             </div>
             <span className="bg-[rgba(99,102,241,0.08)] text-indigo-400 text-sm px-2.5 py-1 rounded-full font-semibold border border-[rgba(99,102,241,0.2)] flex items-center gap-1.5 animate-pulse">
               <Radio className="w-3.5 h-3.5" />
-              Geo-targeted
+              location-based
             </span>
           </div>
 
@@ -1228,7 +1228,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 value={title || ''}
                 onChange={(e) => setTitle(e.target.value)}
                 className="input-field w-full"
-                placeholder="e.g. South Delhi Buzz"
+                placeholder="e.g. Local Buzz"
               />
             </div>
           </div>
@@ -1464,20 +1464,20 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             </div>
           </div>
 
-          {/* Escrow Contract Terms Notice & Balance */}
+          {/* Contract Terms Notice & Balance */}
           <div className="border border-[rgba(255,255,255,0.08)] rounded-xl p-4 flex flex-col gap-3" style={{ background: 'rgba(255,255,255,0.02)' }}>
             <div className="flex items-start gap-3">
               <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
               <div className="flex flex-col gap-0.5 flex-1">
                 <div className="flex justify-between items-center w-full">
-                  <span className="text-sm font-bold text-zinc-100">Automated Escrow Protocol</span>
+                  <span className="text-sm font-bold text-zinc-100">Automated Payment Protocol</span>
                   <div className="bg-transparent border border-[rgba(255,255,255,0.08)] px-2 py-1 rounded-md flex items-center gap-1.5">
                     <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider">Wallet Balance:</span>
                     <span className="text-sm font-mono font-bold text-emerald-400">₹{currentUser?.escrowBalance || 0}</span>
                   </div>
                 </div>
                 <p className="text-xs text-zinc-400 leading-normal mt-1">
-                  Your budget of <span className="font-semibold text-zinc-100">₹{budget}</span> will be locked in smart escrow. A 5% platform fee is deducted — creators share <span className="font-semibold text-zinc-100">₹{Math.round(budget * 0.95)}</span> equally, so each creator receives <span className="font-semibold text-emerald-400">₹{spotsTotal > 0 ? Math.round((budget * 0.95) / spotsTotal) : '—'}</span>.
+                  Your budget of <span className="font-semibold text-zinc-100">₹{budget}</span> will be locked in secure vault. A 5% platform fee is deducted — creators share <span className="font-semibold text-zinc-100">₹{Math.round(budget * 0.95)}</span> equally, so each creator receives <span className="font-semibold text-emerald-400">₹{spotsTotal > 0 ? Math.round((budget * 0.95) / spotsTotal) : '—'}</span>.
                 </p>
               </div>
             </div>
@@ -1502,7 +1502,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               ) : (
                 <>
                   <DollarSign className="w-4 h-4 fill-current" />
-                  <span>Deposit ₹{budget - (currentUser?.escrowBalance || 0)} to Escrow Account via Razorpay</span>
+                  <span>Deposit ₹{budget - (currentUser?.escrowBalance || 0)} to Wallet via Razorpay</span>
                 </>
               )}
             </button>
@@ -1585,7 +1585,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
                   <div className="flex items-center gap-4">
                     <div className="flex flex-col items-end">
-                      <span className="text-[11px] uppercase font-mono tracking-wider text-zinc-400">Escrow Locked</span>
+                      <span className="text-[11px] uppercase font-mono tracking-wider text-zinc-400">Funds Locked</span>
                       <span className="text-sm font-bold text-emerald-400 font-mono flex items-center gap-1">
                         <ShieldCheck className="w-3.5 h-3.5" />
                         ₹{camp.budget}
@@ -1603,7 +1603,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                     <button
                       onClick={async (e) => {
                         e.stopPropagation();
-                        if (confirm('Are you sure you want to delete this campaign? The locked budget will be refunded to your escrow balance.')) {
+                        if (confirm('Are you sure you want to delete this campaign? The locked budget will be refunded to your wallet balance.')) {
                           try {
                             await deleteCampaign({ campaignId: camp.id as Id<'campaigns'> });
                           } catch (err) {
@@ -1803,7 +1803,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               <div className="w-12 h-12 border-4 border-blue-100 border-t-[#3366cc] rounded-full animate-spin mb-2" />
               <div className="text-center">
                 <h4 className="text-lg font-bold text-zinc-100 mb-1">Processing Payment</h4>
-                <p className="text-sm text-zinc-400">Please wait while we secure your escrow...</p>
+                <p className="text-sm text-zinc-400">Please wait while we secure your funds...</p>
               </div>
               <div className="w-full rounded-xl border border-[rgba(255,255,255,0.08)] p-4 mt-2" style={{ background: 'rgba(255,255,255,0.04)' }}>
                 <div className="flex justify-between text-sm mb-1.5">
@@ -1850,13 +1850,13 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             className="glass-2 rounded-2xl p-6 flex flex-col gap-3 card-hover"
           >
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase tracking-widest" style={{ color: 'var(--color-text-tertiary)' }}>Total Escrow Secured</span>
+              <span className="text-[10px] font-mono uppercase tracking-widest" style={{ color: 'var(--color-text-tertiary)' }}>Total Funds Secured</span>
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)' }}>
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
               </div>
             </div>
             <span className="text-4xl font-bold tracking-tight font-mono" style={{ color: 'var(--color-mint-bright)' }}><AnimatedNumber prefix="₹" value={analytics.totalEscrowSecured} /></span>
-            <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>100% cryptographic protection active.</p>
+            <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>100% secure protection active.</p>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14, duration: 0.35 }}

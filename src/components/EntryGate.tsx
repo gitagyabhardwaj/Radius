@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { SignIn, useUser, useClerk } from '@clerk/clerk-react';
+import { SignIn, useUser, useClerk, ClerkLoading, ClerkLoaded } from '@clerk/clerk-react';
+import { dark } from '@clerk/themes';
 import { Creator } from '../types';
+import { HolographicOrb } from './Loaders';
 import {
   Briefcase,
   User,
@@ -90,7 +92,7 @@ const SLIDES = [
     label: 'Brand Setup',
     icon: MapPin,
     title: 'Draw a geofence, lock the budget.',
-    caption: 'Brands set a coordinate radius and deposit campaign funds straight into a smart escrow contract.',
+    caption: 'Brands set a coordinate radius and deposit campaign funds straight into a secure vault contract.',
     visual: (
       <BrowserFrame>
         <div className="grid grid-cols-5 gap-3">
@@ -152,7 +154,7 @@ const SLIDES = [
     label: 'Creator Radar',
     icon: User,
     title: 'Creators accept & submit content.',
-    caption: 'Local creators see hyperlocal offers on their radar and accept a campaign to start delivering.',
+    caption: 'Local creators see local offers on their radar and accept a campaign to start delivering.',
     visual: (
       <BrowserFrame>
         <div className="flex flex-col gap-2">
@@ -178,10 +180,10 @@ const SLIDES = [
     ),
   },
   {
-    label: 'Escrow Release',
+    label: 'Payment Release',
     icon: ShieldCheck,
     title: 'Instant, automated payout.',
-    caption: 'Once a deliverable is verified, the locked escrow funds release to the creator instantly.',
+    caption: 'Once a deliverable is verified, the locked funds release to the creator instantly.',
     visual: (
       <BrowserFrame>
         <div className="flex items-center gap-3">
@@ -290,25 +292,34 @@ function AppWalkthroughDeck({ onClose }: { onClose: () => void }) {
 // ─── ANIMATED LEFT CANVAS ───
 function SignalCanvas() {
   const [visible, setVisible] = useState(false);
-
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 200);
     return () => clearTimeout(t);
   }, []);
 
   return (
-    <motion.div
-      variants={canvasVariants}
-      initial="hidden"
-      animate={visible ? 'visible' : 'hidden'}
-      className="relative w-full h-full overflow-hidden"
-      style={{ background: 'var(--color-obsidian)' }}
-    >
-      {/* Nebula gradient blobs */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-3/4 h-3/4 rounded-full opacity-60" style={{ background: 'radial-gradient(ellipse at 20% 20%, rgba(79,70,229,0.25) 0%, transparent 60%)', filter: 'blur(40px)' }} />
-        <div className="absolute bottom-0 right-0 w-1/2 h-1/2 rounded-full opacity-50" style={{ background: 'radial-gradient(ellipse at 80% 80%, rgba(16,185,129,0.15) 0%, transparent 60%)', filter: 'blur(30px)' }} />
-      </div>
+    <div className="absolute inset-0 bg-[#070709] overflow-hidden">
+      <motion.div
+        initial={{ clipPath: 'inset(0 100% 0 0)', opacity: 0 }}
+        animate={{ clipPath: 'inset(0 0% 0 0)', opacity: 1 }}
+        transition={{ duration: 1.8, ease: [0.25, 1, 0.36, 1] }}
+        className="absolute inset-0"
+      >
+        {/* Animated Nebula gradient blobs */}
+        <div className="absolute inset-0 pointer-events-none">
+          <motion.div 
+            animate={{ x: [0, 80, -40, 0], y: [0, -50, 50, 0] }}
+            transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
+            className="absolute top-[-10%] left-[-10%] w-3/4 h-3/4 rounded-full opacity-60" 
+            style={{ background: 'radial-gradient(ellipse at center, rgba(79,70,229,0.3) 0%, transparent 60%)', filter: 'blur(60px)' }} 
+          />
+          <motion.div 
+            animate={{ x: [0, -80, 40, 0], y: [0, 50, -50, 0] }}
+            transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+            className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full opacity-50" 
+            style={{ background: 'radial-gradient(ellipse at center, rgba(16,185,129,0.2) 0%, transparent 60%)', filter: 'blur(50px)' }} 
+          />
+        </div>
 
       {/* Orthogonal grid overlay */}
       <div
@@ -319,26 +330,40 @@ function SignalCanvas() {
         }}
       />
 
+      {/* Grid Runners (Data Packets) */}
+      {[...Array(7)].map((_, i) => (
+        <motion.div
+          key={`h-runner-${i}`}
+          className="absolute h-[1px] w-64 bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent shadow-[0_0_12px_rgba(99,102,241,0.9)] opacity-40"
+          style={{ top: `${15 + i * 12}%` }}
+          initial={{ left: '-20%' }}
+          animate={{ left: '120%' }}
+          transition={{ duration: 5 + (i % 3) * 3, repeat: Infinity, delay: i * 1.5, ease: 'linear' }}
+        />
+      ))}
+      {[...Array(8)].map((_, i) => (
+        <motion.div
+          key={`v-runner-${i}`}
+          className="absolute w-[1px] h-64 bg-gradient-to-b from-transparent via-emerald-500/80 to-transparent shadow-[0_0_12px_rgba(16,185,129,0.9)] opacity-40"
+          style={{ left: `${20 + i * 10}%` }}
+          initial={{ top: '-20%' }}
+          animate={{ top: '120%' }}
+          transition={{ duration: 6 + (i % 4) * 2, repeat: Infinity, delay: i * 1.2, ease: 'linear' }}
+        />
+      ))}
+
       {/* Creator pins */}
       {MOCK_PINS.map((pin, i) => (
         <motion.div
           key={pin.id}
-          variants={pinVariants(0.5 + i * 0.1)}
-          initial="hidden"
-          animate={visible ? 'visible' : 'hidden'}
+          initial={{ opacity: 0, scale: 0 }}
+          animate={visible ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 20, delay: 0.5 + i * 0.1 }}
           className="absolute group cursor-default"
           style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
         >
-          {/* Pulse rings */}
           <span className="absolute inset-0 rounded-full animate-ping" style={{ background: 'rgba(99,102,241,0.3)', animationDuration: `${1.8 + (i % 3) * 0.4}s`, animationDelay: `${i * 0.2}s`, width: 16, height: 16, left: -4, top: -4 }} />
-          {/* Core dot */}
           <div className="relative w-2 h-2 rounded-full" style={{ background: '#6366F1', boxShadow: '0 0 10px rgba(99,102,241,0.9), 0 0 4px rgba(99,102,241,1)' }} />
-          {/* Hover tooltip */}
-          <div className="absolute left-4 -top-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
-            <div className="px-2 py-1 rounded-md text-[9px] font-mono" style={{ background: 'rgba(15,17,22,0.95)', border: '1px solid rgba(255,255,255,0.12)', color: '#8B909C' }}>
-              <span className="text-violet-400 font-bold">{pin.label}</span> · {pin.budget}
-            </div>
-          </div>
         </motion.div>
       ))}
 
@@ -349,35 +374,24 @@ function SignalCanvas() {
           initial={{ opacity: 0, y: 8 }}
           animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
           transition={{ delay: 1.2 + i * 0.2, duration: 0.5 }}
-          className="absolute float-animation"
-          style={{ left: `${b.x}%`, top: `${b.y}%`, animationDelay: `${i * 1.3}s` }}
+          className="absolute"
+          style={{ left: `${b.x}%`, top: `${b.y}%` }}
         >
-          <div className="px-2.5 py-1.5 rounded-lg text-[10px] font-mono font-bold flex items-center gap-1.5 whitespace-nowrap" style={{ background: 'rgba(26,30,39,0.85)', border: '1px solid rgba(99,102,241,0.25)', borderTopColor: 'rgba(99,102,241,0.40)', color: '#A5B4FC', backdropFilter: 'blur(12px)' }}>
+          <motion.div 
+             animate={{ y: [0, -10, 0] }}
+             transition={{ duration: 4, repeat: Infinity, delay: i * 1.3, ease: 'easeInOut' }}
+             className="px-2.5 py-1.5 rounded-lg text-[10px] font-mono font-bold flex items-center gap-1.5 whitespace-nowrap" style={{ background: 'rgba(26,30,39,0.85)', border: '1px solid rgba(99,102,241,0.25)', borderTopColor: 'rgba(99,102,241,0.40)', color: '#A5B4FC', backdropFilter: 'blur(12px)' }}
+          >
             <Zap className="w-2.5 h-2.5 text-violet-400" />
             {b.text}
-          </div>
+          </motion.div>
         </motion.div>
       ))}
-
-      {/* Bottom brand tagline */}
-      <div className="absolute bottom-8 left-8 right-8">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={visible ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.8, duration: 0.5 }}
-        >
-          <p className="text-[11px] font-mono uppercase tracking-[0.25em] mb-2" style={{ color: 'rgba(99,102,241,0.7)' }}>
-            Delhi NCR · Hyperlocal Grid
-          </p>
-          <h2 className="text-2xl font-bold tracking-tight leading-tight" style={{ color: 'rgba(241,241,243,0.9)' }}>
-            Creator campaigns,<br />
-            <span className="text-gradient-violet">exactly where they happen.</span>
-          </h2>
-        </motion.div>
-      </div>
     </motion.div>
+    </div>
   );
 }
+
 
 // ─── MAIN ENTRYGATE ───
 interface EntryGateProps {
@@ -395,65 +409,77 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
   const [showDeck, setShowDeck] = useState(false);
 
   return (
-    <div className="h-screen flex overflow-hidden" style={{ background: 'var(--color-obsidian)' }}>
+    <div className="w-screen h-screen relative flex items-center justify-center overflow-hidden bg-black text-zinc-200">
+      <SignalCanvas />
 
-      {/* ── LEFT PANEL — 60% — Animated Canvas ── */}
-      <div className="hidden lg:block lg:w-[60%] h-full relative">
-        <SignalCanvas />
+      {/* THE MASSIVE GLASS PANE */}
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9, y: 80, filter: 'blur(30px)' }}
+        animate={{ 
+          opacity: [0, 1, 1], 
+          y: [80, 0, 0], 
+          scale: [0.9, 0.9, 1], 
+          filter: ['blur(30px)', 'blur(0px)', 'blur(0px)'] 
+        }}
+        transition={{ 
+          duration: 1.4, 
+          times: [0, 0.7, 1], 
+          ease: ["easeOut", "backOut"], 
+          delay: 0.8 
+        }}
+        className="absolute inset-4 md:inset-6 z-10 rounded-3xl overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.8)] flex flex-col md:flex-row"
+        style={{
+          background: 'rgba(15, 17, 22, 0.5)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          borderTopColor: 'rgba(255, 255, 255, 0.25)',
+          borderLeftColor: 'rgba(255, 255, 255, 0.15)',
+        }}
+      >
+        {/* Glossy Diagonal Reflection Overlay */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.01) 30%, transparent 50%, transparent 100%)'
+        }} />
 
-        {/* Logo watermark top-left */}
-        <div className="absolute top-8 left-8 flex items-center gap-3 z-10">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.7 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25, delay: 0.1 }}
-            className="w-10 h-10 rounded-xl flex items-center justify-center font-display font-black text-white text-base sidebar-logo-bg"
-          >
-            R.
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.25, duration: 0.4 }}
-            className="flex flex-col"
-          >
-            <span className="font-bold text-sm tracking-[0.2em] uppercase text-white leading-none">RADIUS</span>
-            <span className="text-[9px] font-mono tracking-widest uppercase leading-none mt-1" style={{ color: 'var(--color-text-tertiary)' }}>Hyperlocal Escrow</span>
-          </motion.div>
-        </div>
-      </div>
+        {/* LEFT COLUMN: Logo & Tagline */}
+        <div className="relative w-full md:w-[60%] p-8 md:p-12 flex flex-col justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center font-display font-black text-white text-xl" style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', boxShadow: '0 4px 15px rgba(99,102,241,0.4)' }}>
+              R.
+            </div>
+            <div className="flex flex-col">
+              <span className="font-bold text-lg tracking-[0.2em] uppercase text-white leading-none">RADIUS</span>
+              <span className="text-[10px] font-mono tracking-widest uppercase leading-none mt-1 text-indigo-300">Creator Marketplace</span>
+            </div>
+          </div>
 
-      {/* ── RIGHT PANEL — 40% — Auth Card ── */}
-      <div className="w-full lg:w-[40%] h-full flex flex-col overflow-y-auto relative" style={{ borderLeft: '1px solid rgba(255,255,255,0.06)', background: 'var(--color-obsidian-surface)' }}>
-
-        {/* Mobile-only logo */}
-        <div className="lg:hidden flex items-center gap-3 p-6 pb-0">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center font-display font-black text-white text-sm sidebar-logo-bg">R.</div>
-          <div className="flex flex-col">
-            <span className="font-bold text-sm tracking-widest uppercase text-white leading-none">RADIUS</span>
-            <span className="text-[9px] font-mono tracking-widest uppercase leading-none mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>Hyperlocal Escrow</span>
+          <div className="mt-16 md:mt-auto mb-4">
+            <p className="text-xs font-mono uppercase tracking-[0.25em] mb-4 text-indigo-400">
+              Local Region · Creator Network
+            </p>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight text-white">
+              Creator campaigns,<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-fuchsia-400">exactly where they happen.</span>
+            </h2>
           </div>
         </div>
 
-        <motion.div
-          variants={cardVariants}
-          initial="hidden"
-          animate="visible"
-          className="flex-1 flex flex-col justify-center px-8 py-10 max-w-md mx-auto w-full"
-        >
+        {/* RIGHT COLUMN: Authentication / Select Portal */}
+        <div className="relative w-full md:w-[40%] p-8 md:p-12 flex flex-col justify-center overflow-y-auto custom-scrollbar">
+          
+          {/* Tapered Partition Line */}
+          <div className="hidden md:block absolute left-0 top-16 bottom-16 w-[1px] bg-gradient-to-b from-transparent via-white/25 to-transparent pointer-events-none" />
 
-          {/* Header text */}
-          <div className="flex flex-col gap-2 mb-8">
-            <p className="text-[10px] font-mono uppercase tracking-[0.2em]" style={{ color: 'var(--color-violet-bright)' }}>
+          <div className="flex flex-col gap-2 mb-10">
+            <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-indigo-400">
               Mission Control
             </p>
-            <h1 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--color-text-primary)' }}>
+            <h1 className="text-3xl font-bold tracking-tight text-white">
               {selectedRole ? 'Authenticate.' : 'Select your portal.'}
             </h1>
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="text-sm leading-relaxed text-zinc-400 mt-2">
               {selectedRole
                 ? 'Sign in securely to access your workspace.'
-                : 'Identify your role to enter the hyperlocal escrow network.'}
+                : 'Identify your role to enter the Creator Marketplace network.'}
             </p>
           </div>
 
@@ -479,7 +505,7 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
                   onClick={() => setSelectedRole('brand')}
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full text-left rounded-2xl p-5 flex items-start gap-4 transition-all cursor-pointer"
+                  className="w-full text-left rounded-2xl p-5 flex items-start gap-4 cursor-pointer"
                   style={{
                     background: 'rgba(99,102,241,0.06)',
                     borderTop: '1px solid rgba(99,102,241,0.30)',
@@ -497,7 +523,7 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
                       <ChevronRight className="w-4 h-4" style={{ color: 'var(--color-text-tertiary)' }} />
                     </div>
                     <p className="text-sm leading-snug" style={{ color: 'var(--color-text-secondary)' }}>
-                      Launch geo-targeted campaigns, discover local creators, and lock funds in smart escrow.
+                      Launch location-based campaigns, discover local creators, and lock funds in secure vault.
                     </p>
                   </div>
                 </motion.button>
@@ -512,7 +538,7 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
                   onClick={() => setSelectedRole('creator')}
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full text-left rounded-2xl p-5 flex items-start gap-4 transition-all cursor-pointer"
+                  className="w-full text-left rounded-2xl p-5 flex items-start gap-4 cursor-pointer"
                   style={{
                     background: 'rgba(16,185,129,0.05)',
                     borderTop: '1px solid rgba(16,185,129,0.28)',
@@ -530,7 +556,7 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
                       <ChevronRight className="w-4 h-4" style={{ color: 'var(--color-text-tertiary)' }} />
                     </div>
                     <p className="text-sm leading-snug" style={{ color: 'var(--color-text-secondary)' }}>
-                      Receive hyperlocal campaign offers, submit content, and get paid instantly upon verification.
+                      Receive local campaign offers, submit content, and get paid instantly upon verification.
                     </p>
                   </div>
                 </motion.button>
@@ -540,7 +566,7 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
                 <div className="flex gap-3 items-start">
                   <Shield className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-xs font-bold font-mono tracking-tight uppercase" style={{ color: 'var(--color-text-secondary)' }}>100% Cryptographic Escrow</span>
+                    <span className="text-xs font-bold font-mono tracking-tight uppercase" style={{ color: 'var(--color-text-secondary)' }}>100% secure vault</span>
                     <p className="text-[11px] leading-relaxed" style={{ color: 'var(--color-text-tertiary)' }}>
                       Funds lock securely and release autonomously when deliverables are GPS-verified.
                     </p>
@@ -557,7 +583,7 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
                   onClick={() => setShowDeck(true)}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
-                  className="self-center flex items-center gap-2 text-xs font-mono font-bold px-4 py-2 rounded-full transition-all"
+                  className="self-center flex items-center gap-2 text-xs font-mono font-bold px-4 py-2 rounded-full"
                   style={{ background: 'rgba(99,102,241,0.10)', border: '1px solid rgba(99,102,241,0.22)', color: '#A5B4FC' }}
                 >
                   <PlayCircle className="w-4 h-4" />
@@ -592,21 +618,38 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
                     : <span className="status-badge-mint">Creator Radar</span>}
                 </div>
 
-                <SignIn
-                  appearance={{
-                    elements: {
-                      rootBox: 'w-full',
-                      card: 'glass-2 rounded-2xl',
-                      headerTitle: 'font-bold text-zinc-100',
-                      headerSubtitle: 'text-zinc-400',
-                      socialButtonsBlockButton: 'btn-secondary w-full',
-                      formFieldInput: 'input-field',
-                      formButtonPrimary: 'btn-primary rounded-xl w-full',
-                      footerActionLink: 'text-indigo-400 hover:text-indigo-300',
-                    },
-                  }}
-                  routing="hash"
-                />
+                <ClerkLoading>
+                  <div className="w-full flex items-center justify-center py-12">
+                    <HolographicOrb />
+                  </div>
+                </ClerkLoading>
+                <ClerkLoaded>
+                  <SignIn
+                    appearance={{
+                      baseTheme: dark,
+                      variables: {
+                        colorBackground: 'transparent',
+                        colorPrimary: '#6366F1',
+                        colorText: 'white',
+                        colorInputBackground: 'rgba(255, 255, 255, 0.05)',
+                        colorInputText: 'white',
+                      },
+                      elements: {
+                        rootBox: 'w-full',
+                        card: 'bg-transparent shadow-none w-full p-0 border-0',
+                        headerTitle: 'hidden',
+                        headerSubtitle: 'hidden',
+                        socialButtonsBlockButton: 'bg-white/5 border border-white/10 hover:bg-white/10 text-white transition-all',
+                        formButtonPrimary: 'bg-indigo-500 hover:bg-indigo-400 font-bold',
+                        footer: 'bg-transparent border-none mt-4',
+                        formFieldInput: 'bg-white/5 border border-white/10 text-white',
+                        dividerLine: 'bg-white/10',
+                        dividerText: 'text-zinc-500 font-mono text-xs',
+                      },
+                    }}
+                    routing="hash"
+                  />
+                </ClerkLoaded>
               </motion.div>
             )}
 
@@ -767,14 +810,8 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
             )}
 
           </AnimatePresence>
-        </motion.div>
-
-        {/* Footer */}
-        <div className="px-8 pb-6 flex items-center gap-2">
-          <span className="live-dot" />
-          <span className="text-[10px] font-mono" style={{ color: 'var(--color-text-tertiary)' }}>V2.0 Production Gateway · Secured</span>
         </div>
-      </div>
+      </motion.div>
 
       {/* Walkthrough Modal */}
       <AnimatePresence>

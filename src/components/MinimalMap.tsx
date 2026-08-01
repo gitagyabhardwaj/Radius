@@ -50,6 +50,13 @@ function MapUpdater({ centerLat, centerLng }: { centerLat: number; centerLng: nu
   const map = useMap();
   useEffect(() => {
     map.setView([centerLat, centerLng], map.getZoom(), { animate: true });
+    
+    // Fix Leaflet's tile loading bug when mounted inside a flex/animating container
+    const t = setTimeout(() => {
+      map.invalidateSize();
+    }, 400); // 400ms allows Framer Motion animations to finish expanding the layout
+    
+    return () => clearTimeout(t);
   }, [centerLat, centerLng, map]);
   return null;
 }
@@ -115,18 +122,11 @@ export default function MinimalMap({
   return (
     <div className="relative w-full h-[380px] md:h-[460px] rounded-2xl overflow-hidden select-none z-0" style={{ background: '#0F1115', border: '1px solid rgba(255,255,255,0.08)' }}>
       
-      {/* Top-left overlay: engine label + match count */}
+      {/* Top-left overlay: engine label */}
       <div className="absolute top-4 left-4 z-[400] flex flex-col gap-2 pointer-events-none">
         <div style={{ background: 'rgba(15,17,21,0.85)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.1)', borderTopColor: 'rgba(255,255,255,0.18)', borderRadius: '10px' }} className="px-3 py-1.5 flex items-center gap-2">
           <Compass className="w-3.5 h-3.5 text-indigo-400 animate-spin-slow" />
-          <span className="text-[11px] font-mono font-semibold text-zinc-300 tracking-widest uppercase">Delhi Geo-Radial Engine</span>
-        </div>
-        <div style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.28)', borderRadius: '10px' }} className="px-3 py-1.5 flex items-center gap-2">
-          <Users className="w-3.5 h-3.5 text-indigo-400" />
-          <span className="text-[11px] font-mono font-semibold">
-            <span className="text-zinc-400">Matched: </span>
-            <span className="text-indigo-300">{activeMatchesCount} creators</span>
-          </span>
+          <span className="text-[11px] font-mono font-semibold text-zinc-300 tracking-widest uppercase">Location Engine</span>
         </div>
       </div>
 
@@ -136,31 +136,16 @@ export default function MinimalMap({
         <div>LNG: {centerLng.toFixed(4)}</div>
       </div>
 
-      {/* Bottom-left: legend */}
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.4 }}
-        className="absolute bottom-5 left-4 z-[400] flex gap-4 glass-4 px-3 py-2 rounded-xl border border-[rgba(255,255,255,0.08)] shadow-lg backdrop-blur-md"
-      >
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#6366F1', boxShadow: '0 0 6px rgba(99,102,241,0.7)' }} />
-          <span className="text-[10px] font-mono text-zinc-400">Selected</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#10B981', boxShadow: '0 0 6px rgba(16,185,129,0.6)' }} />
-          <span className="text-[10px] font-mono text-zinc-400">Matched</span>
-        </div>
-      </motion.div>
+
 
       <MapContainer 
         center={[centerLat, centerLng]} 
         zoom={11} 
         style={{ width: '100%', height: '100%', zIndex: 1, background: '#0F1115' }}
         zoomControl={false}
+        attributionControl={false}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         />
         
@@ -197,43 +182,6 @@ export default function MinimalMap({
           })}
         />
 
-        {creatorsWithStatus.map((creator) => {
-          const isSelected = selectedCreatorId === creator.id;
-          return (
-            <Marker 
-              key={creator.id}
-              position={[creator.lat, creator.lng]}
-              icon={createIcon(isSelected, creator.isInside)}
-              eventHandlers={{
-                click: () => {
-                  if (onSelectCreator) onSelectCreator(creator.id);
-                },
-              }}
-            >
-              <Popup className="custom-popup">
-                <div style={{ padding: '12px 14px', minWidth: '160px' }}>
-                  <div className="flex items-center gap-2.5 mb-3">
-                    <img src={creator.avatar} alt={creator.name} className="w-8 h-8 rounded-full object-cover" style={{ border: '1px solid rgba(99,102,241,0.4)' }} />
-                    <div>
-                      <div className="text-xs font-bold text-zinc-100 leading-tight">{creator.name}</div>
-                      <div className="text-[10px] font-mono text-zinc-400 mt-0.5">{creator.handle}</div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-mono text-zinc-400">Match Score</span>
-                      <span className="text-[11px] font-mono font-bold text-indigo-400">{creator.matchScore}%</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-mono text-zinc-400">Local Audience</span>
-                      <span className="text-[11px] font-mono font-bold text-emerald-400">{creator.audienceInLocality}%</span>
-                    </div>
-                  </div>
-                </div>
-              </Popup>
-            </Marker>
-          );
-        })}
       </MapContainer>
     </div>
   );

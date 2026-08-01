@@ -45,7 +45,7 @@ function timeAgo(ts: number, now: number): string {
 /**
  * Live, reactive activity timeline for one campaign's dispatch cascade —
  * batch dispatch/cascade, offer accept/decline/expire, submissions, and
- * escrow moves, merged into a single feed via convex/activity.ts.
+ * payment activity, merged into a single feed via convex/activity.ts.
  * Purely additive/read-only: no write path touches existing mutations.
  */
 export default function DispatchFeed({ campaignId }: { campaignId: string }) {

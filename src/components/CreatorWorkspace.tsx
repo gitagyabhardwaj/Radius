@@ -925,7 +925,7 @@ export default function CreatorWorkspace({
                 <span className="text-sm font-mono uppercase tracking-wider text-amber-400 font-bold">Velocity Priority Tier</span>
               </div>
               <span className="bg-amber-400/10 text-amber-300 text-[11px] font-mono px-2 py-0.5 rounded border border-amber-400/20 font-bold">
-                Delhi NCR Grid
+                Local Region Grid
               </span>
             </div>
 
@@ -984,7 +984,7 @@ export default function CreatorWorkspace({
                   </div>
                   <h4 className="text-lg font-display font-bold text-zinc-200">Radar is Offline</h4>
                   <p className="text-sm text-zinc-400 text-center max-w-sm mt-2 leading-relaxed">
-                    You have disconnected your node from the cryptographic router. Toggle your radar back on to receive localized priority offers.
+                    You have disconnected your node from the secure router. Toggle your radar back on to receive localized priority offers.
                   </p>
                 </div>
               ) : activeRadarCampaigns.length === 0 ? (
@@ -995,7 +995,7 @@ export default function CreatorWorkspace({
                   </div>
                   <h4 className="text-lg font-display font-bold text-zinc-200">Scanning for offers...</h4>
                   <p className="text-sm text-zinc-400 text-center max-w-sm mt-2 leading-relaxed">
-                    Your node is active. We are actively pinging the cryptographic router for geofenced campaigns matching your niche.
+                    Your node is active. We are actively pinging the secure router for geofenced campaigns matching your niche.
                   </p>
                 </div>
               ) : activeRadarCampaigns.map((camp) => {
@@ -1101,7 +1101,7 @@ export default function CreatorWorkspace({
 
     return (
       <div className="max-w-4xl mx-auto flex flex-col gap-8 animate-fade-in">
-        <h2 className="text-3xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-fuchsia-500 px-2 pb-2">Active Campaigns & Escrows</h2>
+        <h2 className="text-3xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-fuchsia-500 px-2 pb-2">Active Campaigns & Payments</h2>
         
         {acceptedCampaigns.length > 0 ? (
           acceptedCampaigns.map((camp) => {
@@ -1163,12 +1163,12 @@ export default function CreatorWorkspace({
                       className="overflow-hidden"
                     >
                       <div className="pt-6 border-t border-white/5 flex flex-col gap-8">
-                        {/* Escrow Status Stepper */}
+                        {/* Payment Status Stepper */}
                         <div className="relative z-10 flex flex-col gap-4">
-                  <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-bold">Escrow Protocol State</span>
+                  <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-bold">Payment State</span>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[
-                      { step: 'Locked', desc: 'Budget escrowed', active: true, done: true },
+                      { step: 'Locked', desc: 'Budget secured', active: true, done: true },
                       {
                         step: 'Submitted',
                         desc: 'Deliverable uploaded',
@@ -1489,7 +1489,7 @@ export default function CreatorWorkspace({
                             {submission.status === 'final_verifying' ? 'Brand Is Reviewing Your Final Post' : 'Final Link Submitted Successfully'}
                           </h4>
                           <p className="text-sm text-zinc-400 leading-relaxed max-w-xl">
-                            <span className="text-white font-bold">{camp.brandName}</span> is reviewing your published post. Payout releases instantly via smart escrow once they approve it.
+                            <span className="text-white font-bold">{camp.brandName}</span> is reviewing your published post. Payout releases instantly via secure vault once they approve it.
                           </p>
                         </div>
                         <div className="grid grid-cols-2 gap-4 bg-zinc-900/50 rounded-2xl p-4 border border-zinc-800">
@@ -1556,7 +1556,7 @@ export default function CreatorWorkspace({
             <div className="flex flex-col gap-2">
               <h4 className="text-2xl font-display font-black text-white">No Active Campaigns</h4>
               <p className="text-base text-zinc-400 max-w-md mx-auto leading-relaxed">
-                Accept a hyperlocal campaign from the Active Radar to lock contract payouts. Payout releases once you submit your deliverable and the brand approves it.
+                Accept a local campaign from the Active Radar to lock contract payouts. Payout releases once you submit your deliverable and the brand approves it.
               </p>
             </div>
           </div>
@@ -1570,7 +1570,7 @@ export default function CreatorWorkspace({
         {/* Quick Balance Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="glass-card p-6 flex flex-col gap-3">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Unclaimed Escrow Balance</span>
+            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Unclaimed Balance</span>
             <span className="text-3xl font-display font-black text-emerald-600">
               {earnings === undefined ? (
                 <span className="inline-block w-24 h-8 bg-white/10 rounded animate-pulse" />
@@ -1607,7 +1607,7 @@ export default function CreatorWorkspace({
           <div className="lg:col-span-7 glass-card p-6 flex flex-col gap-6">
             <div>
               <h3 className="text-base font-display font-semibold text-zinc-100">Monthly Localized Earnings</h3>
-              <p className="text-xs text-zinc-400 mt-0.5">Your monthly payout progression in the Delhi NCR Grid network.</p>
+              <p className="text-xs text-zinc-400 mt-0.5">Your monthly payout progression in the Local Region Grid network.</p>
             </div>
 
             <div className="flex items-end justify-between gap-4 h-48 pt-6 border-b border-white/10 px-4">
@@ -1629,7 +1629,7 @@ export default function CreatorWorkspace({
           {/* Historical Logs */}
           <div className="lg:col-span-5 glass-card p-6 flex flex-col gap-4">
             <div>
-              <h3 className="text-base font-display font-semibold text-zinc-100">Cryptographic Escrow History</h3>
+              <h3 className="text-base font-display font-semibold text-zinc-100">secure vault History</h3>
               <p className="text-xs text-zinc-400 mt-0.5">Logs of recent automated smart contract payouts.</p>
             </div>
 

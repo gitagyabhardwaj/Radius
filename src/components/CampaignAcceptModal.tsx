@@ -78,7 +78,7 @@ export const CampaignAcceptModal: React.FC<CampaignAcceptModalProps> = ({ campai
                     </div>
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-[10px] font-mono tracking-widest text-emerald-500/70 uppercase">Escrow Value</span>
+                    <span className="text-[10px] font-mono tracking-widest text-emerald-500/70 uppercase">Campaign Value</span>
                     <span className="text-2xl font-bold font-mono" style={{ color: 'var(--color-mint-bright)' }}>₹{campaign.budget}</span>
                   </div>
                 </div>
@@ -157,7 +157,7 @@ export const CampaignAcceptModal: React.FC<CampaignAcceptModalProps> = ({ campai
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
                     <p className="text-sm text-zinc-300 leading-relaxed">
-                      <strong className="text-white">Escrow Guarantee:</strong> The brand has already deposited ₹{campaign.budget} into a smart escrow. The funds are locked and guaranteed to be paid upon approval.
+                      <strong className="text-white">Payment Guarantee:</strong> The brand has already deposited ₹{campaign.budget} into a secure vault. The funds are locked and guaranteed to be paid upon approval.
                     </p>
                   </div>
                   <div className="flex items-start gap-3">

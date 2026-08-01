@@ -23,8 +23,8 @@ export function ReviewsCard({
   const textMuted = dark ? 'text-zinc-400' : 'text-zinc-400';
   const textBase = dark ? 'text-zinc-200' : 'text-zinc-200';
   const cardBg = dark
-    ? 'bg-zinc-900/60 border-zinc-850'
-    : 'bg-zinc-50/60 border-zinc-150';
+    ? 'bg-white/5 border-white/5'
+    : 'bg-white/5 border-white/5';
 
   if (!summary) return null;
 

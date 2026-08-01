@@ -1111,7 +1111,7 @@ export default function CreatorWorkspace({
             return (
               <div 
                 key={camp.id} 
-                className={`relative overflow-hidden bg-zinc-950/95 backdrop-blur-3xl border border-white/10 rounded-[2rem] shadow-[0_0_50px_-12px_rgba(99,102,241,0.2)] flex flex-col group transition-all duration-500 hover:shadow-[0_0_80px_-15px_rgba(99,102,241,0.3)] hover:border-white/20 ${expandedCampaignId === camp.id ? 'p-8 gap-0' : 'p-6'}`}
+                className={`relative overflow-hidden glass-card rounded-2xl flex flex-col group transition-all duration-500 hover:border-white/20 ${expandedCampaignId === camp.id ? 'p-8 gap-0' : 'p-6'}`}
               >
                 {/* Dynamic background glow */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none group-hover:bg-indigo-500/20 transition-all duration-700" />
@@ -1137,7 +1137,7 @@ export default function CreatorWorkspace({
                     })()}
                     <h2 className="text-2xl font-display font-black text-white">{camp.title}</h2>
                     <span className="text-sm text-zinc-400 font-mono">
-                      Brand: <span className="text-zinc-300">{camp.brandName}</span> • Quota: <span className="text-zinc-300">{camp.spotsFilled}/{camp.spotsTotal} spots</span>
+                      Brand: <span className="text-zinc-300">{camp.brandName}</span>
                     </span>
                   </div>
 
@@ -1585,7 +1585,7 @@ export default function CreatorWorkspace({
           </div>
           <div className="glass-card p-6 flex flex-col gap-2">
             <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Total Payouts Released</span>
-            <span className="text-3xl font-display font-black text-zinc-950">
+            <span className="text-3xl font-display font-black text-zinc-100">
               {earnings === undefined ? (
                 <span className="inline-block w-24 h-8 bg-white/10 rounded animate-pulse" />
               ) : (

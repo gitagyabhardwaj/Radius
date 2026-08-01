@@ -1562,10 +1562,12 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             {activeCampaigns.map((camp) => {
               const isCollapsed = collapsedCampaigns[camp.id] ?? true;
               return (
-              <div key={camp.id} className="border border-[rgba(255,255,255,0.08)] rounded-xl flex flex-col transition-all bg-transparent overflow-hidden">
+              <div key={camp.id} className="glass-card flex flex-col transition-all overflow-hidden mb-4 relative group">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none group-hover:bg-indigo-500/10 transition-all duration-700" />
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-fuchsia-500/5 rounded-full blur-[100px] pointer-events-none group-hover:bg-fuchsia-500/10 transition-all duration-700" />
                 {/* Header info */}
                 <div 
-                  className={`p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer transition-colors ${!isCollapsed ? 'border-b border-[rgba(255,255,255,0.08)]' : ''}`}
+                  className={`p-6 relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer transition-colors ${!isCollapsed ? 'border-b border-[rgba(255,255,255,0.08)]' : ''}`}
                   onClick={() => setCollapsedCampaigns(prev => ({ ...prev, [camp.id]: !(prev[camp.id] ?? true) }))}
                 >
                   <div className="flex flex-col">
@@ -1575,7 +1577,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                         {camp.brandName}
                       </span>
                     </div>
-                    <span className="text-xs text-zinc-400 font-mono mt-0.5">
+                    <span className="text-xs text-zinc-400 font-mono mt-1">
                       LOC: {camp.centerLocality} • deliverable: {camp.deliverable}
                       {isCollapsed && ` • Spots: ${camp.spotsFilled}/${camp.spotsTotal}`}
                     </span>
@@ -1622,9 +1624,17 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                   </div>
                 </div>
 
-                {!isCollapsed && (
-                  <div className="p-5 flex flex-col gap-6 bg-transparent">
-                    {/* Programmatic Batch Timeline Track */}
+                <AnimatePresence initial={false}>
+                  {!isCollapsed && (
+                    <motion.div 
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+                      className="overflow-hidden relative z-10"
+                    >
+                      <div className="p-6 flex flex-col gap-8 bg-transparent">
+                        {/* Programmatic Batch Timeline Track */}
                 {camp.batches.length === 0 ? (
                   (now - camp.createdAt > 3000) ? (
                     <div className="border border-rose-100 rounded-xl p-8 flex flex-col items-center justify-center gap-3" style={{ background: 'rgba(239,68,68,0.08)' }}>
@@ -1761,8 +1771,10 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
                 <DispatchFeed campaignId={camp.id} />
 
-                  </div>
-                )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             )})}
           </div>

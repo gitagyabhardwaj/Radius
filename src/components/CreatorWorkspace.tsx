@@ -487,11 +487,11 @@ export default function CreatorWorkspace({
           {activeSubTab === 'profile' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Creator Profile Editor Card */}
-        <div className="lg:col-span-7 bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-6">
-          <div className="flex items-center justify-between border-b border-zinc-100 pb-4">
+        <div className="lg:col-span-7 glass-card p-6 flex flex-col gap-6">
+          <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] pb-4">
             <div>
-              <h2 className="text-xl font-display font-semibold text-zinc-900">Creator Identity & Node Registry</h2>
-              <p className="text-sm text-zinc-500 mt-0.5">
+              <h2 className="text-xl font-display font-semibold text-zinc-100">Creator Identity & Node Registry</h2>
+              <p className="text-sm text-zinc-400 mt-0.5">
                 Manage your public creator workspace details, geolocated coordinates, and verify your photography gear credentials.
               </p>
             </div>
@@ -501,7 +501,7 @@ export default function CreatorWorkspace({
                 Velocity Node
               </span>
             ) : (
-              <span className="bg-zinc-50 text-zinc-500 text-sm px-2.5 py-1 rounded-full font-semibold border border-zinc-200 flex items-center gap-1.5">
+              <span className="bg-black/20 text-zinc-400 text-sm px-2.5 py-1 rounded-full font-semibold border border-[rgba(255,255,255,0.15)] flex items-center gap-1.5">
                 Basic Node
               </span>
             )}
@@ -515,7 +515,7 @@ export default function CreatorWorkspace({
                 type="text"
                 defaultValue={currentCreator.name}
 
-                className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors font-medium"
+                className="w-full bg-black/20 border border-[rgba(255,255,255,0.08)] rounded-xl px-3.5 py-2.5 text-base text-zinc-200 focus:outline-none focus:border-indigo-500 focus:bg-black/40 transition-colors font-medium"
                 placeholder="e.g. Bhavya Harbola"
               />
             </div>
@@ -528,7 +528,7 @@ export default function CreatorWorkspace({
                   type="text"
                   defaultValue={currentCreator.handle}
                   onChange={() => setHandleVerifiedData(null)}
-                  className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
+                  className="w-full bg-black/20 border border-[rgba(255,255,255,0.08)] rounded-xl px-3.5 py-2.5 text-base text-zinc-200 focus:outline-none focus:border-indigo-500 focus:bg-black/40 transition-colors"
                   placeholder="e.g. @bhavya_craft"
                 />
                 <button
@@ -558,7 +558,7 @@ export default function CreatorWorkspace({
                 id="creator-profile-niche-select"
                 defaultValue={currentCreator.niche || ""}
 
-                className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
+                className="w-full bg-black/20 border border-[rgba(255,255,255,0.08)] rounded-xl px-3.5 py-2.5 text-base text-zinc-200 focus:outline-none focus:border-indigo-500 focus:bg-black/40 transition-colors"
               >
                 <option value="" disabled>Select a Niche...</option>
                 <option value="Food & Lifestyle">Food & Lifestyle</option>
@@ -582,10 +582,10 @@ export default function CreatorWorkspace({
                 {handleVerifiedData ? (
                   <span className="text-[9px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded font-bold border border-emerald-200">API VERIFIED</span>
                 ) : (
-                  <span className="text-[9px] bg-zinc-100 text-zinc-500 px-1.5 py-0.5 rounded font-bold">UNVERIFIED</span>
+                  <span className="text-[9px] bg-white/10 text-zinc-400 px-1.5 py-0.5 rounded font-bold">UNVERIFIED</span>
                 )}
               </label>
-              <div className="w-full bg-zinc-100 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-500 cursor-not-allowed flex items-center justify-between">
+              <div className="w-full bg-white/10 border border-[rgba(255,255,255,0.15)] rounded-xl px-3.5 py-2.5 text-base text-zinc-400 cursor-not-allowed flex items-center justify-between">
                 <span>{handleVerifiedData ? handleVerifiedData.followers : (currentCreator.followers && currentCreator.followers !== '0' ? currentCreator.followers : 'Verify Handle to Fetch')}</span>
                 <span className="text-xs">{handleVerifiedData ? '✅' : '🔒'}</span>
               </div>
@@ -612,7 +612,7 @@ export default function CreatorWorkspace({
                     setProfileGeocodeData(null);
                     setGeocodeError(null);
                   }}
-                  className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
+                  className="w-full bg-black/20 border border-[rgba(255,255,255,0.08)] rounded-xl px-3.5 py-2.5 text-base text-zinc-200 focus:outline-none focus:border-indigo-500 focus:bg-black/40 transition-colors"
                   placeholder="Enter your location"
                 />
                 <button
@@ -663,12 +663,12 @@ export default function CreatorWorkspace({
               id="creator-profile-bio-textarea"
               rows={3}
               defaultValue={currentCreator.bio || ""}
-              className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors resize-none leading-relaxed"
+              className="w-full bg-black/20 border border-[rgba(255,255,255,0.08)] rounded-xl px-3.5 py-2.5 text-base text-zinc-200 focus:outline-none focus:border-indigo-500 focus:bg-black/40 transition-colors resize-none leading-relaxed"
               placeholder="Tell brands why they should send priority offers to you..."
             />
           </div>
 
-          <div className="border-t border-zinc-100 pt-4 flex items-center justify-end gap-3">
+          <div className="border-t border-[rgba(255,255,255,0.08)] pt-4 flex items-center justify-end gap-3">
             {profileSaveStatus === 'saved' && (
               <span className="text-sm text-emerald-600 font-medium flex items-center gap-1">
                 <CheckCircle2 className="w-4 h-4" />
@@ -732,26 +732,26 @@ export default function CreatorWorkspace({
           <div className="border-t border-rose-100/50 pt-6 mt-2 flex flex-col gap-3">
             <h3 className="text-sm font-mono uppercase tracking-wider text-rose-600 font-bold">Danger Zone</h3>
             
-            <div className="flex items-center justify-between border border-zinc-200 p-4 rounded-xl mb-3 hover:bg-zinc-50 transition-colors">
+            <div className="flex items-center justify-between border border-[rgba(255,255,255,0.15)] p-4 rounded-xl mb-3 hover:bg-white/5 transition-colors">
               <div className="flex flex-col">
-                <span className="text-sm font-bold text-zinc-900">Sign Out</span>
-                <span className="text-xs text-zinc-500">Securely disconnect this device from your node.</span>
+                <span className="text-sm font-bold text-zinc-100">Sign Out</span>
+                <span className="text-xs text-zinc-400">Securely disconnect this device from your node.</span>
               </div>
               <button
                 onClick={async () => {
                   await signOut();
                   window.location.reload();
                 }}
-                className="py-2 px-4 border border-zinc-200 hover:bg-zinc-100 text-zinc-600 font-mono text-xs rounded-lg font-bold transition-all"
+                className="py-2 px-4 border border-[rgba(255,255,255,0.15)] hover:bg-white/10 text-zinc-300 font-mono text-xs rounded-lg font-bold transition-all"
               >
                 SIGN OUT
               </button>
             </div>
 
-            <div className="flex items-center justify-between bg-rose-50/50 border border-rose-100 p-4 rounded-xl">
+            <div className="flex items-center justify-between border border-[rgba(239,68,68,0.2)] bg-[rgba(239,68,68,0.06)] p-4 rounded-xl">
               <div className="flex flex-col">
-                <span className="text-sm font-bold text-zinc-900">Delete Account</span>
-                <span className="text-xs text-zinc-500">Permanently delete your profile and reset your role.</span>
+                <span className="text-sm font-bold text-zinc-100">Delete Account</span>
+                <span className="text-xs text-zinc-400">Permanently delete your profile and reset your role.</span>
               </div>
               <button
                 onClick={async () => {
@@ -760,7 +760,7 @@ export default function CreatorWorkspace({
                     signOut();
                   }
                 }}
-                className="py-2 px-4 bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 font-mono text-xs rounded-lg font-bold transition-all"
+                className="py-2 px-4 btn-secondary style={{ borderColor:'rgba(239,68,68,0.3)' }} text-rose-400 hover:bg-[rgba(239,68,68,0.1)] font-mono text-xs rounded-lg font-bold transition-all"
               >
                 DELETE PROFILE
               </button>
@@ -781,24 +781,24 @@ export default function CreatorWorkspace({
               />
               <div className="flex flex-col">
                 <span className="text-base font-bold text-white tracking-tight leading-none">{currentCreator.name}</span>
-                <span className="text-[11px] font-mono text-zinc-500 mt-1.5 uppercase">{currentCreator.handle}</span>
+                <span className="text-[11px] font-mono text-zinc-400 mt-1.5 uppercase">{currentCreator.handle}</span>
               </div>
             </div>
 
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col p-4 bg-zinc-900/60 rounded-xl border border-zinc-850 h-64 justify-center items-center text-center">
-                  <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-widest font-bold">Avg Match Score</span>
+                  <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest font-bold">Avg Match Score</span>
                   <span className="text-5xl font-black text-white mt-4">
                     {activeRadarCampaigns.length > 0
                       ? Math.round(activeRadarCampaigns.reduce((acc, curr) => acc + curr.matchScore, 0) / activeRadarCampaigns.length)
                       : "-"
                     }%
                   </span>
-                  <span className="text-xs text-zinc-500 mt-3 max-w-[80%]">Averaged across all active local campaigns.</span>
+                  <span className="text-xs text-zinc-400 mt-3 max-w-[80%]">Averaged across all active local campaigns.</span>
                 </div>
                 <div className="flex flex-col p-4 bg-zinc-900/60 rounded-xl border border-zinc-850 h-64">
-                  <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-widest font-bold mb-2">Top 5 Audience Locations</span>
+                  <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest font-bold mb-2">Top 5 Audience Locations</span>
                   
                   {!isInstagramLinked ? (
                     <div className="flex-1 w-full h-full flex flex-col items-center justify-center text-center px-4">
@@ -877,16 +877,16 @@ export default function CreatorWorkspace({
         {/* Left Pane: Profiles, Subscriptions and Available feeds */}
         <div className="lg:col-span-4 flex flex-col gap-6">
           {/* Node Analytics / Health */}
-          <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-4">
+          <div className="glass-card p-6 flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-mono uppercase tracking-wider text-zinc-400 font-bold">Node Analytics</h3>
-                <p className="text-xs text-zinc-500 mt-0.5">Real-time geofenced performance metrics.</p>
+                <p className="text-xs text-zinc-400 mt-0.5">Real-time geofenced performance metrics.</p>
               </div>
               <button
                 onClick={() => setIsRadarActive(!isRadarActive)}
                 className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-                  isRadarActive ? 'bg-emerald-500' : 'bg-zinc-200'
+                  isRadarActive ? 'bg-indigo-500' : 'bg-white/10'
                 }`}
                 role="switch"
                 aria-checked={isRadarActive}
@@ -902,42 +902,42 @@ export default function CreatorWorkspace({
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-zinc-50 border border-zinc-100 p-3 rounded-xl flex flex-col items-center justify-center text-center">
-                <span className="text-2xl font-black text-indigo-600 font-display">{activeRadarCampaigns.length}</span>
-                <span className="text-[10px] font-mono uppercase text-zinc-500 font-bold mt-1 tracking-wider">Nearby Offers</span>
+              <div className="bg-white/5 border border-white/10 p-3 rounded-xl flex flex-col items-center justify-center text-center">
+                <span className="text-2xl font-black text-indigo-400 font-display">{activeRadarCampaigns.length}</span>
+                <span className="text-[10px] font-mono uppercase text-zinc-400 font-bold mt-1 tracking-wider">Nearby Offers</span>
               </div>
-              <div className="bg-zinc-50 border border-zinc-100 p-3 rounded-xl flex flex-col items-center justify-center text-center">
-                <span className="text-2xl font-black text-emerald-500 font-display">{currentCreator.audienceInLocality}%</span>
-                <span className="text-[10px] font-mono uppercase text-zinc-500 font-bold mt-1 tracking-wider">Local Audience</span>
+              <div className="bg-white/5 border border-white/10 p-3 rounded-xl flex flex-col items-center justify-center text-center">
+                <span className="text-2xl font-black text-emerald-400 font-display">{currentCreator.audienceInLocality}%</span>
+                <span className="text-[10px] font-mono uppercase text-zinc-400 font-bold mt-1 tracking-wider">Local Audience</span>
               </div>
-              <div className="col-span-2 bg-indigo-50/50 border border-indigo-100 p-3 rounded-xl flex items-center justify-between">
-                 <span className="text-xs font-mono uppercase text-indigo-800 font-bold tracking-wider">Verified Auth Reach</span>
-                 <span className="text-sm font-bold text-indigo-900 font-mono">{currentCreator.followers || 0}</span>
+              <div className="col-span-2 bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl flex items-center justify-between">
+                 <span className="text-xs font-mono uppercase text-indigo-300 font-bold tracking-wider">Verified Auth Reach</span>
+                 <span className="text-sm font-bold text-indigo-200 font-mono">{currentCreator.followers || 0}</span>
               </div>
             </div>
           </div>
 
           {/* Velocity Tier subscription panel */}
-          <div className="bg-zinc-950 text-white rounded-2xl p-5 shadow-lg flex flex-col gap-4 relative overflow-hidden">
+          <div className="glass-card-elevated p-5 flex flex-col gap-4 relative overflow-hidden" style={{ borderColor: 'rgba(251,191,36,0.3)' }}>
             <div className="flex items-center justify-between z-10">
               <div className="flex items-center gap-2">
                 <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
-                <span className="text-sm font-mono uppercase tracking-wider text-zinc-400 font-bold">Velocity Priority Tier</span>
+                <span className="text-sm font-mono uppercase tracking-wider text-amber-400 font-bold">Velocity Priority Tier</span>
               </div>
-              <span className="bg-zinc-800 text-zinc-300 text-[11px] font-mono px-2 py-0.5 rounded border border-zinc-700 font-bold">
+              <span className="bg-amber-400/10 text-amber-300 text-[11px] font-mono px-2 py-0.5 rounded border border-amber-400/20 font-bold">
                 Delhi NCR Grid
               </span>
             </div>
 
             <div className="z-10 flex flex-col gap-1">
-              <h4 className="text-lg font-display font-black tracking-tight">Programmatic Queue Front-running</h4>
+              <h4 className="text-lg font-display font-black tracking-tight text-white">Programmatic Queue Front-running</h4>
               <p className="text-xs text-zinc-400 leading-relaxed">
                 By upgrading to Velocity priority tier, your profile moves programmatically to Batch A (Priority) in 100% of geofenced campaigns matching your niche.
               </p>
             </div>
 
             {/* Simulated Tier state toggle */}
-            <div className="z-10 flex flex-col gap-2 pt-2 border-t border-zinc-800">
+            <div className="z-10 flex flex-col gap-2 pt-2 border-t border-[rgba(255,255,255,0.08)]">
               <div className="flex justify-between items-center text-xs">
                 <span className="text-zinc-400">Upgrade status:</span>
                 <span className={`font-mono font-bold ${velocitySubscribed ? 'text-emerald-400' : 'text-zinc-400'}`}>
@@ -947,10 +947,10 @@ export default function CreatorWorkspace({
 
               {velocitySubscribed ? (
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-zinc-500 font-mono">Subscribed since this session</span>
+                  <span className="text-[11px] text-zinc-400 font-mono">Subscribed since this session</span>
                   <button
                     onClick={handleDowngradeVelocity}
-                    className="text-[11px] text-zinc-500 hover:text-red-400 font-mono underline underline-offset-2 transition-colors cursor-pointer"
+                    className="text-[11px] text-zinc-400 hover:text-red-400 font-mono underline underline-offset-2 transition-colors cursor-pointer"
                   >
                     Cancel subscription
                   </button>
@@ -958,7 +958,7 @@ export default function CreatorWorkspace({
               ) : (
                 <button
                   onClick={handleUpgradeVelocity}
-                  className="w-full py-2 px-3 rounded-xl font-mono text-[11px] font-bold tracking-wider uppercase transition-all active:scale-[0.98] bg-amber-400 hover:bg-amber-500 text-zinc-950"
+                  className="w-full py-2 px-3 rounded-xl font-mono text-[11px] font-bold tracking-wider uppercase transition-all active:scale-[0.98] bg-amber-400/90 hover:bg-amber-400 text-zinc-950"
                 >
                   Upgrade to Velocity Tier (₹9.9/mo)
                 </button>
@@ -970,31 +970,31 @@ export default function CreatorWorkspace({
         {/* Right Pane: Available Campaigns Feed */}
         <div className="lg:col-span-8 flex flex-col gap-6">
           {/* Local geofenced campaign feed */}
-          <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-4">
+          <div className="glass-card p-6 flex flex-col gap-4">
             <div>
               <h3 className="text-sm font-mono uppercase tracking-wider text-zinc-400 font-bold">Local Geofenced Activations</h3>
-              <p className="text-xs text-zinc-500 mt-0.5">Campaigns matched to your current coordinates.</p>
+              <p className="text-xs text-zinc-400 mt-0.5">Campaigns matched to your current coordinates.</p>
             </div>
 
             <div className="flex flex-col gap-3">
               {!isRadarActive ? (
-                <div className="flex flex-col items-center justify-center py-16 px-4 bg-zinc-50/50 rounded-xl border border-dashed border-zinc-200">
-                  <div className="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center mb-4">
+                <div className="flex flex-col items-center justify-center py-16 px-4 bg-white/5 rounded-xl border border-dashed border-white/10">
+                  <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
                     <Radio className="w-8 h-8 text-zinc-400" />
                   </div>
-                  <h4 className="text-lg font-display font-bold text-zinc-800">Radar is Offline</h4>
-                  <p className="text-sm text-zinc-500 text-center max-w-sm mt-2 leading-relaxed">
+                  <h4 className="text-lg font-display font-bold text-zinc-200">Radar is Offline</h4>
+                  <p className="text-sm text-zinc-400 text-center max-w-sm mt-2 leading-relaxed">
                     You have disconnected your node from the cryptographic router. Toggle your radar back on to receive localized priority offers.
                   </p>
                 </div>
               ) : activeRadarCampaigns.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 px-4 bg-zinc-50/50 rounded-xl border border-dashed border-zinc-200">
-                  <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center mb-4 relative">
-                    <div className="absolute inset-0 rounded-full border-2 border-indigo-200 animate-ping opacity-20"></div>
+                <div className="flex flex-col items-center justify-center py-16 px-4 bg-white/5 rounded-xl border border-dashed border-white/10">
+                  <div className="w-16 h-16 rounded-full bg-indigo-500/10 flex items-center justify-center mb-4 relative">
+                    <div className="absolute inset-0 rounded-full border-2 border-indigo-400/50 animate-ping opacity-20"></div>
                     <Radio className="w-8 h-8 text-indigo-400 animate-pulse" />
                   </div>
-                  <h4 className="text-lg font-display font-bold text-zinc-800">Scanning for offers...</h4>
-                  <p className="text-sm text-zinc-500 text-center max-w-sm mt-2 leading-relaxed">
+                  <h4 className="text-lg font-display font-bold text-zinc-200">Scanning for offers...</h4>
+                  <p className="text-sm text-zinc-400 text-center max-w-sm mt-2 leading-relaxed">
                     Your node is active. We are actively pinging the cryptographic router for geofenced campaigns matching your niche.
                   </p>
                 </div>
@@ -1006,20 +1006,20 @@ export default function CreatorWorkspace({
                     key={camp.id}
                     className={`border rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all ${
                       camp.id === selectedCampaignId
-                        ? 'border-indigo-500 bg-indigo-50/10'
-                        : 'border-zinc-150 hover:border-zinc-200 bg-white'
+                        ? 'border-indigo-500/50 bg-indigo-500/10'
+                        : 'border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.15)] bg-[rgba(255,255,255,0.02)]'
                     }`}
                   >
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-bold text-zinc-800">{camp.title}</h4>
+                        <h4 className="text-sm font-bold text-zinc-200">{camp.title}</h4>
                         {inActiveBatch && (
-                          <span className="bg-amber-50 text-amber-700 border border-amber-200/80 font-mono text-[8px] px-1.5 py-0.2 rounded font-bold animate-pulse">
+                          <span className="bg-amber-400/10 text-amber-400 border border-amber-400/20 font-mono text-[8px] px-1.5 py-0.2 rounded font-bold animate-pulse">
                             Priority Batch Offer
                           </span>
                         )}
                       </div>
-                      <span className="text-[11px] text-zinc-500 font-mono">
+                      <span className="text-[11px] text-zinc-400 font-mono">
                         Target Locality: {camp.centerLocality}
                       </span>
                       <div className="flex items-center gap-2 text-[11px] text-zinc-400 mt-1">
@@ -1030,19 +1030,19 @@ export default function CreatorWorkspace({
                     <div className="flex items-center gap-4">
                       <div className="flex flex-col items-end text-right">
                         <span className="text-[11px] font-mono text-zinc-400">Match score:</span>
-                        <span className="text-sm font-bold text-indigo-600">{camp.matchScore}%</span>
+                        <span className="text-sm font-bold text-indigo-400">{camp.matchScore}%</span>
                       </div>
 
                       <div className="flex flex-col items-end text-right">
                         <span className="text-[11px] font-mono text-zinc-400">Your Payout:</span>
-                        <span className="text-sm font-bold text-emerald-600 font-mono">₹{Math.round((camp.budget * 0.95) / camp.spotsTotal)}</span>
+                        <span className="text-sm font-bold text-emerald-400 font-mono">₹{Math.round((camp.budget * 0.95) / camp.spotsTotal)}</span>
                       </div>
 
                       <button
                         onClick={() => {
                           setViewingCampaignId(camp.id);
                         }}
-                        className="py-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+                        className="py-1.5 px-3 bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
                       >
                         <span>Express Interest</span>
                         <ChevronRight className="w-3.5 h-3.5" />
@@ -1165,7 +1165,7 @@ export default function CreatorWorkspace({
                       <div className="pt-6 border-t border-white/5 flex flex-col gap-8">
                         {/* Escrow Status Stepper */}
                         <div className="relative z-10 flex flex-col gap-4">
-                  <span className="text-xs font-mono uppercase tracking-widest text-zinc-500 font-bold">Escrow Protocol State</span>
+                  <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 font-bold">Escrow Protocol State</span>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[
                       { step: 'Locked', desc: 'Budget escrowed', active: true, done: true },
@@ -1203,7 +1203,7 @@ export default function CreatorWorkspace({
                         )}
                         <span
                           className={`text-sm font-black ${
-                            st.done ? 'text-emerald-400' : st.active ? 'text-indigo-400' : 'text-zinc-500'
+                            st.done ? 'text-emerald-400' : st.active ? 'text-indigo-400' : 'text-zinc-400'
                           }`}
                         >
                           {i + 1}. {st.step}
@@ -1217,24 +1217,24 @@ export default function CreatorWorkspace({
                 {/* Advanced Professional Requirements */}
                 {(camp.contentFormat || camp.targetAudience || camp.creativeGuidelines) && (
                   <div className="relative z-10 bg-white/[0.02] border border-white/5 rounded-2xl p-5 flex flex-col gap-4 mt-2">
-                    <h4 className="text-sm font-mono uppercase tracking-widest text-zinc-500 font-bold mb-1">Campaign Requirements</h4>
+                    <h4 className="text-sm font-mono uppercase tracking-widest text-zinc-400 font-bold mb-1">Campaign Requirements</h4>
                     
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       {camp.contentFormat && (
                         <div className="flex flex-col gap-1">
-                          <span className="text-[11px] text-zinc-500 uppercase tracking-wider">Format</span>
+                          <span className="text-[11px] text-zinc-400 uppercase tracking-wider">Format</span>
                           <span className="text-sm text-zinc-300 font-medium">{camp.contentFormat}</span>
                         </div>
                       )}
                       {camp.targetAudience && (
                         <div className="flex flex-col gap-1">
-                          <span className="text-[11px] text-zinc-500 uppercase tracking-wider">Target Audience</span>
+                          <span className="text-[11px] text-zinc-400 uppercase tracking-wider">Target Audience</span>
                           <span className="text-sm text-zinc-300 font-medium">{camp.targetAudience}</span>
                         </div>
                       )}
                       {camp.submissionDeadlineDays && (
                         <div className="flex flex-col gap-1">
-                          <span className="text-[11px] text-zinc-500 uppercase tracking-wider">Deadline</span>
+                          <span className="text-[11px] text-zinc-400 uppercase tracking-wider">Deadline</span>
                           <span className="text-sm text-zinc-300 font-medium">{camp.submissionDeadlineDays} days</span>
                         </div>
                       )}
@@ -1242,7 +1242,7 @@ export default function CreatorWorkspace({
                     
                     {camp.creativeGuidelines && (
                       <div className="flex flex-col gap-1 mt-2 pt-4 border-t border-white/5">
-                        <span className="text-[11px] text-zinc-500 uppercase tracking-wider">Creative Guidelines</span>
+                        <span className="text-[11px] text-zinc-400 uppercase tracking-wider">Creative Guidelines</span>
                         <p className="text-sm text-zinc-400 italic">"{camp.creativeGuidelines}"</p>
                       </div>
                     )}
@@ -1323,14 +1323,14 @@ export default function CreatorWorkspace({
                           </div>
                         ) : (
                           <div className="w-16 h-16 rounded-2xl bg-zinc-800/50 flex items-center justify-center group-hover:scale-110 group-hover:bg-indigo-500/20 transition-all duration-500">
-                            <Upload className="w-8 h-8 text-zinc-500 group-hover:text-indigo-400 transition-colors" />
+                            <Upload className="w-8 h-8 text-zinc-400 group-hover:text-indigo-400 transition-colors" />
                           </div>
                         )}
                         <div className="flex flex-col gap-1 text-center">
                           <span className="text-base font-bold text-zinc-200">
                             {selectedFile && expandedCampaignId === camp.id ? selectedFile.name : 'Click or drag your draft to upload'}
                           </span>
-                          <span className="text-xs font-mono text-zinc-500 uppercase tracking-wider mt-1">Photo or video, up to 10MB</span>
+                          <span className="text-xs font-mono text-zinc-400 uppercase tracking-wider mt-1">Photo or video, up to 10MB</span>
                         </div>
                       </div>
 
@@ -1494,7 +1494,7 @@ export default function CreatorWorkspace({
                         </div>
                         <div className="grid grid-cols-2 gap-4 bg-zinc-900/50 rounded-2xl p-4 border border-zinc-800">
                           <div className="flex flex-col gap-1">
-                            <span className="text-[10px] text-zinc-500 font-mono tracking-widest uppercase">Status</span>
+                            <span className="text-[10px] text-zinc-400 font-mono tracking-widest uppercase">Status</span>
                             <span className="text-sm text-indigo-400 font-bold flex items-center gap-2">
                               <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
                               {submission.status === 'final_verifying' ? 'In Final Review' : 'Awaiting Final Review'}
@@ -1502,7 +1502,7 @@ export default function CreatorWorkspace({
                           </div>
                           {submission.contentUrl && (
                             <div className="flex flex-col gap-1">
-                              <span className="text-[10px] text-zinc-500 font-mono tracking-widest uppercase">Live Link</span>
+                              <span className="text-[10px] text-zinc-400 font-mono tracking-widest uppercase">Live Link</span>
                               <a
                                 href={submission.contentUrl}
                                 target="_blank"
@@ -1551,7 +1551,7 @@ export default function CreatorWorkspace({
         ) : (
           <div className="bg-zinc-950/80 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-16 shadow-2xl text-center max-w-2xl mx-auto flex flex-col items-center gap-6">
             <div className="w-20 h-20 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner">
-              <Briefcase className="w-10 h-10 text-zinc-600 animate-pulse" />
+              <Briefcase className="w-10 h-10 text-zinc-300 animate-pulse" />
             </div>
             <div className="flex flex-col gap-2">
               <h4 className="text-2xl font-display font-black text-white">No Active Campaigns</h4>
@@ -1569,11 +1569,11 @@ export default function CreatorWorkspace({
             <div className="flex flex-col gap-6">
         {/* Quick Balance Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-3">
+          <div className="glass-card p-6 flex flex-col gap-3">
             <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Unclaimed Escrow Balance</span>
             <span className="text-3xl font-display font-black text-emerald-600">
               {earnings === undefined ? (
-                <span className="inline-block w-24 h-8 bg-zinc-100 rounded animate-pulse" />
+                <span className="inline-block w-24 h-8 bg-white/10 rounded animate-pulse" />
               ) : (
                 `₹${earnings.totalPending.toFixed(2)}`
               )}
@@ -1583,18 +1583,18 @@ export default function CreatorWorkspace({
               WITHDRAW TO BANK ACCOUNT
             </button>
           </div>
-          <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-2">
+          <div className="glass-card p-6 flex flex-col gap-2">
             <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Total Payouts Released</span>
             <span className="text-3xl font-display font-black text-zinc-950">
               {earnings === undefined ? (
-                <span className="inline-block w-24 h-8 bg-zinc-100 rounded animate-pulse" />
+                <span className="inline-block w-24 h-8 bg-white/10 rounded animate-pulse" />
               ) : (
                 `₹${earnings.totalReleased.toFixed(2)}`
               )}
             </span>
             <p className="text-xs text-zinc-400">All historical geofence runs cleared without disputes.</p>
           </div>
-          <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-2">
+          <div className="glass-card p-6 flex flex-col gap-2">
             <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Velocity Tier Status</span>
             <span className="text-3xl font-display font-black text-indigo-600">{velocitySubscribed ? 'Active' : 'Basic'}</span>
             <p className="text-xs text-zinc-400">2x frequency boost in priority queue offers.</p>
@@ -1604,13 +1604,13 @@ export default function CreatorWorkspace({
         {/* History + Earnings Chart Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Chart card */}
-          <div className="lg:col-span-7 bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-6">
+          <div className="lg:col-span-7 glass-card p-6 flex flex-col gap-6">
             <div>
-              <h3 className="text-base font-display font-semibold text-zinc-900">Monthly Localized Earnings</h3>
-              <p className="text-xs text-zinc-500 mt-0.5">Your monthly payout progression in the Delhi NCR Grid network.</p>
+              <h3 className="text-base font-display font-semibold text-zinc-100">Monthly Localized Earnings</h3>
+              <p className="text-xs text-zinc-400 mt-0.5">Your monthly payout progression in the Delhi NCR Grid network.</p>
             </div>
 
-            <div className="flex items-end justify-between gap-4 h-48 pt-6 border-b border-zinc-150 px-4">
+            <div className="flex items-end justify-between gap-4 h-48 pt-6 border-b border-white/10 px-4">
               {[
                 { month: 'Oct 26', amount: 320, height: 'h-[40%]' },
                 { month: 'Nov 26', amount: 480, height: 'h-[60%]' },
@@ -1618,7 +1618,7 @@ export default function CreatorWorkspace({
                 { month: 'Jan 27 (Est)', amount: 620, height: 'h-[75%]' },
               ].map((bar, i) => (
                 <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                  <span className="text-[11px] font-mono font-bold text-zinc-800">₹${bar.amount}</span>
+                  <span className="text-[11px] font-mono font-bold text-zinc-200">₹${bar.amount}</span>
                   <div className={`w-full bg-indigo-600/90 rounded-t-sm ${bar.height} transition-all duration-500 hover:bg-indigo-700`} />
                   <span className="text-[11px] font-mono text-zinc-400 mt-1">{bar.month}</span>
                 </div>
@@ -1627,10 +1627,10 @@ export default function CreatorWorkspace({
           </div>
 
           {/* Historical Logs */}
-          <div className="lg:col-span-5 bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-4">
+          <div className="lg:col-span-5 glass-card p-6 flex flex-col gap-4">
             <div>
-              <h3 className="text-base font-display font-semibold text-zinc-900">Cryptographic Escrow History</h3>
-              <p className="text-xs text-zinc-500 mt-0.5">Logs of recent automated smart contract payouts.</p>
+              <h3 className="text-base font-display font-semibold text-zinc-100">Cryptographic Escrow History</h3>
+              <p className="text-xs text-zinc-400 mt-0.5">Logs of recent automated smart contract payouts.</p>
             </div>
 
             <div className="flex flex-col gap-2.5 max-h-[300px] overflow-y-auto pr-1">
@@ -1639,9 +1639,9 @@ export default function CreatorWorkspace({
                 { campaign: 'Sunder Nursery Aesthetics', date: '3 days ago', amount: 300, status: 'Completed' },
                 { campaign: 'HKV Cafe Crawl', date: '1 week ago', amount: 180, status: 'Completed' },
               ].map((log, i) => (
-                <div key={i} className="p-3 border border-zinc-100 rounded-xl flex items-center justify-between">
+                <div key={i} className="p-3 border border-[rgba(255,255,255,0.08)] rounded-xl flex items-center justify-between">
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-zinc-800">{log.campaign}</span>
+                    <span className="text-sm font-bold text-zinc-200">{log.campaign}</span>
                     <span className="text-[11px] text-zinc-400 font-mono">{log.date}</span>
                   </div>
                   <div className="flex flex-col items-end gap-1">
@@ -1659,7 +1659,7 @@ export default function CreatorWorkspace({
           {activeSubTab === 'portfolio' && (
             <div className="max-w-5xl mx-auto flex flex-col gap-8">
         {/* Portfolio Header */}
-        <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm">
+        <div className="glass-card p-6">
           <div className="flex items-start gap-5">
             <img
               src={currentCreator.avatar}
@@ -1669,7 +1669,7 @@ export default function CreatorWorkspace({
             />
             <div className="flex-1 flex flex-col gap-1.5">
               <div className="flex items-center gap-2.5">
-                <h2 className="text-2xl font-display font-black text-zinc-900">{currentCreator.name}</h2>
+                <h2 className="text-2xl font-display font-black text-zinc-100">{currentCreator.name}</h2>
                 {currentCreator.velocityTier === 'Velocity' && (
                   <span className="bg-amber-50 text-amber-700 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-amber-200 flex items-center gap-1">
                     <Zap className="w-3 h-3 fill-amber-500 text-amber-500" />
@@ -1679,40 +1679,40 @@ export default function CreatorWorkspace({
               </div>
               <span className="text-sm text-indigo-600 font-mono font-medium">{currentCreator.handle || 'No handle set'}</span>
               {currentCreator.bio && (
-                <p className="text-sm text-zinc-500 leading-relaxed mt-1 max-w-xl">{currentCreator.bio}</p>
+                <p className="text-sm text-zinc-400 leading-relaxed mt-1 max-w-xl">{currentCreator.bio}</p>
               )}
             </div>
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-5 border-t border-zinc-100">
-            <div className="flex flex-col items-center text-center p-3 bg-zinc-50 rounded-xl">
-              <span className="text-xl font-black text-zinc-900 font-display">{currentCreator.followers || '0'}</span>
-              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Followers</span>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-5 border-t border-[rgba(255,255,255,0.08)]">
+            <div className="flex flex-col items-center text-center p-3 bg-white/5 rounded-xl">
+              <span className="text-xl font-black text-zinc-100 font-display">{currentCreator.followers || '0'}</span>
+              <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider mt-1">Followers</span>
             </div>
-            <div className="flex flex-col items-center text-center p-3 bg-zinc-50 rounded-xl">
+            <div className="flex flex-col items-center text-center p-3 bg-white/5 rounded-xl">
               <span className="text-xl font-black text-emerald-600 font-display">{currentCreator.audienceInLocality}%</span>
-              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Local Audience</span>
+              <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider mt-1">Local Audience</span>
             </div>
-            <div className="flex flex-col items-center text-center p-3 bg-zinc-50 rounded-xl">
+            <div className="flex flex-col items-center text-center p-3 bg-white/5 rounded-xl">
               <span className="text-xl font-black text-indigo-600 font-display">{currentCreator.niche || 'N/A'}</span>
-              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Niche</span>
+              <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider mt-1">Niche</span>
             </div>
-            <div className="flex flex-col items-center text-center p-3 bg-zinc-50 rounded-xl">
-              <span className="text-xl font-black text-zinc-900 font-display">{currentCreator.locality || 'N/A'}</span>
-              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Location</span>
+            <div className="flex flex-col items-center text-center p-3 bg-white/5 rounded-xl">
+              <span className="text-xl font-black text-zinc-100 font-display">{currentCreator.locality || 'N/A'}</span>
+              <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider mt-1">Location</span>
             </div>
           </div>
         </div>
 
         {/* Past Work Gallery */}
-        <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm">
+        <div className="glass-card p-6">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h3 className="text-lg font-display font-bold text-zinc-900">Portfolio & Past Work</h3>
-              <p className="text-xs text-zinc-500 mt-0.5">Previous brand collaborations and content samples.</p>
+              <h3 className="text-lg font-display font-bold text-zinc-100">Portfolio & Past Work</h3>
+              <p className="text-xs text-zinc-400 mt-0.5">Previous brand collaborations and content samples.</p>
             </div>
-            <span className="text-[11px] font-mono text-zinc-400 bg-zinc-50 px-2.5 py-1 rounded-full border border-zinc-100">
+            <span className="text-[11px] font-mono text-zinc-400 bg-black/20 px-2.5 py-1 rounded-full border border-[rgba(255,255,255,0.08)]">
               {currentCreator.pastWork?.length || 0} items
             </span>
           </div>
@@ -1720,7 +1720,7 @@ export default function CreatorWorkspace({
           {currentCreator.pastWork && currentCreator.pastWork.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {currentCreator.pastWork.map((work, idx) => (
-                <div key={idx} className="group relative overflow-hidden rounded-xl border border-zinc-200/80 bg-zinc-50 aspect-square">
+                <div key={idx} className="group relative overflow-hidden rounded-xl border border-[rgba(255,255,255,0.15)]/80 bg-black/20 aspect-square">
                   <img
                     src={work.imgUrl}
                     alt={`${work.brand} - ${work.type}`}
@@ -1737,9 +1737,9 @@ export default function CreatorWorkspace({
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-16 px-4 bg-zinc-50/50 rounded-xl border border-dashed border-zinc-200">
+            <div className="flex flex-col items-center justify-center py-16 px-4 bg-white/5 rounded-xl border border-dashed border-[rgba(255,255,255,0.15)]">
               <Briefcase className="w-10 h-10 text-zinc-300 mb-3" />
-              <h4 className="text-base font-display font-bold text-zinc-600">No portfolio items yet</h4>
+              <h4 className="text-base font-display font-bold text-zinc-300">No portfolio items yet</h4>
               <p className="text-sm text-zinc-400 text-center max-w-sm mt-2">
                 Complete your first campaign to build your portfolio. Past work will appear here automatically.
               </p>
@@ -1748,8 +1748,8 @@ export default function CreatorWorkspace({
         </div>
 
         {/* Reviews Section */}
-        <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm">
-          <h3 className="text-lg font-display font-bold text-zinc-900 mb-4">Brand Reviews</h3>
+        <div className="glass-card p-6">
+          <h3 className="text-lg font-display font-bold text-zinc-100 mb-4">Brand Reviews</h3>
           <ReviewsCard userId={currentCreator.id} label="Reviews from brands" />
         </div>
       </div>

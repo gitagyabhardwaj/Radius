@@ -21,8 +21,8 @@ const COLORS: Record<string, string> = {
   batch_dispatched:   'text-indigo-400 bg-[rgba(99,102,241,0.12)] border-[rgba(99,102,241,0.3)]',
   batch_cascaded:     'text-amber-400 bg-[rgba(245,158,11,0.10)] border-[rgba(245,158,11,0.3)]',
   offer_accepted:     'text-emerald-400 bg-[rgba(16,185,129,0.12)] border-[rgba(16,185,129,0.3)]',
-  offer_declined:     'text-zinc-500 bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.08)]',
-  offer_expired:      'text-zinc-500 bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.08)]',
+  offer_declined:     'text-zinc-400 bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.08)]',
+  offer_expired:      'text-zinc-400 bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.08)]',
   submission_uploaded:'text-indigo-400 bg-[rgba(99,102,241,0.12)] border-[rgba(99,102,241,0.3)]',
   submission_approved:'text-emerald-400 bg-[rgba(16,185,129,0.12)] border-[rgba(16,185,129,0.3)]',
   submission_rejected:'text-rose-400 bg-[rgba(239,68,68,0.10)] border-[rgba(239,68,68,0.25)]',
@@ -81,7 +81,7 @@ export default function DispatchFeed({ campaignId }: { campaignId: string }) {
           const Icon = ICONS[ev.type] || Activity;
           return (
             <div key={i} className="flex items-start gap-2.5">
-              <div className={`shrink-0 w-6 h-6 rounded-full border flex items-center justify-center mt-0.5 ${COLORS[ev.type] || 'text-zinc-500 bg-zinc-100 border-zinc-200'}`}>
+              <div className={`shrink-0 w-6 h-6 rounded-full border flex items-center justify-center mt-0.5 ${COLORS[ev.type] || 'text-zinc-400 bg-zinc-100 border-zinc-200'}`}>
                 <Icon className="w-3.5 h-3.5" />
               </div>
               <div className="flex-1 min-w-0 flex items-baseline justify-between gap-2">

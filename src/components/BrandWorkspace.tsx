@@ -93,7 +93,7 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
 
   return (
     <div className="mt-2 pt-5 border-t border-[rgba(255,255,255,0.08)] flex flex-col gap-3">
-      <span className="text-[11px] font-mono uppercase tracking-wide text-zinc-500 font-bold">
+      <span className="text-[11px] font-mono uppercase tracking-wide text-zinc-400 font-bold">
         Deliverables To Review ({submissions.length})
       </span>
 
@@ -314,7 +314,7 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                       )}
                     </div>
                     <span className="text-[11px] text-indigo-400 font-mono">{creator.handle || 'No handle'}</span>
-                    <div className="flex items-center gap-3 text-[11px] text-zinc-500 mt-0.5">
+                    <div className="flex items-center gap-3 text-[11px] text-zinc-400 mt-0.5">
                       <span>{creator.followers || '0'} followers</span>
                       <span>•</span>
                       <span>{creator.niche || 'No niche'}</span>
@@ -322,7 +322,7 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                       <span>{creator.locality || 'Unknown location'}</span>
                     </div>
                     {creator.bio && (
-                      <p className="text-[11px] text-zinc-500 mt-1 line-clamp-2">{creator.bio}</p>
+                      <p className="text-[11px] text-zinc-400 mt-1 line-clamp-2">{creator.bio}</p>
                     )}
                     {/* Past work preview */}
                     {creator.pastWork && creator.pastWork.length > 0 && (
@@ -339,7 +339,7 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                           />
                         ))}
                         {creator.pastWork.length > 3 && (
-                          <span className="text-[9px] font-mono text-zinc-500">+{creator.pastWork.length - 3}</span>
+                          <span className="text-[9px] font-mono text-zinc-400">+{creator.pastWork.length - 3}</span>
                         )}
                       </div>
                     )}
@@ -433,7 +433,7 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                 <h3 className="text-lg font-bold text-zinc-100">Creator Profile</h3>
                 <button
                   onClick={() => setSelectedProfileCreator(null)}
-                  className="p-2 text-zinc-500 hover:text-zinc-400 bg-transparent rounded-full shadow-sm border border-[rgba(255,255,255,0.1)] transition-colors cursor-pointer"
+                  className="p-2 text-zinc-400 hover:text-zinc-400 bg-transparent rounded-full shadow-sm border border-[rgba(255,255,255,0.1)] transition-colors cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -455,7 +455,7 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                     </div>
                     <span className="text-sm text-indigo-400 font-mono font-medium">{selectedProfileCreator.handle || 'No handle'}</span>
                     
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-500 mt-1">
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-400 mt-1">
                       <div className="flex items-center gap-1.5"><Users className="w-4 h-4" />{selectedProfileCreator.followers || '0'} followers</div>
                       <div className="flex items-center gap-1.5"><MapPin className="w-4 h-4" />{selectedProfileCreator.locality || 'Unknown location'}</div>
                       <div className="flex items-center gap-1.5"><Briefcase className="w-4 h-4" />{selectedProfileCreator.niche || 'No niche'}</div>
@@ -465,26 +465,26 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-[rgba(255,255,255,0.08)]" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-bold">Match Score</span>
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Match Score</span>
                     <span className="text-2xl font-black text-indigo-400">{selectedProfileCreator.matchScore || 90}%</span>
                   </div>
                   <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-[rgba(255,255,255,0.08)]" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-bold">Local Audience</span>
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Local Audience</span>
                     <span className="text-2xl font-black text-emerald-400">{selectedProfileCreator.audienceInLocality || 75}%</span>
                   </div>
                   <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-[rgba(255,255,255,0.08)]" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-bold">Avg Response</span>
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Avg Response</span>
                     <span className="text-2xl font-black text-zinc-100">{selectedProfileCreator.latencyHours || 2}h</span>
                   </div>
                   <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-[rgba(255,255,255,0.08)]" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-bold">Collabs</span>
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Collabs</span>
                     <span className="text-2xl font-black text-zinc-100">{selectedProfileCreator.acceptedCampaignIds?.length || 0}</span>
                   </div>
                 </div>
 
                 {selectedProfileCreator.bio && (
                   <div className="flex flex-col gap-2">
-                    <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-bold">About</span>
+                    <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold">About</span>
                     <p className="text-sm text-zinc-300 leading-relaxed glass-card-elevated p-6 whitespace-pre-wrap">
                       {selectedProfileCreator.bio}
                     </p>
@@ -492,7 +492,7 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                 )}
 
                 <div className="flex flex-col gap-3">
-                  <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-bold">Portfolio & Past Work</span>
+                  <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold">Portfolio & Past Work</span>
                   {selectedProfileCreator.pastWork && selectedProfileCreator.pastWork.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       {selectedProfileCreator.pastWork.map((work: any, idx: number) => (
@@ -509,7 +509,7 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                           </div>
                           <div className="p-3 flex flex-col">
                             <span className="text-sm font-bold text-zinc-100 truncate">{work.brand}</span>
-                            <span className="text-[11px] text-zinc-500 font-mono uppercase mt-0.5 truncate">{work.type}</span>
+                            <span className="text-[11px] text-zinc-400 font-mono uppercase mt-0.5 truncate">{work.type}</span>
                           </div>
                         </div>
                       ))}
@@ -518,7 +518,7 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                     <div className="p-8 border-2 border-dashed border-[rgba(255,255,255,0.08)] rounded-xl flex flex-col items-center justify-center text-center" style={{ background: 'rgba(255,255,255,0.02)' }}>
                       <Briefcase className="w-8 h-8 text-zinc-300 mb-2" />
                       <span className="text-sm font-bold text-zinc-400">No Portfolio Yet</span>
-                      <span className="text-xs text-zinc-500 max-w-xs mt-1">This creator hasn't uploaded any past work examples.</span>
+                      <span className="text-xs text-zinc-400 max-w-xs mt-1">This creator hasn't uploaded any past work examples.</span>
                     </div>
                   )}
                 </div>
@@ -555,7 +555,7 @@ function CampaignDetailPanel({ camp }: { camp: Campaign }) {
         <div className="border border-[rgba(255,255,255,0.08)] rounded-xl p-4 flex flex-col gap-4 animate-fade-in" style={{ background: 'rgba(255,255,255,0.03)' }}>
           {/* Deliverable / Description */}
           <div className="flex flex-col gap-1">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-500 font-bold">Deliverable</span>
+            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Deliverable</span>
             <p className="text-sm text-zinc-300">{camp.deliverable}</p>
           </div>
 
@@ -563,32 +563,32 @@ function CampaignDetailPanel({ camp }: { camp: Campaign }) {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {camp.contentFormat && (
               <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Format</span>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Format</span>
                 <span className="text-sm font-medium text-zinc-100">{camp.contentFormat}</span>
               </div>
             )}
             {camp.targetAudience && (
               <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Target Audience</span>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Target Audience</span>
                 <span className="text-sm font-medium text-zinc-100">{camp.targetAudience}</span>
               </div>
             )}
             {camp.submissionDeadlineDays && (
               <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Submission Deadline</span>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Submission Deadline</span>
                 <span className="text-sm font-medium text-zinc-100">{camp.submissionDeadlineDays} days</span>
               </div>
             )}
             <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Niche</span>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Niche</span>
               <span className="text-sm font-medium text-zinc-100">{camp.niche}</span>
             </div>
             <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Budget</span>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Budget</span>
               <span className="text-sm font-medium text-emerald-400">₹{camp.budget}</span>
             </div>
             <div className="flex flex-col gap-0.5 p-3 bg-transparent rounded-lg border border-[rgba(255,255,255,0.08)]">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Spots</span>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Spots</span>
               <span className="text-sm font-medium text-zinc-100">{camp.spotsFilled}/{camp.spotsTotal} filled</span>
             </div>
           </div>
@@ -596,15 +596,15 @@ function CampaignDetailPanel({ camp }: { camp: Campaign }) {
           {/* Creative Guidelines */}
           {camp.creativeGuidelines && (
             <div className="flex flex-col gap-1 pt-2 border-t border-[rgba(255,255,255,0.08)]">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-500 font-bold">Creative Guidelines</span>
+              <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Creative Guidelines</span>
               <p className="text-sm text-zinc-400 italic">"{camp.creativeGuidelines}"</p>
             </div>
           )}
 
           {/* Location */}
           <div className="flex items-center gap-2 pt-2 border-t border-[rgba(255,255,255,0.08)]">
-            <MapPin className="w-3.5 h-3.5 text-zinc-500" />
-            <span className="text-[11px] text-zinc-500 font-mono">
+            <MapPin className="w-3.5 h-3.5 text-zinc-400" />
+            <span className="text-[11px] text-zinc-400 font-mono">
               {camp.centerLocality} ({camp.centerLat.toFixed(4)}N, {camp.centerLng.toFixed(4)}E)
             </span>
           </div>
@@ -969,7 +969,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Brand Corporate Name</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Brand Corporate Name</label>
               <input
                 id="brand-profile-name-input"
                 type="text"
@@ -984,7 +984,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Corporate Domain</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Corporate Domain</label>
               <input
                 id="brand-profile-domain-input"
                 type="text"
@@ -995,7 +995,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             </div>
             
             <div className="flex flex-col gap-1.5 md:col-span-2">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Brand Instagram Handle</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Brand Instagram Handle</label>
               <input
                 id="brand-profile-handle-input"
                 type="text"
@@ -1008,7 +1008,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Authorized Administrator Email</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Authorized Administrator Email</label>
               <input
                 id="brand-profile-email-input"
                 type="email"
@@ -1020,7 +1020,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Primary Market Sector</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Primary Market Sector</label>
               <select
                 id="brand-profile-sector-select"
                 defaultValue={currentUser?.sector || "Food & Lifestyle"}
@@ -1043,7 +1043,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Brand Bio / Mission Statement</label>
+            <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Brand Bio / Mission Statement</label>
             <textarea
               id="brand-profile-bio-textarea"
               rows={3}
@@ -1054,12 +1054,12 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
           </div>
 
           <div className="border-t border-[rgba(255,255,255,0.08)] pt-5 flex flex-col gap-4">
-            <h3 className="text-sm font-mono uppercase tracking-wider text-zinc-500 font-bold">Secure Escrow Settings</h3>
+            <h3 className="text-sm font-mono uppercase tracking-wider text-zinc-400 font-bold">Secure Escrow Settings</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium flex items-center gap-1">
-                  <span className="text-zinc-500">₹</span> Funding Escrow Wallet
+                <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium flex items-center gap-1">
+                  <span className="text-zinc-400">₹</span> Funding Escrow Wallet
                 </label>
                 <input
                   id="brand-profile-wallet-input"
@@ -1071,7 +1071,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Escrow Release Mechanism</label>
+                <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Escrow Release Mechanism</label>
                 <div className="flex items-center justify-between p-2.5 rounded-xl border border-[rgba(255,255,255,0.08)]" style={{ background: 'rgba(255,255,255,0.04)' }}>
                   <span className="text-sm text-zinc-400 font-medium">Manual Brand Verification</span>
                   <span className="bg-[rgba(245,158,11,0.1)] text-amber-400 border border-[rgba(245,158,11,0.2)] font-mono text-[11px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">
@@ -1128,7 +1128,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             <div className="flex items-center justify-between border border-[rgba(255,255,255,0.08)] p-4 rounded-xl mb-3 hover:bg-[rgba(255,255,255,0.02)] transition-colors">
               <div className="flex flex-col">
                 <span className="text-sm font-bold text-zinc-100">Sign Out</span>
-                <span className="text-xs text-zinc-500">Securely disconnect this device from your node.</span>
+                <span className="text-xs text-zinc-400">Securely disconnect this device from your node.</span>
               </div>
               <button
                 onClick={async () => {
@@ -1144,7 +1144,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             <div className="flex items-center justify-between border border-[rgba(239,68,68,0.2)] p-4 rounded-xl" style={{ background:'rgba(239,68,68,0.06)' }}>
               <div className="flex flex-col">
                 <span className="text-sm font-bold text-zinc-100">Delete Account</span>
-                <span className="text-xs text-zinc-500">Permanently delete your profile and reset your role.</span>
+                <span className="text-xs text-zinc-400">Permanently delete your profile and reset your role.</span>
               </div>
               <button
                 onClick={async () => {
@@ -1171,7 +1171,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               </div>
               <div className="flex flex-col">
                 <span className="text-base font-bold text-white tracking-tight leading-none">{customBrandName}</span>
-                <span className="text-[11px] font-mono text-zinc-500 mt-1 uppercase">Brand Node Operator</span>
+                <span className="text-[11px] font-mono text-zinc-400 mt-1 uppercase">Brand Node Operator</span>
               </div>
             </div>
 
@@ -1180,7 +1180,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 <ShieldCheck className="w-4 h-4 text-indigo-400" />
                 Audit Trail Credentials
               </span>
-              <p className="text-xs text-zinc-500 leading-relaxed">
+              <p className="text-xs text-zinc-400 leading-relaxed">
                 Your corporate node is currently integrated into the Delhi NCR cryptographic router. All campaigns automatically deploy automated multi-modal smart escrows.
               </p>
             </div>
@@ -1212,7 +1212,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Brand Name</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Brand Name</label>
               <input
                 type="text"
                 value={brandName || ''}
@@ -1222,7 +1222,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Campaign Title</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Campaign Title</label>
               <input
                 type="text"
                 value={title || ''}
@@ -1235,7 +1235,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Target Niche</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Target Niche</label>
               <select
                 value={niche}
                 onChange={(e) => setNiche(e.target.value)}
@@ -1256,7 +1256,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               </select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Deliverable</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Deliverable</label>
               <input
                 type="text"
                 value={deliverable || ''}
@@ -1269,7 +1269,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Content Format</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Content Format</label>
               <select
                 value={contentFormat}
                 onChange={(e) => setContentFormat(e.target.value)}
@@ -1283,7 +1283,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               </select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Target Audience</label>
+              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Target Audience</label>
               <input
                 type="text"
                 value={targetAudience || ''}
@@ -1295,7 +1295,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
           </div>
           
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Creative Guidelines</label>
+            <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Creative Guidelines</label>
             <textarea
               value={creativeGuidelines || ''}
               onChange={(e) => {
@@ -1310,7 +1310,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-mono uppercase tracking-wider text-zinc-500 font-medium">Submission Deadline (Days)</label>
+            <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Submission Deadline (Days)</label>
             <div className="flex items-center gap-3">
               <input
                 type="range"
@@ -1332,7 +1332,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                     {submissionDeadlineDays}
                   </motion.span>
                 </AnimatePresence>
-                <span className="ml-1 text-zinc-500 font-normal">days</span>
+                <span className="ml-1 text-zinc-400 font-normal">days</span>
               </div>
             </div>
           </div>
@@ -1345,7 +1345,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               </div>
               <div className="flex flex-col">
                 <span className="text-sm font-mono font-bold text-zinc-300">{resolvedLocalityLabel()}</span>
-                <span className="text-[11px] text-zinc-500">Centered at: {centerLat.toFixed(4)}N, {centerLng.toFixed(4)}E</span>
+                <span className="text-[11px] text-zinc-400">Centered at: {centerLat.toFixed(4)}N, {centerLng.toFixed(4)}E</span>
               </div>
             </div>
 
@@ -1380,10 +1380,10 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                       {spotsTotal}
                     </motion.span>
                   </AnimatePresence>
-                  <span className="ml-1 text-zinc-500 font-normal">creators</span>
+                  <span className="ml-1 text-zinc-400 font-normal">creators</span>
                 </div>
               </div>
-              <span className="text-[11px] text-zinc-500">Platform automatically sends offers to next batch until filled</span>
+              <span className="text-[11px] text-zinc-400">Platform automatically sends offers to next batch until filled</span>
             </div>
           </div>
 
@@ -1394,7 +1394,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 <Sparkles className="w-4 h-4 text-indigo-400" />
                 <span className="text-sm font-semibold text-zinc-300">Smart Budget Recommender</span>
               </div>
-              <span className="text-xs font-mono text-zinc-500">
+              <span className="text-xs font-mono text-zinc-400">
                 Estimated range: <span className="text-zinc-100 font-bold">₹{estMin} - ₹{estMax}</span>
               </span>
             </div>
@@ -1435,7 +1435,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1 p-3 rounded-lg border border-[rgba(255,255,255,0.08)]" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Total Campaign Budget</span>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Total Campaign Budget</span>
                 <AnimatePresence mode="popLayout">
                   <motion.span
                     key={budget}
@@ -1472,11 +1472,11 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 <div className="flex justify-between items-center w-full">
                   <span className="text-sm font-bold text-zinc-100">Automated Escrow Protocol</span>
                   <div className="bg-transparent border border-[rgba(255,255,255,0.08)] px-2 py-1 rounded-md flex items-center gap-1.5">
-                    <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">Wallet Balance:</span>
+                    <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider">Wallet Balance:</span>
                     <span className="text-sm font-mono font-bold text-emerald-400">₹{currentUser?.escrowBalance || 0}</span>
                   </div>
                 </div>
-                <p className="text-xs text-zinc-500 leading-normal mt-1">
+                <p className="text-xs text-zinc-400 leading-normal mt-1">
                   Your budget of <span className="font-semibold text-zinc-100">₹{budget}</span> will be locked in smart escrow. A 5% platform fee is deducted — creators share <span className="font-semibold text-zinc-100">₹{Math.round(budget * 0.95)}</span> equally, so each creator receives <span className="font-semibold text-emerald-400">₹{spotsTotal > 0 ? Math.round((budget * 0.95) / spotsTotal) : '—'}</span>.
                 </p>
               </div>
@@ -1490,7 +1490,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               disabled={isDepositing}
               className={`w-full py-4 px-8 rounded-xl font-display font-medium text-base flex items-center justify-center gap-2 transition-all ${
                 isDepositing
-                  ? 'bg-[rgba(255,255,255,0.05)] text-zinc-500 cursor-not-allowed border border-[rgba(255,255,255,0.08)]'
+                  ? 'bg-[rgba(255,255,255,0.05)] text-zinc-400 cursor-not-allowed border border-[rgba(255,255,255,0.08)]'
                   : 'btn-primary active:scale-[0.97] cursor-pointer'
               }`}
             >
@@ -1552,8 +1552,8 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
         {activeCampaigns.length === 0 ? (
           <div className="text-center py-16 flex flex-col items-center justify-center border border-dashed border-zinc-200 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)' }}>
             <Radio className="w-8 h-8 text-zinc-300 animate-pulse mb-3" />
-            <span className="text-sm font-medium text-zinc-500">No active localized flash activations running.</span>
-            <p className="text-xs text-zinc-500 mt-1 max-w-[280px]">
+            <span className="text-sm font-medium text-zinc-400">No active localized flash activations running.</span>
+            <p className="text-xs text-zinc-400 mt-1 max-w-[280px]">
               Use the campaign setup card above to lock budget and launch one.
             </p>
           </div>
@@ -1575,7 +1575,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                         {camp.brandName}
                       </span>
                     </div>
-                    <span className="text-xs text-zinc-500 font-mono mt-0.5">
+                    <span className="text-xs text-zinc-400 font-mono mt-0.5">
                       LOC: {camp.centerLocality} • deliverable: {camp.deliverable}
                       {isCollapsed && ` • Spots: ${camp.spotsFilled}/${camp.spotsTotal}`}
                     </span>
@@ -1583,7 +1583,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
                   <div className="flex items-center gap-4">
                     <div className="flex flex-col items-end">
-                      <span className="text-[11px] uppercase font-mono tracking-wider text-zinc-500">Escrow Locked</span>
+                      <span className="text-[11px] uppercase font-mono tracking-wider text-zinc-400">Escrow Locked</span>
                       <span className="text-sm font-bold text-emerald-400 font-mono flex items-center gap-1">
                         <ShieldCheck className="w-3.5 h-3.5" />
                         ₹{camp.budget}
@@ -1591,7 +1591,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                     </div>
 
                     <div className="flex flex-col items-end">
-                      <span className="text-[11px] uppercase font-mono tracking-wider text-zinc-500">Campaign Status</span>
+                      <span className="text-[11px] uppercase font-mono tracking-wider text-zinc-400">Campaign Status</span>
                       <span className="text-sm font-bold text-indigo-400 bg-[rgba(99,102,241,0.08)] px-2 py-0.5 rounded border border-[rgba(99,102,241,0.2)]">
                         {camp.batches.length > 0 
                           ? `Batch ${String.fromCharCode(65 + camp.activeBatchIndex)} Active` 
@@ -1610,13 +1610,13 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                           }
                         }
                       }}
-                      className="ml-4 text-zinc-500 hover:text-rose-400 hover:bg-[rgba(239,68,68,0.08)] flex items-center justify-center w-8 h-8 rounded-full transition-colors"
+                      className="ml-4 text-zinc-400 hover:text-rose-400 hover:bg-[rgba(239,68,68,0.08)] flex items-center justify-center w-8 h-8 rounded-full transition-colors"
                       title="Delete Campaign"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
 
-                    <div className="ml-2 text-zinc-500 flex items-center justify-center w-8 h-8 rounded-full hover: transition-colors" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                    <div className="ml-2 text-zinc-400 flex items-center justify-center w-8 h-8 rounded-full hover: transition-colors" style={{ background: 'rgba(255,255,255,0.05)' }}>
                       {isCollapsed ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
                     </div>
                   </div>
@@ -1699,11 +1699,11 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                               DISPATCHED
                             </span>
                           ) : isPassed ? (
-                            <span className="text-zinc-500 text-[11px] font-mono font-medium">
+                            <span className="text-zinc-400 text-[11px] font-mono font-medium">
                               PASSED
                             </span>
                           ) : (
-                            <span className="text-zinc-500 text-[11px] font-mono">
+                            <span className="text-zinc-400 text-[11px] font-mono">
                               QUEUED
                             </span>
                           )}
@@ -1711,7 +1711,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
                         {/* Profiles matched in this batch */}
                         <div className="flex flex-col gap-1.5 my-1">
-                          <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-wide">Target Creators</span>
+                          <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wide">Target Creators</span>
                           <div className="flex items-center gap-1.5">
                             {batch.creatorIds.map((cid) => {
                               const creator = (creators || CREATORS).find((c) => c.id === cid);
@@ -1738,7 +1738,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                         {isCurrent && (
                           <div className="mt-2 flex flex-col gap-2">
                             <div className="flex justify-between items-center text-[11px]">
-                              <span className="text-zinc-500 font-medium">Remaining Priority Window:</span>
+                              <span className="text-zinc-400 font-medium">Remaining Priority Window:</span>
                               <span className="text-indigo-400 font-mono font-bold animate-pulse">
                                 {batch.dispatchedAt && (batch.cascadeAfterMs - (now - batch.dispatchedAt)) > 0
                                   ? `Moves to next batch in ${Math.floor(Math.max(0, batch.cascadeAfterMs - (now - batch.dispatchedAt)) / 1000 / 3600)}h ${Math.floor((Math.max(0, batch.cascadeAfterMs - (now - batch.dispatchedAt)) / 1000 % 3600) / 60)}m ${Math.floor(Math.max(0, batch.cascadeAfterMs - (now - batch.dispatchedAt)) / 1000 % 60)}s`
@@ -1791,22 +1791,22 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               <div className="w-12 h-12 border-4 border-blue-100 border-t-[#3366cc] rounded-full animate-spin mb-2" />
               <div className="text-center">
                 <h4 className="text-lg font-bold text-zinc-100 mb-1">Processing Payment</h4>
-                <p className="text-sm text-zinc-500">Please wait while we secure your escrow...</p>
+                <p className="text-sm text-zinc-400">Please wait while we secure your escrow...</p>
               </div>
               <div className="w-full rounded-xl border border-[rgba(255,255,255,0.08)] p-4 mt-2" style={{ background: 'rgba(255,255,255,0.04)' }}>
                 <div className="flex justify-between text-sm mb-1.5">
-                  <span className="text-zinc-500">Amount payable</span>
+                  <span className="text-zinc-400">Amount payable</span>
                   <span className="font-bold text-zinc-100 font-mono">₹{fakeRazorpayData.amount}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-zinc-500">Order</span>
+                  <span className="text-zinc-400">Order</span>
                   <span className="font-mono text-zinc-400 text-xs mt-0.5">{fakeRazorpayData.orderId.split('_').slice(-1)}</span>
                 </div>
               </div>
             </div>
             
             {/* Footer */}
-            <div className="px-5 py-3 border-t border-[rgba(255,255,255,0.08)] flex items-center justify-center gap-1.5 text-xs text-zinc-500 font-medium" style={{ background: 'rgba(255,255,255,0.02)' }}>
+            <div className="px-5 py-3 border-t border-[rgba(255,255,255,0.08)] flex items-center justify-center gap-1.5 text-xs text-zinc-400 font-medium" style={{ background: 'rgba(255,255,255,0.02)' }}>
               <ShieldCheck className="w-3.5 h-3.5" /> 100% Secure Checkout (Demo Mode)
             </div>
           </div>
@@ -1873,18 +1873,18 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             <div className="flex flex-col gap-4 max-h-[400px] overflow-y-auto pr-2 font-sans">
               {analytics.pastCampaigns.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 text-center rounded-xl border border-dashed border-[rgba(255,255,255,0.1)]" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                  <span className="text-sm font-medium text-zinc-500 mb-1">No Past Campaigns</span>
-                  <span className="text-[11px] text-zinc-500">Launch a new campaign to see performance metrics.</span>
+                  <span className="text-sm font-medium text-zinc-400 mb-1">No Past Campaigns</span>
+                  <span className="text-[11px] text-zinc-400">Launch a new campaign to see performance metrics.</span>
                 </div>
               ) : (
                 analytics.pastCampaigns.map((camp: any) => (
                   <div key={camp.id} className="p-4 border border-[rgba(255,255,255,0.08)] rounded-xl flex items-center justify-between hover:bg-[rgba(255,255,255,0.04)] transition-colors">
                     <div className="flex flex-col">
                       <span className="text-base font-bold text-zinc-100">{camp.title}</span>
-                      <span className="text-xs text-zinc-500 font-mono mt-1">{camp.date} • {(camp.views / 1000).toFixed(1)}k views</span>
+                      <span className="text-xs text-zinc-400 font-mono mt-1">{camp.date} • {(camp.views / 1000).toFixed(1)}k views</span>
                     </div>
                     <div className="flex flex-col items-end">
-                      <span className="text-[10px] text-zinc-500 font-mono uppercase tracking-wider mb-1">PPV</span>
+                      <span className="text-[10px] text-zinc-400 font-mono uppercase tracking-wider mb-1">PPV</span>
                       <span className="text-sm font-mono font-bold text-emerald-400 bg-[rgba(16,185,129,0.08)] px-2.5 py-1 rounded-lg border border-[rgba(16,185,129,0.2)]">
                         ₹{camp.ppv}
                       </span>
@@ -1905,8 +1905,8 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto pr-1 font-sans">
               {frequentCreators.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 text-center rounded-xl border border-dashed border-[rgba(255,255,255,0.1)]" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                  <span className="text-sm font-medium text-zinc-500 mb-1">No Frequent Creators</span>
-                  <span className="text-[11px] text-zinc-500">Launch campaigns to build your network.</span>
+                  <span className="text-sm font-medium text-zinc-400 mb-1">No Frequent Creators</span>
+                  <span className="text-[11px] text-zinc-400">Launch campaigns to build your network.</span>
                 </div>
               ) : (
                 frequentCreators.map((creator: any) => (
@@ -1915,11 +1915,11 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                       <img src={creator.avatar || creator.avatarUrl} alt={creator.name} className="w-8 h-8 rounded-full object-cover border border-[rgba(255,255,255,0.08)] referrerPolicy='no-referrer'" />
                       <div className="flex flex-col">
                         <span className="text-sm font-bold text-zinc-100">{creator.name}</span>
-                        <span className="text-[11px] text-zinc-500 font-mono">{creator.locality}</span>
+                        <span className="text-[11px] text-zinc-400 font-mono">{creator.locality}</span>
                       </div>
                     </div>
                     <div className="flex flex-col items-end">
-                      <span className="text-[10px] text-zinc-500 font-mono uppercase tracking-wider mb-0.5">Worked on</span>
+                      <span className="text-[10px] text-zinc-400 font-mono uppercase tracking-wider mb-0.5">Worked on</span>
                       <span className="text-sm font-mono font-bold text-indigo-400 bg-[rgba(99,102,241,0.08)] px-2 py-0.5 rounded border border-[rgba(99,102,241,0.2)]">{creator.overlap} {creator.overlap === 1 ? 'camp' : 'camps'}</span>
                     </div>
                   </div>

@@ -78,7 +78,7 @@ function BrowserFrame({ children }: { children: React.ReactNode }) {
         <span className="w-2 h-2 rounded-full bg-red-500/60" />
         <span className="w-2 h-2 rounded-full bg-amber-500/60" />
         <span className="w-2 h-2 rounded-full bg-emerald-500/60" />
-        <span className="ml-2 text-[9px] font-mono uppercase tracking-wider text-zinc-600">radius.app</span>
+        <span className="ml-2 text-[9px] font-mono uppercase tracking-wider text-zinc-300">radius.app</span>
       </div>
       <div className="p-4">{children}</div>
     </div>
@@ -136,12 +136,12 @@ const SLIDES = [
             <div key={b.name} className="rounded-lg p-2.5 flex flex-col gap-2" style={{ border: `1px solid ${b.active ? 'rgba(99,102,241,0.3)' : 'rgba(255,255,255,0.08)'}`, background: b.active ? 'rgba(99,102,241,0.07)' : 'transparent' }}>
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono font-bold text-zinc-300">{b.name}</span>
-                <Clock className="w-3 h-3 text-zinc-500" />
+                <Clock className="w-3 h-3 text-zinc-400" />
               </div>
               <div className="h-1 rounded-full bg-zinc-700">
                 <div className="h-full rounded-full bg-indigo-500" style={{ width: `${b.pct}%` }} />
               </div>
-              <span className="text-[9px] font-mono text-zinc-500">{b.status}</span>
+              <span className="text-[9px] font-mono text-zinc-400">{b.status}</span>
             </div>
           ))}
         </div>
@@ -163,7 +163,7 @@ const SLIDES = [
             <div key={c.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.04)', border: `1px solid ${i === 0 ? 'rgba(16,185,129,0.25)' : 'rgba(255,255,255,0.08)'}`, borderRadius: '8px', padding: '8px 12px' }}>
               <div className="flex flex-col">
                 <span className="text-xs font-bold text-zinc-200">{c.name}</span>
-                <span className="text-[9px] font-mono text-zinc-500">{c.dist} away</span>
+                <span className="text-[9px] font-mono text-zinc-400">{c.dist} away</span>
               </div>
               <button
                 className="text-[10px] font-mono font-bold px-2 py-1 rounded-md text-white"
@@ -189,7 +189,7 @@ const SLIDES = [
             <CheckCircle2 className="w-5 h-5 text-emerald-400" />
           </div>
           <div className="flex flex-col flex-1">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Content Verified</span>
+            <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Content Verified</span>
             <span className="text-sm font-bold text-zinc-200">₹4,200 ready to release</span>
           </div>
           <button className="py-2 px-3 rounded-lg text-white text-[10px] font-bold font-mono whitespace-nowrap" style={{ background: 'linear-gradient(135deg,#10B981,#059669)', boxShadow: '0 4px 12px rgba(16,185,129,0.3)' }}>
@@ -232,14 +232,14 @@ function AppWalkthroughDeck({ onClose }: { onClose: () => void }) {
               {slide + 1} / {SLIDES.length} — {current.label}
             </span>
           </div>
-          <button onClick={onClose} aria-label="Close walkthrough" className="text-zinc-500 hover:text-zinc-300 transition-colors">
+          <button onClick={onClose} aria-label="Close walkthrough" className="text-zinc-400 hover:text-zinc-300 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="flex flex-col gap-1">
           <h3 className="text-lg font-bold tracking-tight text-zinc-100">{current.title}</h3>
-          <p className="text-sm text-zinc-500 leading-relaxed">{current.caption}</p>
+          <p className="text-sm text-zinc-400 leading-relaxed">{current.caption}</p>
         </div>
 
         <AnimatePresence mode="wait">
@@ -598,7 +598,7 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
                       rootBox: 'w-full',
                       card: 'glass-2 rounded-2xl',
                       headerTitle: 'font-bold text-zinc-100',
-                      headerSubtitle: 'text-zinc-500',
+                      headerSubtitle: 'text-zinc-400',
                       socialButtonsBlockButton: 'btn-secondary w-full',
                       formFieldInput: 'input-field',
                       formButtonPrimary: 'btn-primary rounded-xl w-full',

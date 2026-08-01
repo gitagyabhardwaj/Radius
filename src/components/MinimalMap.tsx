@@ -131,7 +131,7 @@ export default function MinimalMap({
       </div>
 
       {/* Bottom-right: coordinates */}
-      <div className="absolute bottom-5 right-4 z-[400] text-[10px] font-mono text-zinc-500 flex flex-col gap-0.5" style={{ background: 'rgba(15,17,21,0.8)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '8px', padding: '6px 10px' }}>
+      <div className="absolute bottom-5 right-4 z-[400] text-[10px] font-mono text-zinc-400 flex flex-col gap-0.5" style={{ background: 'rgba(15,17,21,0.8)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '8px', padding: '6px 10px' }}>
         <div>LAT: {centerLat.toFixed(4)}</div>
         <div>LNG: {centerLng.toFixed(4)}</div>
       </div>
@@ -216,16 +216,16 @@ export default function MinimalMap({
                     <img src={creator.avatar} alt={creator.name} className="w-8 h-8 rounded-full object-cover" style={{ border: '1px solid rgba(99,102,241,0.4)' }} />
                     <div>
                       <div className="text-xs font-bold text-zinc-100 leading-tight">{creator.name}</div>
-                      <div className="text-[10px] font-mono text-zinc-500 mt-0.5">{creator.handle}</div>
+                      <div className="text-[10px] font-mono text-zinc-400 mt-0.5">{creator.handle}</div>
                     </div>
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-mono text-zinc-500">Match Score</span>
+                      <span className="text-[10px] font-mono text-zinc-400">Match Score</span>
                       <span className="text-[11px] font-mono font-bold text-indigo-400">{creator.matchScore}%</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-mono text-zinc-500">Local Audience</span>
+                      <span className="text-[10px] font-mono text-zinc-400">Local Audience</span>
                       <span className="text-[11px] font-mono font-bold text-emerald-400">{creator.audienceInLocality}%</span>
                     </div>
                   </div>

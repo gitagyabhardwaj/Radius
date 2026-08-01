@@ -20,8 +20,8 @@ export function ReviewsCard({
 }) {
   const summary = useQuery(api.ratings.getForUser, { userId: userId as any });
 
-  const textMuted = dark ? 'text-zinc-500' : 'text-zinc-400';
-  const textBase = dark ? 'text-zinc-200' : 'text-zinc-700';
+  const textMuted = dark ? 'text-zinc-400' : 'text-zinc-400';
+  const textBase = dark ? 'text-zinc-200' : 'text-zinc-200';
   const cardBg = dark
     ? 'bg-zinc-900/60 border-zinc-850'
     : 'bg-zinc-50/60 border-zinc-150';
@@ -41,7 +41,7 @@ export function ReviewsCard({
                 <Star
                   key={n}
                   className={`w-3.5 h-3.5 ${
-                    n <= Math.round(summary.average) ? 'fill-amber-400 text-amber-400' : 'text-zinc-600'
+                    n <= Math.round(summary.average) ? 'fill-amber-400 text-amber-400' : 'text-zinc-300'
                   }`}
                 />
               ))}
@@ -66,7 +66,7 @@ export function ReviewsCard({
                     <Star
                       key={n}
                       className={`w-3 h-3 ${
-                        n <= r.stars ? 'fill-amber-400 text-amber-400' : 'text-zinc-600'
+                        n <= r.stars ? 'fill-amber-400 text-amber-400' : 'text-zinc-300'
                       }`}
                     />
                   ))}
@@ -109,8 +109,8 @@ export default function RatingWidget({
   if (!status) return null;
   if (!status.canRate && !status.alreadyRated) return null;
 
-  const textMuted = dark ? 'text-zinc-500' : 'text-zinc-400';
-  const textBase = dark ? 'text-zinc-200' : 'text-zinc-700';
+  const textMuted = dark ? 'text-zinc-400' : 'text-zinc-400';
+  const textBase = dark ? 'text-zinc-200' : 'text-zinc-200';
 
   if (status.alreadyRated && status.myRating) {
     return (
@@ -123,7 +123,7 @@ export default function RatingWidget({
             <Star
               key={n}
               className={`w-4 h-4 ${
-                n <= status.myRating.stars ? 'fill-amber-400 text-amber-400' : 'text-zinc-600'
+                n <= status.myRating.stars ? 'fill-amber-400 text-amber-400' : 'text-zinc-300'
               }`}
             />
           ))}
@@ -152,7 +152,7 @@ export default function RatingWidget({
           >
             <Star
               className={`w-5 h-5 transition-colors ${
-                n <= (hoverStars || stars) ? 'fill-amber-400 text-amber-400' : 'text-zinc-600'
+                n <= (hoverStars || stars) ? 'fill-amber-400 text-amber-400' : 'text-zinc-300'
               }`}
             />
           </button>
@@ -166,8 +166,8 @@ export default function RatingWidget({
         maxLength={280}
         className={`text-xs rounded-lg px-3 py-1.5 border outline-none ${
           dark
-            ? 'bg-zinc-900 border-zinc-800 text-zinc-200 placeholder:text-zinc-600'
-            : 'bg-white border-zinc-200 text-zinc-700 placeholder:text-zinc-400'
+            ? 'bg-zinc-900 border-zinc-800 text-zinc-200 placeholder:text-zinc-300'
+            : 'bg-white border-zinc-200 text-zinc-200 placeholder:text-zinc-400'
         }`}
       />
       {error && <span className="text-[11px] text-rose-500">{error}</span>}

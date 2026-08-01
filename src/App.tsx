@@ -123,7 +123,7 @@ function NavItem({
       id={id}
       onClick={onClick}
       className={`relative flex flex-col items-center justify-center w-16 h-14 rounded-[16px] transition-all duration-300 outline-none ${
-        isActive ? 'text-indigo-400' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'
+        isActive ? 'text-indigo-400' : 'text-zinc-400 hover:text-zinc-300 hover:bg-white/5'
       }`}
     >
       {isActive && (

@@ -60,7 +60,7 @@ export default function AddressSearch({ onLocationFound }: AddressSearchProps) {
             className="input-field w-full pl-10 pr-4"
             disabled={loading}
           />
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
         </div>
         <button
           type="submit"

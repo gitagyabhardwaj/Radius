@@ -414,17 +414,17 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
 
       {/* THE MASSIVE GLASS PANE */}
       <motion.div 
-        initial={{ opacity: 0, scale: 0.9, y: 80, filter: 'blur(30px)' }}
+        initial={{ opacity: 0, scale: 0.96, y: 80, filter: 'blur(30px)' }}
         animate={{ 
           opacity: [0, 1, 1], 
           y: [80, 0, 0], 
-          scale: [0.9, 0.9, 1], 
+          scale: [0.96, 0.96, 1], 
           filter: ['blur(30px)', 'blur(0px)', 'blur(0px)'] 
         }}
         transition={{ 
           duration: 1.4, 
           times: [0, 0.7, 1], 
-          ease: ["easeOut", "backOut"], 
+          ease: ["easeInOut", "easeInOut"], 
           delay: 0.8 
         }}
         className="absolute inset-4 md:inset-6 z-10 rounded-3xl overflow-hidden shadow-[0_30px_100px_rgba(0,0,0,0.8)] flex flex-col md:flex-row"

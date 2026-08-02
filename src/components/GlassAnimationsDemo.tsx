@@ -107,18 +107,18 @@ export default function GlassAnimationsDemo() {
   return (
     <div className="w-screen h-screen bg-black flex flex-wrap">
       {renderQuadrant("1. CINEMATIC FLOAT + POP", {
-        initial: { opacity: 0, scale: 0.9, y: 80, filter: 'blur(30px)' },
+        initial: { opacity: 0, scale: 0.96, y: 80, filter: 'blur(30px)' },
         animate: { 
           opacity: [0, 1, 1], 
           y: [80, 0, 0], 
-          scale: [0.9, 0.9, 1], 
+          scale: [0.96, 0.96, 1], 
           filter: ['blur(30px)', 'blur(0px)', 'blur(0px)'] 
         },
         exit: { opacity: 0, scale: 0.95 },
         transition: { 
           duration: 1.4, 
           times: [0, 0.7, 1], 
-          ease: ["easeOut", "backOut"], 
+          ease: ["easeInOut", "easeInOut"], 
           delay: 0.8 
         },
       })}

@@ -7,6 +7,7 @@ import AddressSearch from './components/AddressSearch';
 import BrandWorkspace from './components/BrandWorkspace';
 import CreatorWorkspace from './components/CreatorWorkspace';
 import EntryGate from './components/EntryGate';
+import ErrorBoundary from './components/ErrorBoundary';
 import { Campaign, Creator } from './types';
 import {
   Compass,
@@ -555,25 +556,27 @@ export default function App() {
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.2 }}
               >
-                <BrandWorkspace
-                  centerLat={centerLat}
-                  centerLng={centerLng}
-                  centerAddress={centerAddress}
+                <ErrorBoundary label="Brand Workspace">
+                  <BrandWorkspace
+                    centerLat={centerLat}
+                    centerLng={centerLng}
+                    centerAddress={centerAddress}
 
-                  setCenterLat={setCenterLat}
-                  setCenterLng={setCenterLng}
-                  onCampaignCreated={handleCampaignCreated}
-                  activeCampaigns={activeCampaigns}
-                  setSelectedCreator={(creator) => {
-                    setSelectedCreatorId(creator.id);
-                  }}
-                  setView={() => {}}
-                  setSelectedCampaignId={setSelectedCampaignId}
-                  activeSubTab={activeBrandSubTab}
-                  customBrandName={brandDisplayName}
-                  setCustomBrandName={setCustomBrandName}
-                  creators={creators}
-                />
+                    setCenterLat={setCenterLat}
+                    setCenterLng={setCenterLng}
+                    onCampaignCreated={handleCampaignCreated}
+                    activeCampaigns={activeCampaigns}
+                    setSelectedCreator={(creator) => {
+                      setSelectedCreatorId(creator.id);
+                    }}
+                    setView={() => {}}
+                    setSelectedCampaignId={setSelectedCampaignId}
+                    activeSubTab={activeBrandSubTab}
+                    customBrandName={brandDisplayName}
+                    setCustomBrandName={setCustomBrandName}
+                    creators={creators}
+                  />
+                </ErrorBoundary>
               </motion.div>
             ) : (
               <motion.div
@@ -583,20 +586,22 @@ export default function App() {
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.2 }}
               >
-                <CreatorWorkspace
-                  activeCampaigns={activeCampaigns}
-                  selectedCreatorId={selectedCreatorId}
-                  setSelectedCreatorId={setSelectedCreatorId}
-                  selectedCampaignId={selectedCampaignId}
-                  setSelectedCampaignId={(id) => {
-                    setSelectedCampaignId(id);
-                    if (id) {
-                      setActiveCreatorSubTab('escrow');
-                    }
-                  }}
-                  activeSubTab={activeCreatorSubTab}
-                  creators={creators}
-                />
+                <ErrorBoundary label="Creator Workspace">
+                  <CreatorWorkspace
+                    activeCampaigns={activeCampaigns}
+                    selectedCreatorId={selectedCreatorId}
+                    setSelectedCreatorId={setSelectedCreatorId}
+                    selectedCampaignId={selectedCampaignId}
+                    setSelectedCampaignId={(id) => {
+                      setSelectedCampaignId(id);
+                      if (id) {
+                        setActiveCreatorSubTab('escrow');
+                      }
+                    }}
+                    activeSubTab={activeCreatorSubTab}
+                    creators={creators}
+                  />
+                </ErrorBoundary>
               </motion.div>
             )}
           </AnimatePresence>

@@ -38,6 +38,7 @@ import DispatchFeed from './DispatchFeed';
 import DispatchQueue from './DispatchQueue';
 import BrandProfileEditor from './BrandProfileEditor';
 import CorkboardGallery from './CorkboardGallery';
+import ErrorBoundary from './ErrorBoundary';
 import { Id } from '../../convex/_generated/dataModel';
 
 interface BrandWorkspaceProps {
@@ -1382,7 +1383,9 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                   centerLocality={camp.centerLocality}
                 />
 
-                <DispatchQueue campaignId={camp.id} />
+                <ErrorBoundary label="Live Dispatch Queue" fallback={null}>
+                  <DispatchQueue campaignId={camp.id} />
+                </ErrorBoundary>
 
                 <DispatchFeed campaignId={camp.id} />
 

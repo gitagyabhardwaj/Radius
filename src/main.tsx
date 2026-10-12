@@ -17,6 +17,7 @@ if (!clerkPublishableKey) {
   throw new Error('VITE_CLERK_PUBLISHABLE_KEY is not set. Get it from your Clerk dashboard.');
 }
 
+
 const convex = new ConvexReactClient(convexUrl);
 
 createRoot(document.getElementById('root')!).render(

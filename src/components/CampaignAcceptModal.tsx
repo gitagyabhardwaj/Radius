@@ -31,7 +31,8 @@ export const CampaignAcceptModal: React.FC<CampaignAcceptModalProps> = ({ campai
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-2xl bg-zinc-950 border border-white/10 rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+            className="relative w-full max-w-2xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+            style={{ background: 'var(--color-obsidian-surface)', border: '1px solid rgba(255,255,255,0.1)', borderTopColor: 'rgba(255,255,255,0.16)' }}
           >
             {/* Dynamic glow */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none" />
@@ -40,7 +41,7 @@ export const CampaignAcceptModal: React.FC<CampaignAcceptModalProps> = ({ campai
             {/* Header */}
             <div className="relative z-10 p-6 sm:p-8 flex items-center justify-between border-b border-white/5">
               <div className="flex flex-col gap-1">
-                <h3 className="text-2xl font-display font-black text-white flex items-center gap-2">
+                <h3 className="text-xl font-bold tracking-tight flex items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
                   <FileText className="w-6 h-6 text-indigo-400" />
                   Campaign Brief
                 </h3>
@@ -73,12 +74,12 @@ export const CampaignAcceptModal: React.FC<CampaignAcceptModalProps> = ({ campai
                     </div>
                     <div className="flex flex-col">
                       <span className="text-sm font-bold text-white">{campaign.brandName}</span>
-                      <span className="text-[10px] font-mono tracking-widest text-zinc-500 uppercase">Verified Brand</span>
+                      <span className="text-[10px] font-mono tracking-widest text-zinc-400 uppercase">Verified Brand</span>
                     </div>
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-[10px] font-mono tracking-widest text-emerald-500/70 uppercase">Escrow Value</span>
-                    <span className="text-2xl font-display font-black text-emerald-400">₹{campaign.budget}</span>
+                    <span className="text-[10px] font-mono tracking-widest text-emerald-500/70 uppercase">Campaign Value</span>
+                    <span className="text-2xl font-bold font-mono" style={{ color: 'var(--color-mint-bright)' }}>₹{campaign.budget}</span>
                   </div>
                 </div>
 
@@ -95,7 +96,7 @@ export const CampaignAcceptModal: React.FC<CampaignAcceptModalProps> = ({ campai
               {/* Data Points */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white/[0.02] border border-white/5 p-4 rounded-2xl flex flex-col gap-1">
-                  <div className="flex items-center gap-1.5 text-zinc-500 mb-2">
+                  <div className="flex items-center gap-1.5 text-zinc-400 mb-2">
                     <MapPin className="w-4 h-4" />
                     <span className="text-xs font-mono uppercase tracking-wider font-bold">Target Zone</span>
                   </div>
@@ -104,7 +105,7 @@ export const CampaignAcceptModal: React.FC<CampaignAcceptModalProps> = ({ campai
                 </div>
                 
                 <div className="bg-white/[0.02] border border-white/5 p-4 rounded-2xl flex flex-col gap-1">
-                  <div className="flex items-center gap-1.5 text-zinc-500 mb-2">
+                  <div className="flex items-center gap-1.5 text-zinc-400 mb-2">
                     <Zap className="w-4 h-4" />
                     <span className="text-xs font-mono uppercase tracking-wider font-bold">Match Score</span>
                   </div>
@@ -116,24 +117,24 @@ export const CampaignAcceptModal: React.FC<CampaignAcceptModalProps> = ({ campai
               {/* Advanced Professional Requirements */}
               {(campaign.contentFormat || campaign.targetAudience || campaign.creativeGuidelines) && (
                 <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-5 flex flex-col gap-4">
-                  <h4 className="text-sm font-mono uppercase tracking-widest text-zinc-500 font-bold mb-1">Campaign Requirements</h4>
+                  <h4 className="text-sm font-mono uppercase tracking-widest text-zinc-400 font-bold mb-1">Campaign Requirements</h4>
                   
                   <div className="grid grid-cols-2 gap-4">
                     {campaign.contentFormat && (
                       <div className="flex flex-col gap-1">
-                        <span className="text-[11px] text-zinc-500 uppercase tracking-wider">Format</span>
+                        <span className="text-[11px] text-zinc-400 uppercase tracking-wider">Format</span>
                         <span className="text-sm text-zinc-300 font-medium">{campaign.contentFormat}</span>
                       </div>
                     )}
                     {campaign.targetAudience && (
                       <div className="flex flex-col gap-1">
-                        <span className="text-[11px] text-zinc-500 uppercase tracking-wider">Target Audience</span>
+                        <span className="text-[11px] text-zinc-400 uppercase tracking-wider">Target Audience</span>
                         <span className="text-sm text-zinc-300 font-medium">{campaign.targetAudience}</span>
                       </div>
                     )}
                     {campaign.submissionDeadlineDays && (
                       <div className="flex flex-col gap-1">
-                        <span className="text-[11px] text-zinc-500 uppercase tracking-wider">Deadline</span>
+                        <span className="text-[11px] text-zinc-400 uppercase tracking-wider">Deadline</span>
                         <span className="text-sm text-zinc-300 font-medium">{campaign.submissionDeadlineDays} days</span>
                       </div>
                     )}
@@ -141,7 +142,7 @@ export const CampaignAcceptModal: React.FC<CampaignAcceptModalProps> = ({ campai
                   
                   {campaign.creativeGuidelines && (
                     <div className="flex flex-col gap-1 mt-2 pt-4 border-t border-white/5">
-                      <span className="text-[11px] text-zinc-500 uppercase tracking-wider">Creative Guidelines</span>
+                      <span className="text-[11px] text-zinc-400 uppercase tracking-wider">Creative Guidelines</span>
                       <p className="text-sm text-zinc-400 italic">"{campaign.creativeGuidelines}"</p>
                     </div>
                   )}
@@ -150,13 +151,13 @@ export const CampaignAcceptModal: React.FC<CampaignAcceptModalProps> = ({ campai
 
               {/* Terms */}
               <div className="flex flex-col gap-4">
-                <h4 className="text-sm font-mono uppercase tracking-widest text-zinc-500 font-bold">Protocol Terms</h4>
+                <h4 className="text-sm font-mono uppercase tracking-widest text-zinc-400 font-bold">Protocol Terms</h4>
                 
                 <div className="flex flex-col gap-3">
                   <div className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
                     <p className="text-sm text-zinc-300 leading-relaxed">
-                      <strong className="text-white">Escrow Guarantee:</strong> The brand has already deposited ₹{campaign.budget} into a smart escrow. The funds are locked and guaranteed to be paid upon approval.
+                      <strong className="text-white">Payment Guarantee:</strong> The brand has already deposited ₹{campaign.budget} into a secure vault. The funds are locked and guaranteed to be paid upon approval.
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
@@ -187,7 +188,7 @@ export const CampaignAcceptModal: React.FC<CampaignAcceptModalProps> = ({ campai
                 <span>Express Interest</span>
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
-              <p className="text-center text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-4 flex items-center justify-center gap-1.5">
+              <p className="text-center text-[10px] font-mono text-zinc-400 uppercase tracking-widest mt-4 flex items-center justify-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 Brand will review your profile before confirming
               </p>

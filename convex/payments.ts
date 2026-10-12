@@ -115,8 +115,17 @@ export const createEscrowDepositOrder = action({
 
       const keyId = process.env.RAZORPAY_KEY_ID;
       const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+      // ── Demo mode: return simulated order when keys aren't set ──
       if (!keyId || !keySecret) {
-        return { error: "Razorpay is not configured (missing RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET)." };
+        const demoOrderId = `order_demo_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        return {
+          orderId: demoOrderId,
+          amount: Math.round(args.amount * 100),
+          currency: "INR",
+          keyId: "rzp_demo_key",
+          demo: true,
+        };
       }
 
       const amountPaise = Math.round(args.amount * 100);
@@ -164,6 +173,12 @@ export const verifyAndCreditEscrow = action({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
+
+    // ── Demo mode: skip signature verification for simulated orders ──
+    if (args.razorpay_order_id.startsWith("order_demo_")) {
+      await ctx.runMutation(api.users.creditEscrow, { amount: args.amount });
+      return { verified: true };
+    }
 
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
     if (!keySecret) {

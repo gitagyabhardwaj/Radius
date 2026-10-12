@@ -29,12 +29,12 @@ interface EntryGateProps {
 
 function BrowserFrame({ children, accent = 'indigo' }: { children: React.ReactNode; accent?: 'indigo' | 'emerald' }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden shadow-sm">
-      <div className="flex items-center gap-1.5 px-3 py-2 border-b border-zinc-100 bg-zinc-50">
-        <span className="w-2 h-2 rounded-full bg-red-300" />
-        <span className="w-2 h-2 rounded-full bg-amber-300" />
-        <span className="w-2 h-2 rounded-full bg-emerald-300" />
-        <span className={`ml-2 text-[9px] font-mono uppercase tracking-wider text-zinc-400`}>
+    <div className="rounded-none border border-zinc-800 bg-zinc-900 overflow-hidden ">
+      <div className="flex items-center gap-1.5 px-3 py-2 border-b border-zinc-800 bg-zinc-50">
+        <span className="w-2 h-2 rounded-none bg-red-300" />
+        <span className="w-2 h-2 rounded-none bg-amber-300" />
+        <span className="w-2 h-2 rounded-none bg-black" />
+        <span className={`ml-2 text-[9px] font-sans tracking-wider text-white`}>
           radius.app
         </span>
       </div>
@@ -53,26 +53,26 @@ const SLIDES = [
       <BrowserFrame>
         <div className="grid grid-cols-5 gap-3">
           <div className="col-span-2 flex flex-col gap-2.5">
-            <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-zinc-400">
+            <div className="flex items-center gap-1.5 text-[10px] font-sans tracking-wider text-white">
               <Sliders className="w-3 h-3" /> Geofence Radius
             </div>
-            <div className="h-1.5 rounded-full bg-zinc-100 relative">
-              <div className="absolute inset-y-0 left-0 w-2/3 rounded-full bg-indigo-500" />
-              <div className="absolute -top-1 left-2/3 w-3 h-3 rounded-full bg-white border-2 border-indigo-500" />
+            <div className="h-1.5 rounded-none bg-zinc-100 relative">
+              <div className="absolute inset-y-0 left-0 w-2/3 rounded-none bg-black" />
+              <div className="absolute -top-1 left-2/3 w-3 h-3 rounded-none bg-zinc-900 border-2 border-zinc-800" />
             </div>
-            <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-zinc-400 mt-1">
+            <div className="flex items-center gap-1.5 text-[10px] font-sans tracking-wider text-white mt-1">
               <DollarSign className="w-3 h-3" /> Budget
             </div>
-            <div className="h-7 rounded-lg bg-zinc-50 border border-zinc-200 px-2 flex items-center text-xs font-mono text-zinc-600">
+            <div className="h-7 rounded-none bg-zinc-50 border border-zinc-800 px-2 flex items-center text-xs font-mono text-white">
               ₹25,000
             </div>
-            <button className="mt-2 py-2 rounded-lg bg-zinc-950 text-white text-[11px] font-bold font-mono">
+            <button className="mt-2 py-2 rounded-none bg-zinc-900 text-white text-[11px] font-bold font-mono">
               Lock Budget & Launch
             </button>
           </div>
-          <div className="col-span-3 rounded-lg bg-[radial-gradient(#e4e4e7_1px,transparent_1px)] [background-size:10px_10px] border border-zinc-200 relative flex items-center justify-center">
-            <div className="w-16 h-16 rounded-full border-2 border-indigo-400/60 bg-indigo-400/10" />
-            <div className="absolute w-2.5 h-2.5 rounded-full bg-indigo-600" />
+          <div className="col-span-3 rounded-none bg-[radial-gradient(#e4e4e7_1px,transparent_1px)] [background-size:10px_10px] border border-zinc-800 relative flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full border-2 border-zinc-800/60 bg-black/10" />
+            <div className="absolute w-2.5 h-2.5 rounded-none bg-black" />
           </div>
         </div>
       </BrowserFrame>
@@ -91,18 +91,18 @@ const SLIDES = [
             { name: 'Batch B', status: 'Queued', color: 'zinc', pct: 20 },
             { name: 'Batch C', status: 'Pending', color: 'zinc', pct: 0 },
           ].map((b) => (
-            <div key={b.name} className="rounded-lg border border-zinc-200 p-2.5 flex flex-col gap-2">
+            <div key={b.name} className="rounded-none border border-zinc-800 p-2.5 flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono font-bold text-zinc-700">{b.name}</span>
-                <Clock className="w-3 h-3 text-zinc-400" />
+                <span className="text-[10px] font-mono font-bold text-white">{b.name}</span>
+                <Clock className="w-3 h-3 text-white" />
               </div>
-              <div className="h-1 rounded-full bg-zinc-100">
+              <div className="h-1 rounded-none bg-zinc-100">
                 <div
-                  className={`h-full rounded-full ${b.color === 'indigo' ? 'bg-indigo-500' : 'bg-zinc-300'}`}
+                  className={`h-full rounded-none ${b.color === 'indigo' ? 'bg-black' : 'bg-zinc-300'}`}
                   style={{ width: `${b.pct}%` }}
                 />
               </div>
-              <span className="text-[9px] font-mono text-zinc-400">{b.status}</span>
+              <span className="text-[9px] font-mono text-white">{b.status}</span>
             </div>
           ))}
         </div>
@@ -121,14 +121,14 @@ const SLIDES = [
             { name: 'Nike Air Max Drop', dist: '0.8 km' },
             { name: 'Blue Tokai Coffee', dist: '1.4 km' },
           ].map((c, i) => (
-            <div key={c.name} className="flex items-center justify-between rounded-lg border border-zinc-200 px-3 py-2">
+            <div key={c.name} className="flex items-center justify-between rounded-none border border-zinc-800 px-3 py-2">
               <div className="flex flex-col">
-                <span className="text-xs font-bold text-zinc-800">{c.name}</span>
-                <span className="text-[9px] font-mono text-zinc-400">{c.dist} away</span>
+                <span className="text-xs font-bold text-white">{c.name}</span>
+                <span className="text-[9px] font-mono text-white">{c.dist} away</span>
               </div>
               <button
-                className={`text-[10px] font-mono font-bold px-2 py-1 rounded-md ${
-                  i === 0 ? 'bg-emerald-600 text-white' : 'bg-zinc-100 text-zinc-400'
+                className={`text-[10px] font-mono font-bold px-2 py-1 rounded-none ${
+                  i === 0 ? 'bg-black text-white' : 'bg-zinc-100 text-white'
                 }`}
               >
                 Accept Campaign
@@ -147,14 +147,14 @@ const SLIDES = [
     visual: (
       <BrowserFrame accent="emerald">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+          <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+            <CheckCircle2 className="w-5 h-5 text-white" />
           </div>
           <div className="flex flex-col flex-1">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Content Verified</span>
-            <span className="text-sm font-bold text-zinc-800">₹4,200 ready to release</span>
+            <span className="text-[10px] font-sans tracking-wider text-white">Content Verified</span>
+            <span className="text-sm font-bold text-white">₹4,200 ready to release</span>
           </div>
-          <button className="py-2 px-3 rounded-lg bg-emerald-600 text-white text-[10px] font-bold font-mono whitespace-nowrap">
+          <button className="py-2 px-3 rounded-none bg-black text-white text-[10px] font-bold font-mono whitespace-nowrap">
             Trigger Payout
           </button>
         </div>
@@ -173,33 +173,33 @@ function AppWalkthroughDeck({ onClose }: { onClose: () => void }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-zinc-950/70 flex items-center justify-center p-6"
+      className="fixed inset-0 z-50 bg-zinc-900 flex items-center justify-center p-6"
       onClick={onClose}
     >
       <motion.div
         initial={{ opacity: 0, y: 16, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 16, scale: 0.98 }}
-        className="bg-white rounded-2xl border border-zinc-200 shadow-2xl w-full max-w-lg p-6 flex flex-col gap-5"
+        className="bg-zinc-900 rounded-none border border-zinc-800  w-full max-w-lg p-6 flex flex-col gap-5"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-              <StepIcon className="w-4 h-4 text-indigo-600" />
+            <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center">
+              <StepIcon className="w-4 h-4 text-white" />
             </div>
-            <span className="text-[10px] font-mono uppercase tracking-wider text-indigo-500 font-bold">
+            <span className="text-[10px] font-sans tracking-wider text-white font-bold">
               {slide + 1} / {SLIDES.length} — {current.label}
             </span>
           </div>
-          <button onClick={onClose} aria-label="Close walkthrough" className="text-zinc-300 hover:text-zinc-500">
+          <button onClick={onClose} aria-label="Close walkthrough" className="text-white hover:text-white">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="flex flex-col gap-1">
-          <h3 className="text-lg font-display font-black tracking-tight text-zinc-900">{current.title}</h3>
-          <p className="text-sm text-zinc-500 leading-relaxed">{current.caption}</p>
+          <h3 className="text-lg font-display font-semibold font-semibold tracking-tight text-white font-mono uppercase">{current.title}</h3>
+          <p className="text-sm text-white leading-relaxed">{current.caption}</p>
         </div>
 
         <AnimatePresence mode="wait">
@@ -220,7 +220,7 @@ function AppWalkthroughDeck({ onClose }: { onClose: () => void }) {
               <button
                 key={i}
                 onClick={() => setSlide(i)}
-                className={`h-1.5 rounded-full transition-all ${i === slide ? 'w-5 bg-indigo-600' : 'w-1.5 bg-zinc-200'}`}
+                className={`h-1.5 rounded-none transition-all ${i === slide ? 'w-5 bg-black' : 'w-1.5 bg-zinc-200'}`}
                 aria-label={`Go to slide ${i + 1}`}
               />
             ))}
@@ -230,7 +230,7 @@ function AppWalkthroughDeck({ onClose }: { onClose: () => void }) {
             {slide > 0 && (
               <button
                 onClick={() => setSlide((s) => Math.max(0, s - 1))}
-                className="py-1.5 px-2.5 border border-zinc-200 text-zinc-600 hover:bg-zinc-50 rounded-lg text-[11px] font-mono font-bold flex items-center gap-1 transition-all"
+                className="py-1.5 px-2.5 border border-zinc-800 text-white hover:bg-zinc-50 rounded-none text-[11px] font-mono font-bold flex items-center gap-1 transition-all"
               >
                 <ChevronLeft className="w-3 h-3" />
                 Back
@@ -240,7 +240,7 @@ function AppWalkthroughDeck({ onClose }: { onClose: () => void }) {
             {slide < SLIDES.length - 1 ? (
               <button
                 onClick={() => setSlide((s) => Math.min(SLIDES.length - 1, s + 1))}
-                className="py-1.5 px-3 bg-zinc-950 hover:bg-zinc-900 text-white rounded-lg text-[11px] font-mono font-bold flex items-center gap-1 transition-all"
+                className="py-1.5 px-3 bg-zinc-900 hover:bg-zinc-900 text-white rounded-none text-[11px] font-mono font-bold flex items-center gap-1 transition-all"
               >
                 Next
                 <ChevronRight className="w-3 h-3" />
@@ -248,7 +248,7 @@ function AppWalkthroughDeck({ onClose }: { onClose: () => void }) {
             ) : (
               <button
                 onClick={onClose}
-                className="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[11px] font-mono font-bold flex items-center gap-1 transition-all"
+                className="py-1.5 px-3 bg-black hover:bg-black text-white rounded-none text-[11px] font-mono font-bold flex items-center gap-1 transition-all"
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
                 Done
@@ -276,38 +276,116 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafc] flex flex-col justify-between py-12 px-6 relative overflow-hidden selection:bg-indigo-100 selection:text-indigo-900">
-      <div className="absolute inset-0 bg-[radial-gradient(#e4e4e7_1.2px,transparent_1.2px)] [background-size:24px_24px] opacity-60 pointer-events-none" />
-      <div className="absolute inset-x-0 top-1/4 border-b border-zinc-200/40 pointer-events-none" />
-      <div className="absolute inset-y-0 left-1/4 border-r border-zinc-200/40 pointer-events-none" />
-
-      <header className="max-w-4xl mx-auto w-full z-10 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-zinc-950 flex items-center justify-center text-white font-display font-black tracking-tighter text-base">
-            R.
+    <div className="min-h-screen flex w-full bg-zinc-900 selection:bg-zinc-700 selection:text-white relative">
+      
+      {/* TEXT HIGHLIGHT ILLUSTRATION (Visible only on large screens, fills empty left space) */}
+      <div className="absolute left-8 xl:left-16 top-[45%] -translate-y-[45%] hidden lg:flex flex-col z-30 pointer-events-none max-w-[28%] xl:max-w-[32%]">
+        
+        {/* Floating Toolbar (Mimicking text selection) */}
+        <motion.div 
+          animate={{ opacity: [0, 0, 0, 1, 1, 0], y: [10, 10, 10, 0, 0, 10] }}
+          transition={{ duration: 5, times: [0, 0.2, 0.4, 0.45, 0.8, 1], repeat: Infinity, ease: "easeOut" }}
+          className="absolute -top-14 left-1/4 flex items-center gap-3 bg-zinc-900 border border-zinc-700 shadow-xl px-3 py-1.5 z-40 rounded-none scale-90 origin-bottom-left"
+        >
+          <div className="flex items-center gap-3 border-r border-zinc-700 pr-3">
+            <span className="text-zinc-400 font-serif text-sm font-bold">B</span>
+            <span className="text-zinc-400 font-serif text-sm italic">I</span>
+            <span className="text-zinc-400 font-serif text-sm underline decoration-2 underline-offset-2">U</span>
+            <span className="text-zinc-400 font-serif text-sm line-through">S</span>
+            <span className="text-zinc-400 font-sans text-sm font-medium ml-1">🔗</span>
           </div>
-          <div className="flex flex-col">
-            <span className="font-display font-bold text-sm tracking-wider text-zinc-950 uppercase leading-none">
-              RADIUS
-            </span>
-            <span className="text-[8px] font-mono tracking-widest text-zinc-400 mt-0.5 uppercase leading-none">
-              Hyperlocal Escrow Network
-            </span>
+          <div className="flex items-center gap-1.5 pl-1">
+            <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center">
+              <span className="text-[8px] text-white">✦</span>
+            </div>
+            <span className="text-xs text-white font-sans font-medium tracking-wide">Ask AI</span>
           </div>
-        </div>
+          {/* Caret pointing down */}
+          <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-zinc-900 border-b border-r border-zinc-700 rotate-45"></div>
+        </motion.div>
 
-        <div className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-400 bg-white border border-zinc-200/60 px-2 py-0.5 rounded-md">
-          <Compass className="w-3.5 h-3.5 text-indigo-500 animate-spin-slow" />
-          <span>GRID: DELHI_NCR</span>
-        </div>
-      </header>
+        {/* The Text Content */}
+        <h2 className="text-2xl xl:text-3xl font-display font-medium text-zinc-500 leading-snug">
+          Spatial matching connects{' '}
+          <span className="relative inline-block mt-1">
+            <motion.span 
+              animate={{ scaleX: [0, 0, 1, 1, 0] }}
+              transition={{ duration: 5, times: [0, 0.2, 0.4, 0.8, 1], repeat: Infinity, ease: "easeInOut" }}
+              className="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 origin-left z-0" 
+            />
+            <span className="relative z-10 px-1 text-white">
+              local brands with creators
+            </span>
+
+            {/* Fake Cursor Illustration */}
+            <motion.div 
+              animate={{ 
+                left: ["-5%", "-2%", "100%", "100%", "100%"], 
+                top: ["150%", "40%", "40%", "150%", "150%"], 
+                opacity: [0, 1, 1, 0, 0] 
+              }}
+              transition={{ duration: 5, times: [0, 0.2, 0.4, 0.8, 1], repeat: Infinity, ease: "easeInOut" }}
+              className="absolute z-50 pointer-events-none w-6 h-6"
+            >
+              <svg className="w-full h-full text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7 2l12 11.2-5.8.5 3.3 7.3-2.2 1-3.2-7.4-4.4 4.8z" stroke="black" strokeWidth="1"/>
+              </svg>
+            </motion.div>
+          </span>.
+        </h2>
+      </div>
+
+      {/* LEFT SIDE: Login Content */}
+      <div className="flex-1 flex flex-col justify-between py-12 px-6 lg:px-12 relative overflow-hidden order-2 lg:order-1 z-20 bg-zinc-900  lg:bg-transparent lg:backdrop-blur-none lg:bg-gradient-to-r lg:from-zinc-950 lg:via-zinc-950/90 lg:to-transparent lg:w-1/2">
+        <div className="absolute inset-0 bg-[radial-gradient(#3f3f46_1px,transparent_1px)] [background-size:24px_24px] opacity-30 pointer-events-none mask-image-gradient-to-r" />
+
+        <header className="max-w-xl mx-auto w-full z-10 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-white font-display font-semibold font-semibold tracking-tighter text-base">
+              R.
+            </div>
+            <div className="flex flex-col">
+              <span className="font-display font-semibold font-bold text-sm tracking-wider text-white uppercase leading-none">
+                RADIUS
+              </span>
+              <span className="text-[8px] font-mono tracking-widest text-white mt-0.5 uppercase leading-none">
+                Hyperlocal Escrow Network
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-[11px] font-mono text-black font-bold bg-cyan-400 border border-cyan-400 px-2 py-0.5 rounded-none">
+            <Compass className="w-3.5 h-3.5 text-black animate-spin-slow" />
+            <span>GRID: DELHI_NCR</span>
+          </div>
+        </header>
 
       <main className="max-w-lg mx-auto w-full z-10 my-auto flex flex-col gap-6 pt-8 pb-12">
         <div className="text-center flex flex-col gap-2">
-          <h1 className="text-3xl font-display font-black tracking-tight text-zinc-900 sm:text-4xl">
-            {selectedRole ? 'Secure Authentication.' : 'Select Portal.'}
+          <h1 className="text-3xl font-display font-semibold font-semibold tracking-tight text-white sm:text-4xl font-mono uppercase">
+            {selectedRole ? (
+              <>
+                Secure{' '}
+                <span className="relative inline-block whitespace-nowrap">
+                  <span className="relative z-10">Authentication.</span>
+                  <svg className="absolute -inset-1 w-full h-full text-zinc-600 z-0 pointer-events-none scale-105" viewBox="0 0 100 40" preserveAspectRatio="none" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M10,20 C20,5 80,5 90,20 C100,35 20,35 10,20 C5,15 25,5 35,5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </span>
+              </>
+            ) : (
+              <>
+                Select{' '}
+                <span className="relative inline-block whitespace-nowrap">
+                  <span className="relative z-10">Portal.</span>
+                  <svg className="absolute -inset-2 w-full h-full text-zinc-600 z-0 pointer-events-none scale-110" viewBox="0 0 100 40" preserveAspectRatio="none" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M10,20 C20,5 80,5 90,20 C100,35 20,35 10,20 C5,15 25,5 35,5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </span>
+              </>
+            )}
           </h1>
-          <p className="text-sm text-zinc-500 max-w-sm mx-auto font-sans leading-relaxed">
+          <p className="text-sm text-white max-w-sm mx-auto font-sans font-medium leading-relaxed">
             {selectedRole
               ? 'Complete your sign-in to securely access your workspace.'
               : 'Identify your role to securely access the hyperlocal escrow network.'}
@@ -318,16 +396,16 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
           <div className="flex flex-col gap-4">
             <button
               onClick={() => handleRoleSelect('brand')}
-              className="group relative w-full bg-white border border-zinc-200/80 hover:border-indigo-600/30 rounded-2xl p-6 shadow-sm flex items-start gap-4 transition-all"
+              className="group relative w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-800/50 rounded-none p-6  flex items-start gap-4 transition-all"
             >
-              <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
-                <Briefcase className="w-6 h-6 text-indigo-600" />
+              <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center shrink-0">
+                <Briefcase className="w-6 h-6 text-white" />
               </div>
               <div className="flex flex-col items-start text-left gap-1">
-                <h3 className="font-display font-bold text-zinc-900 text-lg group-hover:text-indigo-600 transition-colors">
+                <h3 className="font-display font-semibold font-bold text-white text-lg group-hover:text-white transition-colors font-mono uppercase">
                   Brand Login
                 </h3>
-                <p className="text-sm text-zinc-500 leading-snug">
+                <p className="text-sm text-white leading-snug">
                   Launch geo-targeted campaigns, discover local creators, and lock funds in smart escrow.
                 </p>
               </div>
@@ -335,26 +413,26 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
 
             <button
               onClick={() => handleRoleSelect('creator')}
-              className="group relative w-full bg-white border border-zinc-200/80 hover:border-emerald-600/30 rounded-2xl p-6 shadow-sm flex items-start gap-4 transition-all"
+              className="group relative w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-800/50 rounded-none p-6  flex items-start gap-4 transition-all"
             >
-              <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
-                <User className="w-6 h-6 text-emerald-600" />
+              <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center shrink-0">
+                <User className="w-6 h-6 text-white" />
               </div>
               <div className="flex flex-col items-start text-left gap-1">
-                <h3 className="font-display font-bold text-zinc-900 text-lg group-hover:text-emerald-600 transition-colors">
+                <h3 className="font-display font-semibold font-bold text-white text-lg group-hover:text-white transition-colors font-mono uppercase">
                   Creator Login
                 </h3>
-                <p className="text-sm text-zinc-500 leading-snug">
+                <p className="text-sm text-white leading-snug">
                   Receive hyperlocal campaign offers, submit content, and get paid instantly upon verification.
                 </p>
               </div>
             </button>
 
-            <div className="mt-4 border-t border-zinc-200/60 pt-6 flex gap-3 items-start">
-              <Shield className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+            <div className="mt-4 border-t border-zinc-800 pt-6 flex gap-3 items-start">
+              <Shield className="w-5 h-5 text-white shrink-0 mt-0.5" />
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-bold text-zinc-800 font-mono tracking-tight uppercase">100% Cryptographic Escrow</span>
-                <p className="text-[11px] text-zinc-500 leading-relaxed">
+                <span className="text-xs font-bold text-white font-mono tracking-tight uppercase">100% Cryptographic Escrow</span>
+                <p className="text-[11px] text-white leading-relaxed">
                   Radius holds budgets securely in escrow and releases funds autonomously when creators deliver matching GPS-verified deliverables.
                 </p>
               </div>
@@ -362,7 +440,7 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
 
             <button
               onClick={() => setShowDeck(true)}
-              className="self-center flex items-center gap-2 text-xs font-mono font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3.5 py-2 rounded-full transition-all"
+              className="self-center flex items-center gap-2 text-xs font-mono font-bold text-white hover:text-white bg-black/10 hover:bg-black/20 px-3.5 py-2 rounded-none transition-all"
             >
               <PlayCircle className="w-4 h-4" />
               App Walkthrough
@@ -376,7 +454,7 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
               onClick={() => {
                 setSelectedRole(null);
               }}
-              className="text-xs font-mono font-medium text-zinc-400 hover:text-zinc-600 self-start"
+              className="text-xs font-mono font-bold text-white hover:text-white self-start"
             >
               ← Back to role selection
             </button>
@@ -386,13 +464,19 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
                 appearance={{
                   elements: {
                     rootBox: 'w-full',
-                    card: 'bg-white border border-zinc-200/80 rounded-2xl shadow-sm',
-                    headerTitle: 'font-display font-semibold text-zinc-800',
-                    headerSubtitle: 'text-zinc-400',
-                    socialButtonsBlockButton: 'border-zinc-200 hover:bg-zinc-50 font-medium',
-                    formFieldInput: 'bg-zinc-50 border-zinc-200 rounded-xl focus:border-indigo-500',
-                    formButtonPrimary: 'bg-zinc-950 hover:bg-zinc-900 rounded-xl font-display shadow-md shadow-zinc-200',
-                    footerActionLink: 'text-indigo-600 hover:text-indigo-700',
+                    card: 'bg-zinc-900 border border-zinc-800 rounded-none ',
+                    headerTitle: 'font-display font-semibold font-semibold text-white',
+                    headerSubtitle: 'text-white',
+                    socialButtonsBlockButton: 'border-zinc-800 hover:bg-black text-white font-bold',
+                    formFieldInput: 'bg-zinc-900 border-zinc-800 text-white rounded-none focus:border-zinc-800',
+                    formFieldLabel: 'text-white',
+                    formButtonPrimary: 'bg-zinc-900 hover:bg-zinc-800 text-white rounded-none font-display font-semibold ',
+                    footerActionLink: 'text-white hover:text-white',
+                    footerActionText: 'text-white',
+                    dividerLine: 'bg-black',
+                    dividerText: 'text-white',
+                    identityPreviewText: 'text-white',
+                    identityPreviewEditButton: 'text-white',
                   },
                 }}
                 routing="hash"
@@ -404,22 +488,22 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
         {selectedRole && isSignedIn && (
           <div className="flex flex-col gap-6 animate-fade-in">
             <div className="text-center flex flex-col gap-2 mb-2">
-              <h2 className="text-2xl font-display font-black tracking-tight text-zinc-900">
+              <h2 className="text-2xl font-display font-semibold font-semibold tracking-tight text-white font-mono uppercase">
                 Complete Your Profile.
               </h2>
-              <p className="text-sm text-zinc-500">
+              <p className="text-sm text-white">
                 {selectedRole === 'brand' ? 'Enter your brand details to provision your node.' : 'Enter your creator details to activate your radar.'}
               </p>
               <div className="flex items-center justify-center gap-1.5 mt-2">
-                <span className="text-xs text-zinc-500 font-mono bg-zinc-100 px-2 py-1 rounded">
-                  Authenticated as: <span className="font-bold text-zinc-700">{clerkUser?.primaryEmailAddress?.emailAddress}</span>
+                <span className="text-xs text-white font-mono bg-zinc-900 border border-zinc-800 px-2 py-1 rounded-none">
+                  Authenticated as: <span className="font-bold text-white">{clerkUser?.primaryEmailAddress?.emailAddress}</span>
                 </span>
                 <button
                   onClick={async () => {
                     await signOut();
                     window.location.reload();
                   }}
-                  className="text-xs text-red-500 font-mono hover:underline px-2 py-1"
+                  className="text-xs text-red-400 font-mono hover:underline px-2 py-1"
                 >
                   Sign Out / Switch User
                 </button>
@@ -473,21 +557,21 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
                   }
                 }
               }}
-              className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-5"
+              className="bg-zinc-900 border border-zinc-800 rounded-none p-6  flex flex-col gap-5"
             >
               {selectedRole === 'brand' ? (
                 <>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Brand Name</label>
-                    <input name="brandName" required type="text" className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors" placeholder="e.g. Nike" />
+                    <label className="text-xs font-sans tracking-wider text-white font-bold">Brand Name</label>
+                    <input name="brandName" required type="text" className="w-full bg-zinc-900 border border-zinc-800 rounded-none px-3.5 py-2.5 text-base text-white focus:outline-none focus:border-zinc-800 focus:bg-zinc-900 transition-colors" placeholder="e.g. Nike" />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Corporate Domain</label>
-                    <input name="domain" required type="text" className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors" placeholder="e.g. nike.com" />
+                    <label className="text-xs font-sans tracking-wider text-white font-bold">Corporate Domain</label>
+                    <input name="domain" required type="text" className="w-full bg-zinc-900 border border-zinc-800 rounded-none px-3.5 py-2.5 text-base text-white focus:outline-none focus:border-zinc-800 focus:bg-zinc-900 transition-colors" placeholder="e.g. nike.com" />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Primary Market Sector</label>
-                    <select name="sector" required className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors">
+                    <label className="text-xs font-sans tracking-wider text-white font-bold">Primary Market Sector</label>
+                    <select name="sector" required className="w-full bg-zinc-900 border border-zinc-800 rounded-none px-3.5 py-2.5 text-base text-white focus:outline-none focus:border-zinc-800 focus:bg-zinc-900 transition-colors">
                       <option value="" disabled selected>Select a Sector...</option>
                       <option value="Food & Lifestyle">Food & Lifestyle</option>
                       <option value="Fashion & Aesthetics">Fashion & Aesthetics</option>
@@ -507,12 +591,12 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
               ) : (
                 <>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Creator Handle</label>
-                    <input name="handle" required type="text" className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors" placeholder="e.g. @username" />
+                    <label className="text-xs font-sans tracking-wider text-white font-bold">Creator Handle</label>
+                    <input name="handle" required type="text" className="w-full bg-zinc-900 border border-zinc-800 rounded-none px-3.5 py-2.5 text-base text-white focus:outline-none focus:border-zinc-800 focus:bg-zinc-900 transition-colors" placeholder="e.g. @username" />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Content Niche</label>
-                    <select name="niche" required className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors">
+                    <label className="text-xs font-sans tracking-wider text-white font-bold">Content Niche</label>
+                    <select name="niche" required className="w-full bg-zinc-900 border border-zinc-800 rounded-none px-3.5 py-2.5 text-base text-white focus:outline-none focus:border-zinc-800 focus:bg-zinc-900 transition-colors">
                       <option value="" disabled selected>Select a Niche...</option>
                       <option value="Food & Lifestyle">Food & Lifestyle</option>
                       <option value="Fashion & Aesthetics">Fashion & Aesthetics</option>
@@ -529,20 +613,20 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
                     </select>
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Primary Locality / Base Area</label>
-                    <input name="locality" required type="text" className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors" placeholder="Enter your location" />
-                    {geocodeError && <span className="text-xs text-red-500 font-medium mt-1">{geocodeError}</span>}
+                    <label className="text-xs font-sans tracking-wider text-white font-bold">Primary Locality / Base Area</label>
+                    <input name="locality" required type="text" className="w-full bg-zinc-900 border border-zinc-800 rounded-none px-3.5 py-2.5 text-base text-white focus:outline-none focus:border-zinc-800 focus:bg-zinc-900 transition-colors" placeholder="Enter your location" />
+                    {geocodeError && <span className="text-xs text-red-400 font-bold mt-1">{geocodeError}</span>}
                   </div>
                 </>
               )}
               <button 
                 type="submit" 
                 disabled={isGeocoding}
-                className="w-full py-3 bg-zinc-950 hover:bg-zinc-900 text-white rounded-xl font-display font-bold shadow-md shadow-zinc-200 mt-2 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full py-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-none font-display font-semibold font-bold   mt-2 transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isGeocoding ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-none animate-spin" />
                     Locating Coordinates...
                   </>
                 ) : (
@@ -554,19 +638,48 @@ export default function EntryGate({ creators, onSignIn }: EntryGateProps) {
         )}
       </main>
 
-      <footer className="max-w-4xl mx-auto w-full z-10 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-mono text-zinc-400">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>V2.0 Production Gateway • Secured</span>
-        </div>
-        <div>
-          <span>Designed with absolute geometric precision</span>
-        </div>
-      </footer>
+        <footer className="max-w-xl mx-auto w-full z-10 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] font-mono text-white pt-6">
+          <div className="flex flex-col sm:flex-row items-center gap-2">
+            <span className="w-2 h-2 rounded-none bg-zinc-600 animate-pulse" />
+            <span>V2.0 Production Gateway • Secured</span>
+          </div>
+          <div className="flex flex-col items-end gap-1">
+            <span>Designed with absolute geometric precision</span>
+            <span className="text-[10px] text-white font-sans font-medium">&copy; {new Date().getFullYear()} Radius Inc. All rights reserved.</span>
+          </div>
+        </footer>
 
-      <AnimatePresence>
-        {showDeck && <AppWalkthroughDeck onClose={() => setShowDeck(false)} />}
-      </AnimatePresence>
+        <AnimatePresence>
+          {showDeck && <AppWalkthroughDeck onClose={() => setShowDeck(false)} />}
+        </AnimatePresence>
+      </div>
+
+      {/* RIGHT SIDE: Infinite Scrolling Background */}
+      <div 
+        className="absolute inset-0 lg:left-1/3 bg-transparent overflow-hidden flex items-center z-10 pointer-events-none"
+        style={{ 
+          maskImage: 'linear-gradient(to right, transparent, black 30%)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent, black 30%)' 
+        }}
+      >
+        <div className="flex w-[max-content] h-full animate-scroll-infinite opacity-50 mix-blend-screen">
+          {/* We create 2 identical sets of tiles to allow seamless infinite looping */}
+          {[...Array(2)].map((_, setIdx) => (
+            <div key={setIdx} className="flex h-full">
+              {[1, 2, 3, 4].map(tileIdx => (
+                <div key={`${setIdx}-${tileIdx}`} className="w-[800px] h-full relative overflow-hidden shrink-0">
+                  {/* Image is larger than the wrapper and anchored right to permanently crop off the left side (Puck) */}
+                  <img 
+                    src="https://cdn.recent.design/items/l0gvyr4/og/1200.webp" 
+                    alt="" 
+                    className="absolute right-0 w-[1200px] max-w-none h-full object-cover object-right grayscale invert contrast-[1.2] brightness-[0.9]" 
+                  />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

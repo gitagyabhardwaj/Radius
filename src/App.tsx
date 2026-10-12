@@ -80,6 +80,14 @@ function convexToCampaign(campaign: any, batches: any[]): Campaign {
     creativeGuidelines: campaign.creativeGuidelines,
     targetAudience: campaign.targetAudience,
     submissionDeadlineDays: campaign.submissionDeadlineDays,
+    description: campaign.description,
+    productPromoted: campaign.productPromoted,
+    brandLogoUrl: campaign.brandLogoUrl,
+    referenceAssetUrls: campaign.referenceAssetUrls,
+    startDate: campaign.startDate,
+    endDate: campaign.endDate,
+    perCreatorPayout: campaign.perCreatorPayout,
+    isTieredPayout: campaign.isTieredPayout,
     durationHours: campaign.durationHours,
     createdAt: campaign._creationTime || Date.now(),
     status: campaign.status as 'draft' | 'active' | 'completed',
@@ -220,12 +228,12 @@ export default function App() {
   // --- LOADING STATE ---
   if (!isAuthLoaded) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+      <div className="min-h-screen bg-zinc-900 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-zinc-950 font-display font-black tracking-tighter text-base animate-pulse">
+          <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500 font-display font-semibold font-semibold tracking-tighter text-base animate-pulse">
             R.
           </div>
-          <span className="text-zinc-500 font-mono text-sm">Initializing Radius...</span>
+          <span className="text-white font-mono text-sm">Initializing Radius...</span>
         </div>
       </div>
     );
@@ -240,12 +248,12 @@ export default function App() {
   if (currentUser === undefined) {
     // Still loading from Convex
     return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+      <div className="min-h-screen bg-zinc-900 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-zinc-950 font-display font-black tracking-tighter text-base animate-pulse">
+          <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500 font-display font-semibold font-semibold tracking-tighter text-base animate-pulse">
             R.
           </div>
-          <span className="text-zinc-500 font-mono text-sm">Loading profile...</span>
+          <span className="text-white font-mono text-sm">Loading profile...</span>
         </div>
       </div>
     );
@@ -268,50 +276,56 @@ export default function App() {
   const showMap = view === 'brand' && activeBrandSubTab === 'setup';
 
   return (
-    <div className="h-screen overflow-hidden bg-gradient-to-br from-indigo-50/60 via-[#f2f5f9] to-slate-100 text-zinc-900 selection:bg-indigo-100 selection:text-indigo-900 flex flex-row">
+    <div className="h-screen overflow-hidden bg-black text-white selection:bg-indigo-500/30 selection:text-white flex flex-row relative z-0 font-sans">
       
+      {/* Premium Ambient Lighting Glows */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-indigo-500/10 blur-[120px] rounded-full mix-blend-screen opacity-50 animate-pulse" />
+        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-purple-500/10 blur-[120px] rounded-full mix-blend-screen opacity-50" />
+      </div>
+
       {/* MINIMALIST PERSISTENT SIDEBAR NAVIGATION */}
-      <aside className="w-64 bg-zinc-950 text-zinc-300 border-r border-zinc-800 flex flex-col justify-between shrink-0 h-screen overflow-y-auto">
+      <aside className="w-64 bg-black/50 text-white border-r border-zinc-800/50 flex flex-col justify-between shrink-0 h-screen overflow-y-auto z-20 backdrop-blur-xl transition-glass">
         <div className="flex flex-col">
           {/* Logo Brand Header */}
-          <div className="p-5 border-b border-zinc-900 flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-zinc-950 font-display font-black tracking-tighter text-base">
+          <div className="p-5 border-b border-zinc-800 flex items-center gap-2.5 bg-transparent text-white">
+            <div className="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-white font-semibold text-base border-2 border-zinc-800">
               R.
             </div>
             <div className="flex flex-col">
-              <span className="font-display font-bold text-base tracking-tight text-white uppercase leading-none">
+              <span className="font-display font-semibold font-bold text-base tracking-tight text-white uppercase leading-none">
                 RADIUS
               </span>
-              <span className="text-[11px] font-mono tracking-wider text-zinc-500 mt-0.5 uppercase leading-none">
+              <span className="text-[11px] font-mono tracking-wider text-white mt-0.5 uppercase leading-none">
                 Hyperlocal Escrow
               </span>
             </div>
           </div>
-          <div className="px-5 py-4 border-b border-zinc-900 bg-zinc-900/20 flex flex-col gap-3">
+          <div className="px-5 py-4 border-b border-zinc-800 bg-zinc-900 flex flex-col gap-3">
             <div className="flex items-center gap-3">
               <img src={currentUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name || 'U')}&background=random`} alt="User" className="w-8 h-8 rounded-full" />
               <div className="flex flex-col">
-                <span className="font-medium text-sm text-zinc-200">{currentUser.name}</span>
-                <span className="text-[10px] uppercase font-mono text-zinc-500">{currentUser.role}</span>
+                <span className="font-bold text-sm text-white">{currentUser.name}</span>
+                <span className="text-[10px] uppercase font-mono text-white">{currentUser.role}</span>
               </div>
             </div>
-            <div className="bg-zinc-950 rounded-lg p-2.5 border border-zinc-800 flex justify-between items-center">
-              <span className="text-xs font-mono text-zinc-400">Wallet</span>
-              <span className="text-sm font-bold text-emerald-500 font-mono">₹{currentUser.escrowBalance || 0}</span>
+            <div className="bg-zinc-900 rounded-2xl p-2.5 border border-zinc-800 flex justify-between items-center">
+              <span className="text-xs font-mono text-white">Wallet</span>
+              <span className="text-sm font-bold text-white font-mono">₹{currentUser.escrowBalance || 0}</span>
             </div>
           </div>
           {/* Subtab Navigation */}
           <div className="p-4 flex flex-col gap-2">
-            <span className="text-[11px] font-mono uppercase tracking-widest text-zinc-500 font-bold px-1.5">Navigation Features</span>
+            <span className="text-[11px] font-sans tracking-widest text-white font-bold px-1.5">Navigation Features</span>
             <nav className="flex flex-col gap-1">
               {view === 'brand' ? (
                 <>
                   <button
                     onClick={() => setActiveBrandSubTab('setup')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeBrandSubTab === 'setup'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
+                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
+                        : 'text-white hover:text-white hover:bg-zinc-900'
                     }`}
                   >
                     <Compass className="w-4 h-4" />
@@ -319,10 +333,10 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setActiveBrandSubTab('dispatch')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeBrandSubTab === 'dispatch'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
+                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
+                        : 'text-white hover:text-white hover:bg-zinc-900'
                     }`}
                   >
                     <Activity className="w-4 h-4" />
@@ -330,10 +344,10 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setActiveBrandSubTab('analytics')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeBrandSubTab === 'analytics'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
+                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
+                        : 'text-white hover:text-white hover:bg-zinc-900'
                     }`}
                   >
                     <ShieldCheck className="w-4 h-4" />
@@ -341,10 +355,10 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setActiveBrandSubTab('profile')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeBrandSubTab === 'profile'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
+                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
+                        : 'text-white hover:text-white hover:bg-zinc-900'
                     }`}
                   >
                     <User className="w-4 h-4" />
@@ -355,10 +369,10 @@ export default function App() {
                 <>
                   <button
                     onClick={() => setActiveCreatorSubTab('radar')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeCreatorSubTab === 'radar'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
+                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
+                        : 'text-white hover:text-white hover:bg-zinc-900'
                     }`}
                   >
                     <Radio className="w-4 h-4" />
@@ -366,10 +380,10 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setActiveCreatorSubTab('escrow')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeCreatorSubTab === 'escrow'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
+                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
+                        : 'text-white hover:text-white hover:bg-zinc-900'
                     }`}
                   >
                     <Compass className="w-4 h-4" />
@@ -377,10 +391,10 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setActiveCreatorSubTab('wallet')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeCreatorSubTab === 'wallet'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
+                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
+                        : 'text-white hover:text-white hover:bg-zinc-900'
                     }`}
                   >
                     <DollarSign className="w-4 h-4" />
@@ -388,10 +402,10 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setActiveCreatorSubTab('portfolio')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeCreatorSubTab === 'portfolio'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
+                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
+                        : 'text-white hover:text-white hover:bg-zinc-900'
                     }`}
                   >
                     <Image className="w-4 h-4" />
@@ -399,10 +413,10 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setActiveCreatorSubTab('profile')}
-                    className={`w-full py-2 px-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeCreatorSubTab === 'profile'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-indigo-500 rounded-l-none'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/30'
+                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
+                        : 'text-white hover:text-white hover:bg-zinc-900'
                     }`}
                   >
                     <User className="w-4 h-4" />
@@ -415,7 +429,7 @@ export default function App() {
         </div>
 
         {/* Bottom profile info */}
-        <div className="p-4 border-t border-zinc-900 flex flex-col gap-3">
+        <div className="p-4 border-t border-zinc-800 flex flex-col gap-3">
           <div className="flex items-center gap-2.5 px-1">
             {clerkUser?.imageUrl ? (
               <img
@@ -425,7 +439,7 @@ export default function App() {
                 referrerPolicy="no-referrer"
               />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center font-bold text-sm text-indigo-400 uppercase">
+              <div className="w-8 h-8 rounded-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 flex items-center justify-center font-bold text-sm text-white uppercase">
                 {view === 'brand' ? brandDisplayName.substring(0, 2) : '?'}
               </div>
             )}
@@ -433,7 +447,7 @@ export default function App() {
               <span className="text-xs font-bold text-white tracking-tight line-clamp-1 leading-none">
                 {view === 'brand' ? brandDisplayName : currentCreatorProfile?.name || 'Creator'}
               </span>
-              <span className="text-[10px] font-mono text-zinc-400 mt-1 leading-none truncate max-w-[120px]" title={clerkUser?.primaryEmailAddress?.emailAddress || ''}>
+              <span className="text-[10px] font-mono text-white mt-1 leading-none truncate max-w-[120px]" title={clerkUser?.primaryEmailAddress?.emailAddress || ''}>
                 {clerkUser?.primaryEmailAddress?.emailAddress || (view === 'brand' ? 'Active Brand Admin' : 'Grid Operator')}
               </span>
             </div>
@@ -443,7 +457,7 @@ export default function App() {
               await signOut();
               window.location.reload();
             }}
-            className="w-full py-2 border border-zinc-850 rounded-xl text-[11px] font-mono font-bold tracking-wider uppercase text-zinc-400 hover:text-white hover:bg-zinc-900/50 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+            className="w-full py-2 border border-zinc-800 rounded-2xl text-[11px] font-mono font-bold tracking-wider uppercase text-white hover:text-white hover:bg-zinc-900 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>
@@ -455,23 +469,23 @@ export default function App() {
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto relative custom-scrollbar">
         
         {/* Dynamic header status bar */}
-        <header className="border-b border-zinc-200/60 bg-white/85 backdrop-blur-md sticky top-0 z-30 px-6 py-4">
+        <header className="border-b border-zinc-800 bg-zinc-900  sticky top-0 z-30 px-6 py-4  transition-glass">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <span className="text-sm font-mono font-bold text-zinc-400 uppercase">Current Node:</span>
-              <span className="text-sm font-mono font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded uppercase">
+              <span className="text-sm font-mono font-bold text-white uppercase">Current Node:</span>
+              <span className="text-sm font-mono font-bold text-white bg-indigo-500 border border-indigo-500 px-2 py-0.5 rounded-2xl uppercase">
                 {view === 'brand' ? `${brandDisplayName} Admin` : `${currentCreatorProfile?.name || 'Creator'} Terminal`}
               </span>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 text-sm font-mono font-medium text-zinc-500">
-                <Activity className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
+              <div className="flex items-center gap-2 text-sm font-mono font-bold text-white">
+                <Activity className="w-3.5 h-3.5 text-white animate-pulse" />
                 <span className="hidden sm:inline">{view === 'brand' ? 'Escrow Node: Connected' : 'Radar Status: Listening for Offers'}</span>
               </div>
-              <div className="flex items-center justify-center p-2 rounded-full hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white border border-zinc-800">
+              <div className="flex items-center justify-center p-2 rounded-2xl hover:bg-zinc-900 transition-all text-white hover:text-white border border-zinc-800 hover:border-zinc-800  cursor-pointer group">
                 <button 
-                  className="flex items-center justify-center" 
+                  className="flex items-center justify-center transition-transform group-hover:scale-110" 
                   aria-label="Sign out"
                   onClick={async () => {
                     await signOut();
@@ -492,11 +506,11 @@ export default function App() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-fade-in">
               <div className="lg:col-span-12 flex flex-col gap-3">
                 <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h1 className="text-base font-display font-bold text-zinc-900 tracking-tight">
+                  <div className="flex-1 bg-zinc-900  p-6 rounded-2xl border border-zinc-800  ">
+                    <h1 className="text-xl font-display font-semibold font-bold text-white tracking-tight font-mono uppercase">
                       Hyperlocal Match Engine
                     </h1>
-                    <p className="text-sm text-zinc-500 mt-0.5 mb-4">
+                    <p className="text-sm text-white mt-1 mb-5">
                       Search an address or place the target pin to visualize creator match density.
                     </p>
                     <AddressSearch 
@@ -507,8 +521,8 @@ export default function App() {
                       }} 
                     />
                   </div>
-                  <div className="flex items-center gap-2 text-sm font-mono font-medium text-zinc-500 mt-1">
-                    <Compass className="w-4 h-4 text-indigo-500 animate-spin-slow" />
+                  <div className="flex items-center gap-2 text-sm font-mono font-bold text-white mt-1">
+                    <Compass className="w-4 h-4 text-white animate-spin-slow" />
                     <span>Delhi Grid (CP Centered)</span>
                   </div>
                 </div>

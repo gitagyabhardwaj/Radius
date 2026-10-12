@@ -42,6 +42,35 @@ export const createOrUpdateUser = mutation({
     domain: v.optional(v.string()),
     sector: v.optional(v.string()),
     escrowBalance: v.optional(v.number()),
+    contactPerson: v.optional(v.string()),
+    contactPhone: v.optional(v.string()),
+    teamMembers: v.optional(
+      v.array(
+        v.object({
+          name: v.string(),
+          email: v.string(),
+          role: v.string(),
+        })
+      )
+    ),
+    website: v.optional(v.string()),
+    instagramHandle: v.optional(v.string()),
+    otherSocialLinks: v.optional(
+      v.array(
+        v.object({
+          platform: v.string(),
+          url: v.string(),
+        })
+      )
+    ),
+    brandBio: v.optional(v.string()),
+    brandAssets: v.optional(
+      v.object({
+        logoUrl: v.optional(v.string()),
+        productImages: v.optional(v.array(v.string())),
+        guidelinesDocUrl: v.optional(v.string()),
+      })
+    ),
     // Creator fields
     handle: v.optional(v.string()),
     locality: v.optional(v.string()),
@@ -104,6 +133,35 @@ export const updateProfile = mutation({
     domain: v.optional(v.string()),
     sector: v.optional(v.string()),
     escrowBalance: v.optional(v.number()),
+    contactPerson: v.optional(v.string()),
+    contactPhone: v.optional(v.string()),
+    teamMembers: v.optional(
+      v.array(
+        v.object({
+          name: v.string(),
+          email: v.string(),
+          role: v.string(),
+        })
+      )
+    ),
+    website: v.optional(v.string()),
+    instagramHandle: v.optional(v.string()),
+    otherSocialLinks: v.optional(
+      v.array(
+        v.object({
+          platform: v.string(),
+          url: v.string(),
+        })
+      )
+    ),
+    brandBio: v.optional(v.string()),
+    brandAssets: v.optional(
+      v.object({
+        logoUrl: v.optional(v.string()),
+        productImages: v.optional(v.array(v.string())),
+        guidelinesDocUrl: v.optional(v.string()),
+      })
+    ),
     handle: v.optional(v.string()),
     locality: v.optional(v.string()),
     lat: v.optional(v.number()),
@@ -125,6 +183,7 @@ export const updateProfile = mutation({
       )
     ),
     bio: v.optional(v.string()),
+    upiId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();

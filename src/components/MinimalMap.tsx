@@ -89,31 +89,31 @@ export default function MinimalMap({
   };
 
   return (
-    <div className="relative w-full h-[360px] md:h-[440px] bg-slate-50 border border-zinc-200/80 rounded-2xl overflow-hidden select-none z-0">
+    <div className="relative w-full h-[360px] md:h-[440px] bg-zinc-900 border border-zinc-800 rounded-none overflow-hidden select-none z-0">
       
       {/* Overlay UI elements */}
       <div className="absolute top-4 left-4 z-[400] flex flex-col gap-1.5 pointer-events-none">
-        <div className="bg-white/90 backdrop-blur-md border border-zinc-200/80 shadow-sm px-3 py-1.5 rounded-xl flex items-center gap-2">
-          <Compass className="w-4 h-4 text-zinc-500 animate-spin-slow" />
-          <span className="text-sm font-mono font-medium text-zinc-700">DELHI GEO-RADIAL ENGINE</span>
+        <div className="bg-zinc-900  border border-zinc-800  px-3 py-1.5 rounded-none flex items-center gap-2">
+          <Compass className="w-4 h-4 text-white animate-spin-slow" />
+          <span className="text-sm font-mono font-bold text-white">DELHI GEO-RADIAL ENGINE</span>
         </div>
-        <div className="bg-zinc-950/95 backdrop-blur-sm text-white px-3 py-1.5 rounded-xl shadow-md flex items-center gap-2.5">
-          <Users className="w-4 h-4 text-indigo-400" />
-          <span className="text-sm font-sans font-medium">
-            Active Target: <span className="text-indigo-300 font-bold">{activeMatchesCount} matches</span>
+        <div className="bg-zinc-900  text-white px-3 py-1.5 rounded-none  flex items-center gap-2.5">
+          <Users className="w-4 h-4 text-white" />
+          <span className="text-sm font-sans font-medium font-bold">
+            Active Target: <span className="text-white font-bold">{activeMatchesCount} matches</span>
           </span>
         </div>
       </div>
 
-      <div className="absolute bottom-6 right-4 z-[400] bg-white/95 backdrop-blur-sm px-2.5 py-1.5 rounded-lg border border-zinc-200/60 shadow-sm text-[11px] font-mono text-zinc-400 flex flex-col gap-0.5">
+      <div className="absolute bottom-6 right-4 z-[400] bg-zinc-900  px-2.5 py-1.5 rounded-none border border-zinc-800  text-[11px] font-mono text-white flex flex-col gap-0.5">
         <div>LAT: {centerLat.toFixed(4)}</div>
         <div>LNG: {centerLng.toFixed(4)}</div>
       </div>
 
-      <div className="absolute bottom-6 left-4 z-[400] flex gap-4 bg-white/90 backdrop-blur-md border border-zinc-200/50 p-2 rounded-xl text-[11px] font-sans">
+      <div className="absolute bottom-6 left-4 z-[400] flex gap-4 bg-zinc-900  border border-zinc-800 p-2 rounded-none text-[11px] font-sans font-medium">
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white shadow-sm" />
-          <span className="text-zinc-600 font-medium">Matched Creators</span>
+          <span className="w-2.5 h-2.5 rounded-none bg-black border border-white " />
+          <span className="text-white font-bold">Matched Creators</span>
         </div>
       </div>
 
@@ -125,7 +125,7 @@ export default function MinimalMap({
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         />
         
         <MapEventsHandler onMapClick={onMapClick} />
@@ -159,14 +159,14 @@ export default function MinimalMap({
               }}
             >
               <Popup className="custom-popup">
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-2 bg-zinc-900 text-white rounded-none p-1">
                   <img src={creator.avatar} alt={creator.name} className="w-6 h-6 rounded-full object-cover" />
                   <div>
                     <div className="text-xs font-bold leading-tight m-0 p-0">{creator.name}</div>
-                    <div className="text-[10px] text-gray-500 m-0 p-0">{creator.handle}</div>
+                    <div className="text-[10px] text-white m-0 p-0">{creator.handle}</div>
                   </div>
                 </div>
-                <div className="text-[10px] space-y-1">
+                <div className="text-[10px] space-y-1 text-white">
                   <div><strong>Matches:</strong> {creator.matchScore}%</div>
                   <div><strong>Audience:</strong> {creator.audienceInLocality}% local</div>
                 </div>

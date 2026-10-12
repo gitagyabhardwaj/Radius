@@ -181,8 +181,168 @@ export const getCreatorEarnings = query({
       }
     }
 
-    return { totalReleased, totalPending };
+    // Calculate total withdrawn
+    const withdrawals = await ctx.db
+      .query("withdrawals")
+      .withIndex("by_creator", (q) => q.eq("creatorUserId", user._id))
+      .collect();
+      
+    const totalWithdrawn = withdrawals.reduce((sum, w) => sum + w.amount, 0);
+    const availableBalance = totalReleased - totalWithdrawn;
+
+    return { totalReleased, totalPending, totalWithdrawn, availableBalance };
   },
+});
+
+/**
+ * Get detailed transaction history for the creator.
+ * Combines completed payouts from campaigns and withdrawal requests.
+ */
+export const getCreatorTransactions = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return [];
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+
+    if (!user) return [];
+
+    const transactions: any[] = [];
+
+    // 1. Get Campaign Payouts
+    const acceptedOffers = await ctx.db
+      .query("campaignOffers")
+      .withIndex("by_creator", (q) => q.eq("creatorUserId", user._id))
+      .collect();
+
+    const allEntries = await ctx.db.query("escrowLedger").collect();
+    const creatorEntries = allEntries.filter((e) => e.creatorUserId === user._id);
+
+    for (const offer of acceptedOffers) {
+      if (offer.status === "accepted") {
+        const campaign = await ctx.db.get(offer.campaignId);
+        if (!campaign) continue;
+
+        const amount = (campaign.budget * 0.95) / campaign.spotsTotal;
+        const releaseEntry = creatorEntries.find(
+          (e) => e.campaignId === offer.campaignId && e.action === "released"
+        );
+
+        let status = "Escrow Locked";
+        let date = offer._creationTime;
+
+        // Check submission status if not released
+        if (!releaseEntry) {
+          const submissions = await ctx.db
+            .query("submissions")
+            .withIndex("by_campaign", (q) => q.eq("campaignId", campaign._id))
+            .collect();
+          
+          const creatorSub = submissions.find(s => s.creatorUserId === user._id);
+          if (creatorSub && (creatorSub.status === "approved" || creatorSub.status === "final_verifying")) {
+            status = "Deliverable Verified";
+          }
+        } else {
+          status = "Released";
+          date = releaseEntry._creationTime;
+        }
+
+        transactions.push({
+          id: offer._id,
+          type: "payout",
+          brandName: campaign.brandName,
+          campaignName: campaign.title,
+          amount,
+          date,
+          status,
+        });
+      }
+    }
+
+    // 2. Get Withdrawals
+    const withdrawals = await ctx.db
+      .query("withdrawals")
+      .withIndex("by_creator", (q) => q.eq("creatorUserId", user._id))
+      .collect();
+
+    for (const w of withdrawals) {
+      transactions.push({
+        id: w._id,
+        type: "withdrawal",
+        brandName: "Bank Withdrawal (UPI)",
+        campaignName: `To: ${w.upiId}`,
+        amount: -w.amount,
+        date: w._creationTime,
+        status: w.status.charAt(0).toUpperCase() + w.status.slice(1),
+      });
+    }
+
+    // Sort by date descending
+    transactions.sort((a, b) => b.date - a.date);
+
+    return transactions;
+  },
+});
+
+/**
+ * Request a withdrawal of available funds via UPI.
+ */
+export const requestWithdrawal = mutation({
+  args: {
+    amount: v.number(),
+    upiId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+
+    if (!user) throw new Error("User not found");
+    if (user.role !== "creator") throw new Error("Only creators can withdraw");
+
+    // 1. Recalculate available balance to prevent double-spend
+    const allEntries = await ctx.db.query("escrowLedger").collect();
+    const creatorEntries = allEntries.filter((e) => e.creatorUserId === user._id);
+    const totalReleased = creatorEntries
+      .filter((e) => e.action === "released")
+      .reduce((sum, e) => sum + e.amount, 0);
+
+    const withdrawals = await ctx.db
+      .query("withdrawals")
+      .withIndex("by_creator", (q) => q.eq("creatorUserId", user._id))
+      .collect();
+    const totalWithdrawn = withdrawals.reduce((sum, w) => sum + w.amount, 0);
+    
+    const availableBalance = totalReleased - totalWithdrawn;
+
+    if (args.amount <= 0) throw new Error("Amount must be positive");
+    if (args.amount > availableBalance) {
+      throw new Error("Insufficient available balance");
+    }
+
+    // 2. Insert withdrawal record
+    await ctx.db.insert("withdrawals", {
+      creatorUserId: user._id,
+      amount: args.amount,
+      upiId: args.upiId,
+      status: "pending",
+    });
+
+    // 3. Update user's UPI ID if it's new
+    if (user.upiId !== args.upiId) {
+      await ctx.db.patch(user._id, { upiId: args.upiId });
+    }
+
+    return true;
+  }
 });
 
 /**

@@ -1,24 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --font-display: "Bookman", "Bookman Old Style", "URW Bookman L", "Lora", serif;
+  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: #f2f5f9;
-  color: #09090b;
+  background-color: #f8fafc;
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Ensure headings & sub-headings default to Bookman serif typography */
+/* Ensure headings & sub-headings default to Outfit typography */
 h1, h2, h3, h4, h5, h6, .font-display {
   font-family: var(--font-display) !important;
+  letter-spacing: -0.02em;
 }
 
-/* Base text elements use Montserrat */
+/* Base text elements use Inter */
 p, span, label, input, select, textarea, button, a, div:not(.font-display) {
   font-family: var(--font-sans);
 }
@@ -32,9 +35,55 @@ p, span, label, input, select, textarea, button, a, div:not(.font-display) {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #e4e4e7;
+  background: #cbd5e1;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #d4d4d8;
+  background: #94a3b8;
+}
+
+/* Animated Background Orbs */
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(150px, -150px) scale(1.3); }
+  66% { transform: translate(-100px, 150px) scale(0.8); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Smooth transitions */
+.transition-glass {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Background Infinite Scroll (Marquee) */
+@keyframes scrollInfinite {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-scroll-infinite {
+  animation: scrollInfinite 120s linear infinite;
+}
+
+/* Text Highlight Illustration Animations */
+@keyframes scale-x-100 {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

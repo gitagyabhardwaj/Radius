@@ -20,18 +20,18 @@ export function ReviewsCard({
 }) {
   const summary = useQuery(api.ratings.getForUser, { userId: userId as any });
 
-  const textMuted = dark ? 'text-zinc-500' : 'text-zinc-400';
-  const textBase = dark ? 'text-zinc-200' : 'text-zinc-700';
+  const textMuted = dark ? 'text-white' : 'text-white';
+  const textBase = dark ? 'text-white' : 'text-white';
   const cardBg = dark
-    ? 'bg-zinc-900/60 border-zinc-850'
-    : 'bg-zinc-50/60 border-zinc-150';
+    ? 'bg-zinc-900 border-zinc-800'
+    : 'bg-zinc-900 border-zinc-800';
 
   if (!summary) return null;
 
   return (
-    <div className={`p-4 rounded-xl border flex flex-col gap-3 ${cardBg}`}>
+    <div className={`p-4 rounded-none border flex flex-col gap-3 ${cardBg}`}>
       <div className="flex items-center justify-between">
-        <span className={`text-[11px] font-mono uppercase tracking-widest font-bold ${textMuted}`}>
+        <span className={`text-[11px] font-sans tracking-widest font-bold ${textMuted}`}>
           {label}
         </span>
         {summary.count > 0 ? (
@@ -41,7 +41,7 @@ export function ReviewsCard({
                 <Star
                   key={n}
                   className={`w-3.5 h-3.5 ${
-                    n <= Math.round(summary.average) ? 'fill-amber-400 text-amber-400' : 'text-zinc-600'
+                    n <= Math.round(summary.average) ? 'fill-amber-400 text-amber-400' : 'text-white'
                   }`}
                 />
               ))}
@@ -66,7 +66,7 @@ export function ReviewsCard({
                     <Star
                       key={n}
                       className={`w-3 h-3 ${
-                        n <= r.stars ? 'fill-amber-400 text-amber-400' : 'text-zinc-600'
+                        n <= r.stars ? 'fill-amber-400 text-amber-400' : 'text-white'
                       }`}
                     />
                   ))}
@@ -109,13 +109,13 @@ export default function RatingWidget({
   if (!status) return null;
   if (!status.canRate && !status.alreadyRated) return null;
 
-  const textMuted = dark ? 'text-zinc-500' : 'text-zinc-400';
-  const textBase = dark ? 'text-zinc-200' : 'text-zinc-700';
+  const textMuted = dark ? 'text-white' : 'text-white';
+  const textBase = dark ? 'text-white' : 'text-white';
 
   if (status.alreadyRated && status.myRating) {
     return (
       <div className="flex flex-col gap-1.5">
-        <span className={`text-[11px] font-mono uppercase tracking-wide font-bold ${textMuted}`}>
+        <span className={`text-[11px] font-sans tracking-wide font-bold ${textMuted}`}>
           Your rating of {subjectLabel}
         </span>
         <div className="flex items-center gap-1">
@@ -123,7 +123,7 @@ export default function RatingWidget({
             <Star
               key={n}
               className={`w-4 h-4 ${
-                n <= status.myRating.stars ? 'fill-amber-400 text-amber-400' : 'text-zinc-600'
+                n <= status.myRating.stars ? 'fill-amber-400 text-amber-400' : 'text-white'
               }`}
             />
           ))}
@@ -137,7 +137,7 @@ export default function RatingWidget({
 
   return (
     <div className="flex flex-col gap-2">
-      <span className={`text-[11px] font-mono uppercase tracking-wide font-bold ${textMuted}`}>
+      <span className={`text-[11px] font-sans tracking-wide font-bold ${textMuted}`}>
         Rate {subjectLabel}
       </span>
       <div className="flex items-center gap-1">
@@ -152,7 +152,7 @@ export default function RatingWidget({
           >
             <Star
               className={`w-5 h-5 transition-colors ${
-                n <= (hoverStars || stars) ? 'fill-amber-400 text-amber-400' : 'text-zinc-600'
+                n <= (hoverStars || stars) ? 'fill-amber-400 text-amber-400' : 'text-white'
               }`}
             />
           </button>
@@ -164,13 +164,13 @@ export default function RatingWidget({
         onChange={(e) => setComment(e.target.value)}
         placeholder="Optional comment"
         maxLength={280}
-        className={`text-xs rounded-lg px-3 py-1.5 border outline-none ${
+        className={`text-xs rounded-none px-3 py-1.5 border outline-none ${
           dark
-            ? 'bg-zinc-900 border-zinc-800 text-zinc-200 placeholder:text-zinc-600'
-            : 'bg-white border-zinc-200 text-zinc-700 placeholder:text-zinc-400'
+            ? 'bg-zinc-900 border-zinc-800 text-white placeholder:text-white'
+            : 'bg-zinc-900 border-zinc-800 text-white placeholder:text-white'
         }`}
       />
-      {error && <span className="text-[11px] text-rose-500">{error}</span>}
+      {error && <span className="text-[11px] text-white">{error}</span>}
       <button
         type="button"
         disabled={stars === 0 || submitting}
@@ -189,7 +189,7 @@ export default function RatingWidget({
             setSubmitting(false);
           }
         }}
-        className="w-max py-1.5 px-3 bg-amber-400 hover:bg-amber-500 disabled:opacity-40 disabled:cursor-not-allowed text-zinc-950 text-xs font-bold rounded-lg transition-colors"
+        className="w-max py-1.5 px-3 bg-amber-400 hover:bg-amber-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold rounded-none transition-colors"
       >
         {submitting ? 'Submitting…' : 'Submit Rating'}
       </button>

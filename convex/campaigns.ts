@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
 import { internal } from "./_generated/api";
-import { generateSimulatedTxHash } from "./helpers";
+import { generateSimulatedTxHash, haversineKm, computeMatchScore } from "./helpers";
 
 /**
  * Brand creates a new campaign.
@@ -25,6 +25,14 @@ export const create = mutation({
     creativeGuidelines: v.optional(v.string()),
     targetAudience: v.optional(v.string()),
     submissionDeadlineDays: v.optional(v.number()),
+    description: v.optional(v.string()),
+    productPromoted: v.optional(v.string()),
+    brandLogoUrl: v.optional(v.string()),
+    referenceAssetUrls: v.optional(v.array(v.string())),
+    startDate: v.optional(v.number()),
+    endDate: v.optional(v.number()),
+    perCreatorPayout: v.optional(v.number()),
+    isTieredPayout: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -56,6 +64,14 @@ export const create = mutation({
       creativeGuidelines: args.creativeGuidelines,
       targetAudience: args.targetAudience,
       submissionDeadlineDays: args.submissionDeadlineDays,
+      description: args.description,
+      productPromoted: args.productPromoted,
+      brandLogoUrl: args.brandLogoUrl,
+      referenceAssetUrls: args.referenceAssetUrls,
+      startDate: args.startDate,
+      endDate: args.endDate,
+      perCreatorPayout: args.perCreatorPayout,
+      isTieredPayout: args.isTieredPayout,
 
       budget: args.budget,
       spotsTotal: args.spotsTotal,
@@ -341,5 +357,90 @@ export const rerunMatching = mutation({
     await ctx.scheduler.runAfter(0, internal.matching.assignBatches, {
       campaignId: args.campaignId,
     });
+  },
+});
+
+/**
+ * Get the Live Dispatch Queue for a campaign.
+ * Returns an ordered list of creators being cascaded to, their status, profile, and batch timing.
+ */
+export const getDispatchQueue = query({
+  args: { campaignId: v.id("campaigns") },
+  handler: async (ctx, args) => {
+    // 1. Get campaign
+    const campaign = await ctx.db.get(args.campaignId);
+    if (!campaign) throw new Error("Campaign not found");
+
+    // 2. Get all batches for this campaign
+    const batches = await ctx.db
+      .query("batches")
+      .withIndex("by_campaign", (q) => q.eq("campaignId", args.campaignId))
+      .collect();
+
+    const batchMap = new Map(batches.map(b => [b._id, b]));
+
+    // 3. Get all campaign offers for this campaign
+    const offers = await ctx.db
+      .query("campaignOffers")
+      .withIndex("by_campaign", (q) => q.eq("campaignId", args.campaignId))
+      .collect();
+
+    // 4. Gather creator profiles
+    const queue = [];
+    for (const offer of offers) {
+      const creator = await ctx.db.get(offer.creatorUserId);
+      if (!creator) continue;
+
+      const batch = batchMap.get(offer.batchId);
+      if (!batch) continue;
+
+      let expiresAt = null;
+      if (batch.dispatchedAt) {
+        expiresAt = batch.dispatchedAt + batch.cascadeAfterMs;
+      }
+
+      let distance = 0;
+      if (creator.lat !== undefined && creator.lng !== undefined) {
+         distance = haversineKm(campaign.centerLat, campaign.centerLng, creator.lat, creator.lng);
+      }
+      const matchScore = computeMatchScore(
+         distance,
+         creator.niche,
+         campaign.niche,
+         creator.audienceInLocality,
+         creator.followers,
+         creator.velocityTier as "Free" | "Velocity" | undefined
+      );
+
+      queue.push({
+        offerId: offer._id,
+        creator: {
+          id: creator._id,
+          name: creator.name,
+          handle: creator.handle,
+          avatarUrl: creator.avatarUrl,
+          niche: creator.niche,
+          followers: creator.followers,
+          matchScore: matchScore,
+        },
+        batchName: batch.name,
+        status: offer.status,
+        declineReason: offer.declineReason,
+        expiresAt,
+        batchDispatchedAt: batch.dispatchedAt,
+        // Calculate a score for sorting (active batches first, higher match score first)
+        batchOrder: batch.name === 'Batch A' ? 1 : batch.name === 'Batch B' ? 2 : 3,
+      });
+    }
+
+    // Sort queue by Batch (A -> B -> C) then by Match Score (descending)
+    queue.sort((a, b) => {
+      if (a.batchOrder !== b.batchOrder) {
+        return a.batchOrder - b.batchOrder;
+      }
+      return b.creator.matchScore - a.creator.matchScore;
+    });
+
+    return queue;
   },
 });

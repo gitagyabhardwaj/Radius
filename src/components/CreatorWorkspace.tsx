@@ -24,6 +24,7 @@ import { useClerk } from '@clerk/clerk-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { CampaignAcceptModal } from './CampaignAcceptModal';
 import RatingWidget, { ReviewsCard } from './RatingWidget';
+import CreatorWallet from './CreatorWallet';
 
 const generateAudienceLocations = (creator: any) => {
   const indianCities = [
@@ -85,6 +86,7 @@ export default function CreatorWorkspace({
 
   const acceptGenericCampaign = useMutation(api.users.acceptCampaign);
   const fetchProfileData = useAction(api.instagram.fetchProfileData);
+  const connectMetaOAuth = useAction(api.instagram.connectMetaOAuth);
   const createVelocityOrder = useAction(api.payments.createVelocityOrder);
   const verifyAndActivateVelocity = useAction(api.payments.verifyAndActivateVelocity);
 
@@ -460,27 +462,41 @@ export default function CreatorWorkspace({
       setIsVerifyingHandle(false);
     }
   };
+
+  const handleConnectInstagram = () => {
+    const appId = import.meta.env.VITE_META_APP_ID;
+    if (!appId) {
+      setHandleVerifyMessage({ text: "Missing Instagram App ID configuration.", type: "error" });
+      return;
+    }
+    
+    // Redirect to Instagram Basic Display API OAuth
+    const redirectUri = window.location.origin;
+    const authUrl = `https://api.instagram.com/oauth/authorize?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user_profile,user_media&response_type=code`;
+    
+    window.location.href = authUrl;
+  };
   if (!currentCreator) return null;
 
   if (activeSubTab === 'profile') {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-fade-in">
         {/* Creator Profile Editor Card */}
-        <div className="lg:col-span-7 bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-6">
-          <div className="flex items-center justify-between border-b border-zinc-100 pb-4">
+        <div className="lg:col-span-7 bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl p-8   flex flex-col gap-6 transition-glass hover: hover:">
+          <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
             <div>
-              <h2 className="text-xl font-display font-semibold text-zinc-900">Creator Identity & Node Registry</h2>
-              <p className="text-sm text-zinc-500 mt-0.5">
+              <h2 className="text-xl font-display font-semibold font-semibold text-white font-mono uppercase">Creator Identity & Node Registry</h2>
+              <p className="text-sm text-white mt-0.5">
                 Manage your public creator workspace details, geolocated coordinates, and verify your photography gear credentials.
               </p>
             </div>
             {currentCreator.velocityTier === 'Velocity' ? (
-              <span className="bg-amber-50 text-amber-700 text-sm px-2.5 py-1 rounded-full font-semibold border border-amber-200 flex items-center gap-1.5 animate-pulse">
+              <span className="bg-amber-50 text-amber-700 text-sm px-2.5 py-1 rounded-2xl font-semibold border border-amber-200 flex items-center gap-1.5 animate-pulse">
                 <Zap className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                 Velocity Node
               </span>
             ) : (
-              <span className="bg-zinc-50 text-zinc-500 text-sm px-2.5 py-1 rounded-full font-semibold border border-zinc-200 flex items-center gap-1.5">
+              <span className="bg-zinc-900 text-white text-sm px-2.5 py-1 rounded-2xl font-semibold border border-zinc-800 flex items-center gap-1.5">
                 Basic Node
               </span>
             )}
@@ -488,41 +504,52 @@ export default function CreatorWorkspace({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Public Display Name</label>
+              <label className="text-xs font-sans tracking-wider text-white font-bold">Public Display Name</label>
               <input
                 id="creator-profile-name-input"
                 type="text"
                 defaultValue={currentCreator.name}
 
-                className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors font-medium"
+                className="w-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl px-3.5 py-2.5 text-base text-white focus:outline-none focus:border-zinc-800 focus:bg-zinc-900 transition-colors font-bold"
                 placeholder="e.g. Bhavya Harbola"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Social Handle / Address</label>
+              <label className="text-xs font-sans tracking-wider text-white font-bold">Social Handle / Address</label>
               <div className="flex items-center gap-2">
                 <input
                   id="creator-profile-handle-input"
                   type="text"
                   defaultValue={currentCreator.handle}
                   onChange={() => setHandleVerifiedData(null)}
-                  className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
+                  className="w-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl px-3.5 py-2.5 text-base text-white focus:outline-none focus:border-zinc-800 focus:bg-zinc-900 transition-colors"
                   placeholder="e.g. @bhavya_craft"
                 />
                 <button
                   type="button"
                   onClick={handleVerifySocials}
                   disabled={isVerifyingHandle || !!handleVerifiedData}
-                  className="shrink-0 px-4 py-2.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 disabled:opacity-50 font-bold font-mono text-xs uppercase rounded-xl transition-colors border border-indigo-200"
+                  className="shrink-0 px-4 py-2.5 bg-indigo-500 border-none text-white hover:bg-black disabled:opacity-50 font-bold font-mono text-xs uppercase rounded-2xl transition-colors border border-zinc-800"
                 >
                   {isVerifyingHandle ? 'Scanning...' : (handleVerifiedData ? 'Verified' : 'Verify')}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConnectInstagram}
+                  disabled={isVerifyingHandle}
+                  className="shrink-0 px-4 py-2.5 bg-gradient-to-r from-[#f09433] via-[#dc2743] to-[#bc1888] border-none text-white hover:opacity-90 disabled:opacity-50 font-bold font-mono text-xs uppercase rounded-2xl transition-colors flex items-center gap-2 shadow-lg"
+                >
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                  </svg>
+                  Connect
                 </button>
               </div>
               {handleVerifyMessage && (
                 <span className={`text-[10px] font-mono mt-1 ${
                   handleVerifyMessage.type === 'error' ? 'text-red-500' :
-                  handleVerifyMessage.type === 'warning' ? 'text-amber-500' : 'text-emerald-500'
+                  handleVerifyMessage.type === 'warning' ? 'text-amber-500' : 'text-white'
                 }`}>
                   {handleVerifyMessage.text}
                 </span>
@@ -532,12 +559,12 @@ export default function CreatorWorkspace({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Content Niche Sector</label>
+              <label className="text-xs font-sans tracking-wider text-white font-bold">Content Niche Sector</label>
               <select
                 id="creator-profile-niche-select"
                 defaultValue={currentCreator.niche || ""}
 
-                className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
+                className="w-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl px-3.5 py-2.5 text-base text-white focus:outline-none focus:border-zinc-800 focus:bg-zinc-900 transition-colors"
               >
                 <option value="" disabled>Select a Niche...</option>
                 <option value="Food & Lifestyle">Food & Lifestyle</option>
@@ -556,22 +583,22 @@ export default function CreatorWorkspace({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium flex items-center justify-between">
+              <label className="text-xs font-sans tracking-wider text-white font-bold flex items-center justify-between">
                 Total Audience Reach
                 {handleVerifiedData ? (
-                  <span className="text-[9px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded font-bold border border-emerald-200">API VERIFIED</span>
+                  <span className="text-[9px] bg-emerald-400 text-black px-1.5 py-0.5 rounded-2xl font-bold border border-zinc-800">API VERIFIED</span>
                 ) : (
-                  <span className="text-[9px] bg-zinc-100 text-zinc-500 px-1.5 py-0.5 rounded font-bold">UNVERIFIED</span>
+                  <span className="text-[9px] bg-zinc-900 text-white px-1.5 py-0.5 rounded-2xl font-bold">UNVERIFIED</span>
                 )}
               </label>
-              <div className="w-full bg-zinc-100 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-500 cursor-not-allowed flex items-center justify-between">
+              <div className="w-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl px-3.5 py-2.5 text-base text-white cursor-not-allowed flex items-center justify-between">
                 <span>{handleVerifiedData ? handleVerifiedData.followers : (currentCreator.followers && currentCreator.followers !== '0' ? currentCreator.followers : 'Verify Handle to Fetch')}</span>
                 <span className="text-xs">{handleVerifiedData ? '✅' : '🔒'}</span>
               </div>
               <input type="hidden" id="creator-profile-followers-input" value={handleVerifiedData ? handleVerifiedData.followers : (currentCreator.followers || '0')} />
               <input type="hidden" id="creator-profile-audience-input" value={handleVerifiedData ? handleVerifiedData.audienceInLocality : (currentCreator.audienceInLocality || 0)} />
               {handleVerifiedData && (
-                <span className="text-[10px] text-emerald-600 font-mono mt-1">
+                <span className="text-[10px] text-white font-mono mt-1">
                   ↳ {handleVerifiedData.audienceInLocality}% of audience located in target hub.
                 </span>
               )}
@@ -580,7 +607,7 @@ export default function CreatorWorkspace({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="flex flex-col gap-1.5 md:col-span-2">
-              <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Primary Locality / Base Area</label>
+              <label className="text-xs font-sans tracking-wider text-white font-bold">Primary Locality / Base Area</label>
               <div className="flex items-center gap-2">
                 <input
                   id="creator-profile-locality-input"
@@ -591,7 +618,7 @@ export default function CreatorWorkspace({
                     setProfileGeocodeData(null);
                     setGeocodeError(null);
                   }}
-                  className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
+                  className="w-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl px-3.5 py-2.5 text-base text-white focus:outline-none focus:border-zinc-800 focus:bg-zinc-900 transition-colors"
                   placeholder="Enter your location"
                 />
                 <button
@@ -623,7 +650,7 @@ export default function CreatorWorkspace({
                       setIsGeocoding(false);
                     }
                   }}
-                  className="shrink-0 px-4 py-2.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 disabled:opacity-50 font-bold font-mono text-xs uppercase rounded-xl transition-colors border border-indigo-200"
+                  className="shrink-0 px-4 py-2.5 bg-indigo-500 border-none text-white hover:bg-black disabled:opacity-50 font-bold font-mono text-xs uppercase rounded-2xl transition-colors border border-zinc-800"
                 >
                   {isGeocoding ? 'Locating...' : (profileGeocodeData ? 'Located' : 'Locate')}
                 </button>
@@ -637,25 +664,25 @@ export default function CreatorWorkspace({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-medium">Creative Description / Bio</label>
+            <label className="text-xs font-sans tracking-wider text-white font-bold">Creative Description / Bio</label>
             <textarea
               id="creator-profile-bio-textarea"
               rows={3}
               defaultValue={currentCreator.bio || ""}
-              className="w-full bg-zinc-50/50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-base text-zinc-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors resize-none leading-relaxed"
+              className="w-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl px-3.5 py-2.5 text-base text-white focus:outline-none focus:border-zinc-800 focus:bg-zinc-900 transition-colors resize-none leading-relaxed"
               placeholder="Tell brands why they should send priority offers to you..."
             />
           </div>
 
-          <div className="border-t border-zinc-100 pt-4 flex items-center justify-end gap-3">
+          <div className="border-t border-zinc-800 pt-4 flex items-center justify-end gap-3">
             {profileSaveStatus === 'saved' && (
-              <span className="text-sm text-emerald-600 font-medium flex items-center gap-1">
+              <span className="text-sm text-white font-bold flex items-center gap-1">
                 <CheckCircle2 className="w-4 h-4" />
                 Profile updated successfully
               </span>
             )}
             {profileSaveStatus === 'error' && (
-              <span className="text-sm text-rose-600 font-medium flex items-center gap-1">
+              <span className="text-sm text-white font-bold flex items-center gap-1">
                 <AlertTriangle className="w-4 h-4" />
                 Failed to save profile
               </span>
@@ -702,18 +729,18 @@ export default function CreatorWorkspace({
                   setTimeout(() => setProfileSaveStatus('idle'), 3000);
                 }
               }}
-              className="py-2.5 px-5 bg-zinc-950 hover:bg-zinc-900 text-white font-mono text-sm rounded-xl font-bold tracking-wider uppercase transition-all cursor-pointer disabled:opacity-50"
+              className="py-3 px-6 bg-slate-900 hover:bg-slate-800 text-white font-mono text-sm rounded-2xl font-bold tracking-wider uppercase transition-all  shadow-slate-900/20 hover: hover:scale-[1.02] active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:scale-100"
             >
               {profileSaveStatus === 'saving' ? 'SAVING...' : 'COMMIT LOCAL PROFILE CHANGES'}
             </button>
           </div>
           
           <div className="border-t border-rose-100/50 pt-6 mt-2 flex flex-col gap-3">
-            <h3 className="text-sm font-mono uppercase tracking-wider text-rose-600 font-bold">Danger Zone</h3>
-            <div className="flex items-center justify-between bg-rose-50/50 border border-rose-100 p-4 rounded-xl">
+            <h3 className="text-sm font-sans tracking-wider text-white font-bold font-mono uppercase">Danger Zone</h3>
+            <div className="flex items-center justify-between bg-rose-50/50 border border-rose-100 p-4 rounded-2xl">
               <div className="flex flex-col">
-                <span className="text-sm font-bold text-zinc-900">Delete Account</span>
-                <span className="text-xs text-zinc-500">Permanently delete your profile and reset your role.</span>
+                <span className="text-sm font-bold text-white">Delete Account</span>
+                <span className="text-xs text-white">Permanently delete your profile and reset your role.</span>
               </div>
               <button
                 onClick={async () => {
@@ -722,7 +749,7 @@ export default function CreatorWorkspace({
                     signOut();
                   }
                 }}
-                className="py-2 px-4 bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 font-mono text-xs rounded-lg font-bold transition-all"
+                className="py-2 px-4 bg-zinc-900 border border-rose-200 text-white hover:bg-rose-50 font-mono text-xs rounded-2xl font-bold transition-all"
               >
                 DELETE PROFILE
               </button>
@@ -734,33 +761,33 @@ export default function CreatorWorkspace({
         {/* Creator Profile Statistics Sidebar */}
         <div className="lg:col-span-5 flex flex-col gap-6 animate-fade-in">
           {/* Creator Profile Display Card */}
-          <div className="bg-zinc-950 text-zinc-300 rounded-2xl p-6 shadow-xl flex flex-col gap-5 border border-zinc-800">
-            <div className="flex items-center gap-3 border-b border-zinc-900 pb-4">
+          <div className="bg-slate-900/95  text-slate-300 rounded-2xl p-8  flex flex-col gap-6 border border-slate-800 transition-glass hover:border-slate-700">
+            <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
               <img
                 src={currentCreator.avatar}
                 alt={currentCreator.name}
-                className="w-12 h-12 rounded-full object-cover border-2 border-indigo-500/25 referrerPolicy='no-referrer'"
+                className="w-16 h-16 rounded-full object-cover border-2 border-slate-700/50  referrerPolicy='no-referrer'"
               />
               <div className="flex flex-col">
-                <span className="text-base font-bold text-white tracking-tight leading-none">{currentCreator.name}</span>
-                <span className="text-[11px] font-mono text-zinc-500 mt-1.5 uppercase">{currentCreator.handle}</span>
+                <span className="text-2xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500 tracking-tight leading-none bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">{currentCreator.name}</span>
+                <span className="text-[11px] font-mono text-white mt-1.5 uppercase">{currentCreator.handle}</span>
               </div>
             </div>
 
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col p-4 bg-zinc-900/60 rounded-xl border border-zinc-850 h-64 justify-center items-center text-center">
-                  <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-widest font-bold">Avg Match Score</span>
-                  <span className="text-5xl font-black text-white mt-4">
+                <div className="flex flex-col p-4 bg-zinc-900 rounded-2xl border border-zinc-800 h-64 justify-center items-center text-center">
+                  <span className="text-[11px] font-mono text-white uppercase tracking-widest font-bold">Avg Match Score</span>
+                  <span className="text-5xl font-semibold text-white mt-4">
                     {activeRadarCampaigns.length > 0
                       ? Math.round(activeRadarCampaigns.reduce((acc, curr) => acc + curr.matchScore, 0) / activeRadarCampaigns.length)
                       : "-"
                     }%
                   </span>
-                  <span className="text-xs text-zinc-500 mt-3 max-w-[80%]">Averaged across all active local campaigns.</span>
+                  <span className="text-xs text-white mt-3 max-w-[80%]">Averaged across all active local campaigns.</span>
                 </div>
-                <div className="flex flex-col p-4 bg-zinc-900/60 rounded-xl border border-zinc-850 h-64">
-                  <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-widest font-bold mb-2">Top 5 Audience Locations</span>
+                <div className="flex flex-col p-4 bg-zinc-900 rounded-2xl border border-zinc-800 h-64">
+                  <span className="text-[11px] font-mono text-white uppercase tracking-widest font-bold mb-2">Top 5 Audience Locations</span>
                   <div className="flex-1 w-full h-full min-h-0 min-w-0 relative">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
@@ -799,12 +826,12 @@ export default function CreatorWorkspace({
               </div>
             </div>
 
-            <div className="p-4 bg-indigo-500/5 border border-indigo-500/10 rounded-xl flex flex-col gap-2">
-              <span className="text-[11px] font-mono text-indigo-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                <ShieldCheck className="w-4 h-4 text-indigo-400" />
+            <div className="p-4 bg-black/5 border border-zinc-800/10 rounded-2xl flex flex-col gap-2">
+              <span className="text-[11px] font-mono text-white font-bold uppercase tracking-wider flex items-center gap-1">
+                <ShieldCheck className="w-4 h-4 text-white" />
                 Crypto Verification State
               </span>
-              <p className="text-xs text-zinc-400 leading-relaxed font-sans">
+              <p className="text-xs text-white leading-relaxed font-sans font-medium">
                 Payout release is verified by the brand reviewing your actual deliverable — no camera or GPS check runs on submission.
               </p>
             </div>
@@ -823,16 +850,16 @@ export default function CreatorWorkspace({
         {/* Left Pane: Profiles, Subscriptions and Available feeds */}
         <div className="lg:col-span-4 flex flex-col gap-6">
           {/* Node Analytics / Health */}
-          <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-4">
+          <div className="bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl p-6  flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-mono uppercase tracking-wider text-zinc-400 font-bold">Node Analytics</h3>
-                <p className="text-xs text-zinc-500 mt-0.5">Real-time geofenced performance metrics.</p>
+                <h3 className="text-sm font-sans tracking-wider text-white font-bold font-mono uppercase">Node Analytics</h3>
+                <p className="text-xs text-white mt-0.5">Real-time geofenced performance metrics.</p>
               </div>
               <button
                 onClick={() => setIsRadarActive(!isRadarActive)}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-                  isRadarActive ? 'bg-emerald-500' : 'bg-zinc-200'
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center justify-center rounded-2xl transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                  isRadarActive ? 'bg-black' : 'bg-zinc-200'
                 }`}
                 role="switch"
                 aria-checked={isRadarActive}
@@ -840,7 +867,7 @@ export default function CreatorWorkspace({
                 <span className="sr-only">Toggle Radar</span>
                 <span
                   aria-hidden="true"
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-2xl bg-zinc-900 shadow ring-0 transition duration-200 ease-in-out ${
                     isRadarActive ? 'translate-x-2.5' : '-translate-x-2.5'
                   }`}
                 />
@@ -848,36 +875,36 @@ export default function CreatorWorkspace({
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-zinc-50 border border-zinc-100 p-3 rounded-xl flex flex-col items-center justify-center text-center">
-                <span className="text-2xl font-black text-indigo-600 font-display">{activeRadarCampaigns.length}</span>
-                <span className="text-[10px] font-mono uppercase text-zinc-500 font-bold mt-1 tracking-wider">Nearby Offers</span>
+              <div className="bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 p-3 rounded-2xl flex flex-col items-center justify-center text-center">
+                <span className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500 font-display font-semibold">{activeRadarCampaigns.length}</span>
+                <span className="text-[10px] font-sans text-white font-bold mt-1 tracking-wider">Nearby Offers</span>
               </div>
-              <div className="bg-zinc-50 border border-zinc-100 p-3 rounded-xl flex flex-col items-center justify-center text-center">
-                <span className="text-2xl font-black text-emerald-500 font-display">{currentCreator.audienceInLocality}%</span>
-                <span className="text-[10px] font-mono uppercase text-zinc-500 font-bold mt-1 tracking-wider">Local Audience</span>
+              <div className="bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 p-3 rounded-2xl flex flex-col items-center justify-center text-center">
+                <span className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500 font-display font-semibold">{currentCreator.audienceInLocality}%</span>
+                <span className="text-[10px] font-sans text-white font-bold mt-1 tracking-wider">Local Audience</span>
               </div>
-              <div className="col-span-2 bg-indigo-50/50 border border-indigo-100 p-3 rounded-xl flex items-center justify-between">
-                 <span className="text-xs font-mono uppercase text-indigo-800 font-bold tracking-wider">Verified Auth Reach</span>
-                 <span className="text-sm font-bold text-indigo-900 font-mono">{currentCreator.followers || 0}</span>
+              <div className="col-span-2 bg-indigo-50/50 border border-zinc-800 p-3 rounded-2xl flex items-center justify-between">
+                 <span className="text-xs font-sans text-white font-bold tracking-wider">Verified Auth Reach</span>
+                 <span className="text-sm font-bold text-white font-mono">{currentCreator.followers || 0}</span>
               </div>
             </div>
           </div>
 
           {/* Velocity Tier subscription panel */}
-          <div className="bg-zinc-950 text-white rounded-2xl p-5 shadow-lg flex flex-col gap-4 relative overflow-hidden">
+          <div className="bg-zinc-900 text-white rounded-2xl p-5  flex flex-col gap-4 relative overflow-hidden">
             <div className="flex items-center justify-between z-10">
               <div className="flex items-center gap-2">
                 <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
-                <span className="text-sm font-mono uppercase tracking-wider text-zinc-400 font-bold">Velocity Priority Tier</span>
+                <span className="text-sm font-sans tracking-wider text-white font-bold">Velocity Priority Tier</span>
               </div>
-              <span className="bg-zinc-800 text-zinc-300 text-[11px] font-mono px-2 py-0.5 rounded border border-zinc-700 font-bold">
+              <span className="bg-black text-white text-[11px] font-mono px-2 py-0.5 rounded-2xl border border-zinc-800 font-bold">
                 Delhi NCR Grid
               </span>
             </div>
 
             <div className="z-10 flex flex-col gap-1">
-              <h4 className="text-lg font-display font-black tracking-tight">Programmatic Queue Front-running</h4>
-              <p className="text-xs text-zinc-400 leading-relaxed">
+              <h4 className="text-lg font-display font-semibold font-semibold tracking-tight">Programmatic Queue Front-running</h4>
+              <p className="text-xs text-white leading-relaxed">
                 By upgrading to Velocity priority tier, your profile moves programmatically to Batch A (Priority) in 100% of geofenced campaigns matching your niche.
               </p>
             </div>
@@ -885,18 +912,18 @@ export default function CreatorWorkspace({
             {/* Simulated Tier state toggle */}
             <div className="z-10 flex flex-col gap-2 pt-2 border-t border-zinc-800">
               <div className="flex justify-between items-center text-xs">
-                <span className="text-zinc-400">Upgrade status:</span>
-                <span className={`font-mono font-bold ${velocitySubscribed ? 'text-emerald-400' : 'text-zinc-400'}`}>
+                <span className="text-white">Upgrade status:</span>
+                <span className={`font-mono font-bold ${velocitySubscribed ? 'text-white' : 'text-white'}`}>
                   {velocitySubscribed ? 'ACTIVE (PRIORITY FRONT-RUNNING)' : 'INACTIVE (BASIC OFFERS)'}
                 </span>
               </div>
 
               {velocitySubscribed ? (
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-zinc-500 font-mono">Subscribed since this session</span>
+                  <span className="text-[11px] text-white font-mono">Subscribed since this session</span>
                   <button
                     onClick={handleDowngradeVelocity}
-                    className="text-[11px] text-zinc-500 hover:text-red-400 font-mono underline underline-offset-2 transition-colors cursor-pointer"
+                    className="text-[11px] text-white hover:text-red-400 font-mono underline underline-offset-2 transition-colors cursor-pointer"
                   >
                     Cancel subscription
                   </button>
@@ -904,7 +931,7 @@ export default function CreatorWorkspace({
               ) : (
                 <button
                   onClick={handleUpgradeVelocity}
-                  className="w-full py-2 px-3 rounded-xl font-mono text-[11px] font-bold tracking-wider uppercase transition-all active:scale-[0.98] bg-amber-400 hover:bg-amber-500 text-zinc-950"
+                  className="w-full py-2 px-3 rounded-2xl font-mono text-[11px] font-bold tracking-wider uppercase transition-all active:scale-[0.98] bg-amber-400 hover:bg-amber-500 text-white"
                 >
                   Upgrade to Velocity Tier (₹9.9/mo)
                 </button>
@@ -916,31 +943,31 @@ export default function CreatorWorkspace({
         {/* Right Pane: Available Campaigns Feed */}
         <div className="lg:col-span-8 flex flex-col gap-6">
           {/* Local geofenced campaign feed */}
-          <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-4">
+          <div className="bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl p-6  flex flex-col gap-4">
             <div>
-              <h3 className="text-sm font-mono uppercase tracking-wider text-zinc-400 font-bold">Local Geofenced Activations</h3>
-              <p className="text-xs text-zinc-500 mt-0.5">Campaigns matched to your current coordinates.</p>
+              <h3 className="text-sm font-sans tracking-wider text-white font-bold font-mono uppercase">Local Geofenced Activations</h3>
+              <p className="text-xs text-white mt-0.5">Campaigns matched to your current coordinates.</p>
             </div>
 
             <div className="flex flex-col gap-3">
               {!isRadarActive ? (
-                <div className="flex flex-col items-center justify-center py-16 px-4 bg-zinc-50/50 rounded-xl border border-dashed border-zinc-200">
-                  <div className="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center mb-4">
-                    <Radio className="w-8 h-8 text-zinc-400" />
+                <div className="flex flex-col items-center justify-center py-16 px-4 bg-zinc-900 rounded-2xl border border-dashed border-zinc-800">
+                  <div className="w-16 h-16 rounded-full bg-zinc-900 flex items-center justify-center mb-4">
+                    <Radio className="w-8 h-8 text-white" />
                   </div>
-                  <h4 className="text-lg font-display font-bold text-zinc-800">Radar is Offline</h4>
-                  <p className="text-sm text-zinc-500 text-center max-w-sm mt-2 leading-relaxed">
+                  <h4 className="text-lg font-display font-semibold font-bold text-white">Radar is Offline</h4>
+                  <p className="text-sm text-white text-center max-w-sm mt-2 leading-relaxed">
                     You have disconnected your node from the cryptographic router. Toggle your radar back on to receive localized priority offers.
                   </p>
                 </div>
               ) : activeRadarCampaigns.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 px-4 bg-zinc-50/50 rounded-xl border border-dashed border-zinc-200">
+                <div className="flex flex-col items-center justify-center py-16 px-4 bg-zinc-900 rounded-2xl border border-dashed border-zinc-800">
                   <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center mb-4 relative">
-                    <div className="absolute inset-0 rounded-full border-2 border-indigo-200 animate-ping opacity-20"></div>
-                    <Radio className="w-8 h-8 text-indigo-400 animate-pulse" />
+                    <div className="absolute inset-0 rounded-2xl border-2 border-zinc-800 animate-ping opacity-20"></div>
+                    <Radio className="w-8 h-8 text-white animate-pulse" />
                   </div>
-                  <h4 className="text-lg font-display font-bold text-zinc-800">Scanning for offers...</h4>
-                  <p className="text-sm text-zinc-500 text-center max-w-sm mt-2 leading-relaxed">
+                  <h4 className="text-lg font-display font-semibold font-bold text-white">Scanning for offers...</h4>
+                  <p className="text-sm text-white text-center max-w-sm mt-2 leading-relaxed">
                     Your node is active. We are actively pinging the cryptographic router for geofenced campaigns matching your niche.
                   </p>
                 </div>
@@ -950,45 +977,45 @@ export default function CreatorWorkspace({
                 return (
                   <div
                     key={camp.id}
-                    className={`border rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all ${
+                    className={`border rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all ${
                       camp.id === selectedCampaignId
-                        ? 'border-indigo-500 bg-indigo-50/10'
-                        : 'border-zinc-150 hover:border-zinc-200 bg-white'
+                        ? 'border-zinc-800 bg-indigo-50/10'
+                        : 'border-zinc-800 hover:border-zinc-800 bg-zinc-900'
                     }`}
                   >
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-bold text-zinc-800">{camp.title}</h4>
+                        <h4 className="text-sm font-bold text-white">{camp.title}</h4>
                         {inActiveBatch && (
-                          <span className="bg-amber-50 text-amber-700 border border-amber-200/80 font-mono text-[8px] px-1.5 py-0.2 rounded font-bold animate-pulse">
+                          <span className="bg-amber-50 text-amber-700 border border-amber-200/80 font-mono text-[8px] px-1.5 py-0.2 rounded-2xl font-bold animate-pulse">
                             Priority Batch Offer
                           </span>
                         )}
                       </div>
-                      <span className="text-[11px] text-zinc-500 font-mono">
+                      <span className="text-[11px] text-white font-mono">
                         Target Locality: {camp.centerLocality}
                       </span>
-                      <div className="flex items-center gap-2 text-[11px] text-zinc-400 mt-1">
+                      <div className="flex items-center gap-2 text-[11px] text-white mt-1">
                         <span>Distance: {camp.distance.toFixed(2)} km away</span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-4">
                       <div className="flex flex-col items-end text-right">
-                        <span className="text-[11px] font-mono text-zinc-400">Match score:</span>
-                        <span className="text-sm font-bold text-indigo-600">{camp.matchScore}%</span>
+                        <span className="text-[11px] font-mono text-white">Match score:</span>
+                        <span className="text-sm font-bold text-white">{camp.matchScore}%</span>
                       </div>
 
                       <div className="flex flex-col items-end text-right">
-                        <span className="text-[11px] font-mono text-zinc-400">Your Payout:</span>
-                        <span className="text-sm font-bold text-emerald-600 font-mono">₹{Math.round((camp.budget * 0.95) / camp.spotsTotal)}</span>
+                        <span className="text-[11px] font-mono text-white">Your Payout:</span>
+                        <span className="text-sm font-bold text-white font-mono">₹{Math.round((camp.budget * 0.95) / camp.spotsTotal)}</span>
                       </div>
 
                       <button
                         onClick={() => {
                           setViewingCampaignId(camp.id);
                         }}
-                        className="py-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+                        className="py-1.5 px-3 bg-zinc-900 hover:bg-black text-white text-xs font-bold rounded-2xl transition-colors flex items-center gap-1 cursor-pointer"
                       >
                         <span>Express Interest</span>
                         <ChevronRight className="w-3.5 h-3.5" />
@@ -1048,7 +1075,7 @@ export default function CreatorWorkspace({
 
     return (
       <div className="max-w-4xl mx-auto flex flex-col gap-8 animate-fade-in">
-        <h2 className="text-3xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-fuchsia-500 px-2 pb-2">Active Campaigns & Escrows</h2>
+        <h2 className="text-3xl font-display font-semibold font-semibold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-fuchsia-500 px-2 pb-2 font-mono uppercase">Active Campaigns & Escrows</h2>
         
         {acceptedCampaigns.length > 0 ? (
           acceptedCampaigns.map((camp) => {
@@ -1058,11 +1085,11 @@ export default function CreatorWorkspace({
             return (
               <div 
                 key={camp.id} 
-                className={`relative overflow-hidden bg-zinc-950/95 backdrop-blur-3xl border border-white/10 rounded-[2rem] shadow-[0_0_50px_-12px_rgba(99,102,241,0.2)] flex flex-col group transition-all duration-500 hover:shadow-[0_0_80px_-15px_rgba(99,102,241,0.3)] hover:border-white/20 ${expandedCampaignId === camp.id ? 'p-8 gap-0' : 'p-6'}`}
+                className={`relative overflow-hidden bg-zinc-900  border border-white/10 rounded-2xl-[2rem] shadow-[0_0_50px_-12px_rgba(99,102,241,0.2)] flex flex-col group transition-all duration-500 hover:shadow-[0_0_80px_-15px_rgba(99,102,241,0.3)] hover:border-white/20 ${expandedCampaignId === camp.id ? 'p-8 gap-0' : 'p-6'}`}
               >
                 {/* Dynamic background glow */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none group-hover:bg-indigo-500/20 transition-all duration-700" />
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-fuchsia-500/10 rounded-full blur-[100px] pointer-events-none group-hover:bg-fuchsia-500/20 transition-all duration-700" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-black/10 rounded-2xl blur-[100px] pointer-events-none group-hover:bg-black/20 transition-all duration-700" />
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-fuchsia-500/10 rounded-2xl blur-[100px] pointer-events-none group-hover:bg-fuchsia-500/20 transition-all duration-700" />
 
                 {/* Header info */}
                 <div 
@@ -1073,29 +1100,29 @@ export default function CreatorWorkspace({
                     {(() => {
                       const isPendingApproval = creatorOffers?.some((o: any) => o.campaignId === camp.id && o.status === 'brand_review');
                       return isPendingApproval ? (
-                        <span className="bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[10px] font-mono font-bold px-3 py-1 rounded-full w-max tracking-widest animate-pulse">
+                        <span className="bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[10px] font-mono font-bold px-3 py-1 rounded-2xl w-max tracking-widest animate-pulse">
                           PENDING BRAND APPROVAL
                         </span>
                       ) : (
-                        <span className="bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[10px] font-mono font-bold px-3 py-1 rounded-full w-max tracking-widest">
+                        <span className="bg-black/20 border border-zinc-800/30 text-white text-[10px] font-mono font-bold px-3 py-1 rounded-2xl w-max tracking-widest">
                           ACTIVE CAMPAIGN
                         </span>
                       );
                     })()}
-                    <h2 className="text-2xl font-display font-black text-white">{camp.title}</h2>
-                    <span className="text-sm text-zinc-400 font-mono">
-                      Brand: <span className="text-zinc-300">{camp.brandName}</span> • Quota: <span className="text-zinc-300">{camp.spotsFilled}/{camp.spotsTotal} spots</span>
+                    <h2 className="text-2xl font-display font-semibold font-semibold text-white font-mono uppercase">{camp.title}</h2>
+                    <span className="text-sm text-white font-mono">
+                      Brand: <span className="text-white">{camp.brandName}</span> • Quota: <span className="text-white">{camp.spotsFilled}/{camp.spotsTotal} spots</span>
                     </span>
                   </div>
 
                   <div className="flex items-center gap-6">
-                    <div className="flex flex-col items-end p-4 bg-white/5 rounded-2xl border border-white/5 backdrop-blur-md">
-                      <span className="text-[10px] font-mono tracking-widest text-zinc-400 uppercase mb-1">Your Payout (after 5% fee)</span>
-                      <span className="text-3xl font-display font-black text-emerald-400">₹{Math.round((camp.budget * 0.95) / camp.spotsTotal)}</span>
+                    <div className="flex flex-col items-end p-4 bg-zinc-900 rounded-2xl border border-white/5 ">
+                      <span className="text-[10px] font-mono tracking-widest text-white uppercase mb-1">Your Payout (after 5% fee)</span>
+                      <span className="text-3xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500">₹{Math.round((camp.budget * 0.95) / camp.spotsTotal)}</span>
                     </div>
                     
-                    <div className="p-2 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-transform duration-300">
-                      <ChevronRight className={`w-6 h-6 text-zinc-400 transition-transform duration-300 ${expandedCampaignId === camp.id ? 'rotate-90' : ''}`} />
+                    <div className="p-2 rounded-2xl bg-zinc-900 border border-white/10 flex items-center justify-center transition-transform duration-300">
+                      <ChevronRight className={`w-6 h-6 text-white transition-transform duration-300 ${expandedCampaignId === camp.id ? 'rotate-90' : ''}`} />
                     </div>
                   </div>
                 </div>
@@ -1112,7 +1139,7 @@ export default function CreatorWorkspace({
                       <div className="pt-6 border-t border-white/5 flex flex-col gap-8">
                         {/* Escrow Status Stepper */}
                         <div className="relative z-10 flex flex-col gap-4">
-                  <span className="text-xs font-mono uppercase tracking-widest text-zinc-500 font-bold">Escrow Protocol State</span>
+                  <span className="text-xs font-sans tracking-widest text-white font-bold">Escrow Protocol State</span>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[
                       { step: 'Locked', desc: 'Budget escrowed', active: true, done: true },
@@ -1139,23 +1166,23 @@ export default function CreatorWorkspace({
                         key={i}
                         className={`relative overflow-hidden rounded-2xl p-4 flex flex-col gap-1.5 transition-all duration-300 ${
                           st.done
-                            ? 'bg-emerald-500/10 border border-emerald-500/20'
+                            ? 'bg-black/10 border border-zinc-800/20'
                             : st.active
-                            ? 'bg-indigo-500/10 border border-indigo-500/20'
-                            : 'bg-white/5 border border-white/5 opacity-50 grayscale'
+                            ? 'bg-black/10 border border-zinc-800/20'
+                            : 'bg-zinc-900 border border-white/5 opacity-50 grayscale'
                         }`}
                       >
                         {st.active && !st.done && (
                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
                         )}
                         <span
-                          className={`text-sm font-black ${
-                            st.done ? 'text-emerald-400' : st.active ? 'text-indigo-400' : 'text-zinc-500'
+                          className={`text-sm font-semibold ${
+                            st.done ? 'text-white' : st.active ? 'text-white' : 'text-white'
                           }`}
                         >
                           {i + 1}. {st.step}
                         </span>
-                        <span className="text-xs text-zinc-400 leading-relaxed font-medium">{st.desc}</span>
+                        <span className="text-xs text-white leading-relaxed font-bold">{st.desc}</span>
                       </div>
                     ))}
                   </div>
@@ -1163,34 +1190,34 @@ export default function CreatorWorkspace({
 
                 {/* Advanced Professional Requirements */}
                 {(camp.contentFormat || camp.targetAudience || camp.creativeGuidelines) && (
-                  <div className="relative z-10 bg-white/[0.02] border border-white/5 rounded-2xl p-5 flex flex-col gap-4 mt-2">
-                    <h4 className="text-sm font-mono uppercase tracking-widest text-zinc-500 font-bold mb-1">Campaign Requirements</h4>
+                  <div className="relative z-10 bg-zinc-900/[0.02] border border-white/5 rounded-2xl p-5 flex flex-col gap-4 mt-2">
+                    <h4 className="text-sm font-sans tracking-widest text-white font-bold mb-1">Campaign Requirements</h4>
                     
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       {camp.contentFormat && (
                         <div className="flex flex-col gap-1">
-                          <span className="text-[11px] text-zinc-500 uppercase tracking-wider">Format</span>
-                          <span className="text-sm text-zinc-300 font-medium">{camp.contentFormat}</span>
+                          <span className="text-[11px] text-white uppercase tracking-wider">Format</span>
+                          <span className="text-sm text-white font-bold">{camp.contentFormat}</span>
                         </div>
                       )}
                       {camp.targetAudience && (
                         <div className="flex flex-col gap-1">
-                          <span className="text-[11px] text-zinc-500 uppercase tracking-wider">Target Audience</span>
-                          <span className="text-sm text-zinc-300 font-medium">{camp.targetAudience}</span>
+                          <span className="text-[11px] text-white uppercase tracking-wider">Target Audience</span>
+                          <span className="text-sm text-white font-bold">{camp.targetAudience}</span>
                         </div>
                       )}
                       {camp.submissionDeadlineDays && (
                         <div className="flex flex-col gap-1">
-                          <span className="text-[11px] text-zinc-500 uppercase tracking-wider">Deadline</span>
-                          <span className="text-sm text-zinc-300 font-medium">{camp.submissionDeadlineDays} days</span>
+                          <span className="text-[11px] text-white uppercase tracking-wider">Deadline</span>
+                          <span className="text-sm text-white font-bold">{camp.submissionDeadlineDays} days</span>
                         </div>
                       )}
                     </div>
                     
                     {camp.creativeGuidelines && (
                       <div className="flex flex-col gap-1 mt-2 pt-4 border-t border-white/5">
-                        <span className="text-[11px] text-zinc-500 uppercase tracking-wider">Creative Guidelines</span>
-                        <p className="text-sm text-zinc-400 italic">"{camp.creativeGuidelines}"</p>
+                        <span className="text-[11px] text-white uppercase tracking-wider">Creative Guidelines</span>
+                        <p className="text-sm text-white italic">"{camp.creativeGuidelines}"</p>
                       </div>
                     )}
                   </div>
@@ -1201,11 +1228,11 @@ export default function CreatorWorkspace({
                   {!submission || submission.status === 'draft_rejected' ? (
                     <div className="flex flex-col gap-6 pt-4">
                       <div>
-                        <h4 className="text-lg font-black text-white flex items-center gap-2">
-                          <Upload className="w-5 h-5 text-indigo-400" />
+                        <h4 className="text-lg font-semibold text-white flex items-center gap-2">
+                          <Upload className="w-5 h-5 text-white" />
                           Submit Draft Deliverable
                         </h4>
-                        <p className="text-sm text-zinc-400 mt-1 max-w-2xl">
+                        <p className="text-sm text-white mt-1 max-w-2xl">
                           Upload the actual reel, story, or post draft you made for this campaign. The brand will preview it before you publish.
                         </p>
                       </div>
@@ -1230,10 +1257,10 @@ export default function CreatorWorkspace({
                           setSelectedCampaignId(camp.id);
                           fileInputRef.current?.click();
                         }}
-                        className={`group border-2 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center gap-4 transition-all duration-300 cursor-pointer overflow-hidden relative ${
+                        className={`group border-2 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center gap-4 transition-all duration-300 cursor-pointer overflow-hidden relative ${
                           dragOver
-                            ? 'border-indigo-400 bg-indigo-500/10'
-                            : 'border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800/80 hover:border-zinc-600'
+                            ? 'border-zinc-800 bg-black/10'
+                            : 'border-zinc-800 bg-zinc-900 hover:bg-black hover:border-zinc-800'
                         }`}
                       >
                         <input
@@ -1252,7 +1279,7 @@ export default function CreatorWorkspace({
                             {selectedFile?.type.startsWith('video/') ? (
                               <video
                                 src={selectedFilePreview}
-                                className="w-32 h-32 rounded-2xl object-cover border-2 border-indigo-500/50 shadow-2xl"
+                                className="w-32 h-32 rounded-2xl object-cover border-2 border-zinc-800/50 "
                                 muted
                                 autoPlay
                                 loop
@@ -1261,28 +1288,28 @@ export default function CreatorWorkspace({
                               <img
                                 src={selectedFilePreview}
                                 alt="Selected upload"
-                                className="w-32 h-32 rounded-2xl object-cover border-2 border-indigo-500/50 shadow-2xl"
+                                className="w-32 h-32 rounded-2xl object-cover border-2 border-zinc-800/50 "
                               />
                             )}
-                            <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg border-2 border-zinc-900">
+                            <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-black rounded-2xl flex items-center justify-center  border-2 border-zinc-800">
                               <CheckCircle2 className="w-4 h-4 text-white" />
                             </div>
                           </div>
                         ) : (
-                          <div className="w-16 h-16 rounded-2xl bg-zinc-800/50 flex items-center justify-center group-hover:scale-110 group-hover:bg-indigo-500/20 transition-all duration-500">
-                            <Upload className="w-8 h-8 text-zinc-500 group-hover:text-indigo-400 transition-colors" />
+                          <div className="w-16 h-16 rounded-full bg-black flex items-center justify-center group-hover:scale-110 group-hover:bg-black/20 transition-all duration-500">
+                            <Upload className="w-8 h-8 text-white group-hover:text-white transition-colors" />
                           </div>
                         )}
                         <div className="flex flex-col gap-1 text-center">
-                          <span className="text-base font-bold text-zinc-200">
+                          <span className="text-base font-bold text-white">
                             {selectedFile && expandedCampaignId === camp.id ? selectedFile.name : 'Click or drag your draft to upload'}
                           </span>
-                          <span className="text-xs font-mono text-zinc-500 uppercase tracking-wider mt-1">Photo or video, up to 10MB</span>
+                          <span className="text-xs font-mono text-white uppercase tracking-wider mt-1">Photo or video, up to 10MB</span>
                         </div>
                       </div>
 
                       <div className="flex flex-col gap-2">
-                        <label className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
+                        <label className="text-xs font-mono font-bold text-white uppercase tracking-wider">
                           Draft Caption / Notes (optional)
                         </label>
                         <input
@@ -1293,19 +1320,19 @@ export default function CreatorWorkspace({
                             setContentLink(e.target.value);
                           }}
                           placeholder="Any notes for the brand..."
-                          className="w-full py-4 px-5 text-sm bg-zinc-900/80 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all shadow-inner"
+                          className="w-full py-4 px-5 text-sm bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-zinc-800 transition-all shadow-inner"
                         />
                       </div>
 
                       {uploadError && expandedCampaignId === camp.id && (
-                        <div className="flex items-center gap-3 text-rose-400 text-sm font-medium bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4">
+                        <div className="flex items-center gap-3 text-white text-sm font-bold bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4">
                           <AlertTriangle className="w-5 h-5 shrink-0" />
                           <span>{uploadError}</span>
                         </div>
                       )}
 
                       {submission?.status === 'draft_rejected' && submission.rejectionReason && (
-                        <div className="flex items-center gap-3 text-rose-400 text-sm font-medium bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4">
+                        <div className="flex items-center gap-3 text-white text-sm font-bold bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4">
                           <AlertTriangle className="w-5 h-5 shrink-0" />
                           <span>Brand Feedback: "{submission.rejectionReason}"</span>
                         </div>
@@ -1315,11 +1342,11 @@ export default function CreatorWorkspace({
                         <button
                           onClick={handleFileUploadAndSubmit}
                           disabled={isUploadingThis}
-                          className="w-full py-4 px-6 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 disabled:opacity-50 text-white text-base font-black rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-3 shadow-[0_0_30px_-5px_rgba(99,102,241,0.4)] hover:shadow-[0_0_40px_-5px_rgba(99,102,241,0.6)] hover:-translate-y-0.5 active:translate-y-0"
+                          className="w-full py-4 px-6 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 disabled:opacity-50 text-white text-base font-semibold rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-3 shadow-[0_0_30px_-5px_rgba(99,102,241,0.4)] hover:shadow-[0_0_40px_-5px_rgba(99,102,241,0.6)] hover:-translate-y-0.5 active:translate-y-0"
                         >
                           {isUploadingThis ? (
                             <>
-                              <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                              <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-2xl animate-spin" />
                               <span>Uploading & Submitting...</span>
                             </>
                           ) : (
@@ -1332,10 +1359,10 @@ export default function CreatorWorkspace({
                       )}
                     </div>
                   ) : submission.status === 'draft_uploaded' || submission.status === 'draft_verifying' ? (
-                    <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-3xl p-8 flex flex-col md:flex-row gap-8 items-start relative overflow-hidden">
+                    <div className="bg-black/5 border border-zinc-800/20 rounded-2xl p-8 flex flex-col md:flex-row gap-8 items-start relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-50" />
                       
-                      <div className="w-40 h-40 rounded-2xl overflow-hidden border-2 border-indigo-500/30 shrink-0 bg-zinc-900 shadow-2xl relative group">
+                      <div className="w-40 h-40 rounded-2xl overflow-hidden border-2 border-zinc-800/30 shrink-0 bg-zinc-900  relative group">
                         {submission.fileUrl && submission.fileUrl.match(/\.(mp4|mov|webm)(\?|$)/i) ? (
                           <video src={submission.fileUrl} className="w-full h-full object-cover" autoPlay muted loop />
                         ) : (
@@ -1350,11 +1377,11 @@ export default function CreatorWorkspace({
 
                       <div className="flex-1 flex flex-col gap-6">
                         <div className="flex flex-col gap-2">
-                          <h4 className="text-xl font-display font-black text-white flex items-center gap-3">
-                            <ShieldCheck className="w-6 h-6 text-indigo-400" />
+                          <h4 className="text-xl font-display font-semibold font-semibold text-white flex items-center gap-3">
+                            <ShieldCheck className="w-6 h-6 text-white" />
                             {submission.status === 'draft_verifying' ? 'Brand Is Reviewing Your Draft' : 'Draft Submitted Successfully'}
                           </h4>
-                          <p className="text-sm text-zinc-400 leading-relaxed max-w-xl">
+                          <p className="text-sm text-white leading-relaxed max-w-xl">
                             <span className="text-white font-bold">{camp.brandName}</span> is previewing your draft.
                             Wait for their approval before publishing!
                           </p>
@@ -1364,17 +1391,17 @@ export default function CreatorWorkspace({
                   ) : submission.status === 'draft_approved' || submission.status === 'rejected' ? (
                     <div className="flex flex-col gap-6 pt-4">
                       <div>
-                        <h4 className="text-lg font-black text-white flex items-center gap-2">
-                          <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                        <h4 className="text-lg font-semibold text-white flex items-center gap-2">
+                          <CheckCircle2 className="w-5 h-5 text-white" />
                           Draft Approved! Now Publish it!
                         </h4>
-                        <p className="text-sm text-zinc-400 mt-1 max-w-2xl">
+                        <p className="text-sm text-white mt-1 max-w-2xl">
                           Your draft was approved by the brand. Please publish your post and submit the live link below to get paid.
                         </p>
                       </div>
 
                       <div className="flex flex-col gap-2">
-                        <label className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider">
+                        <label className="text-xs font-mono font-bold text-white uppercase tracking-wider">
                           Link to the live post
                         </label>
                         <input
@@ -1385,19 +1412,19 @@ export default function CreatorWorkspace({
                             setContentLink(e.target.value);
                           }}
                           placeholder="https://instagram.com/reel/..."
-                          className="w-full py-4 px-5 text-sm bg-zinc-900/80 border border-zinc-800 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all shadow-inner"
+                          className="w-full py-4 px-5 text-sm bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-zinc-800 transition-all shadow-inner"
                         />
                       </div>
 
                       {uploadError && expandedCampaignId === camp.id && (
-                        <div className="flex items-center gap-3 text-rose-400 text-sm font-medium bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4">
+                        <div className="flex items-center gap-3 text-white text-sm font-bold bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4">
                           <AlertTriangle className="w-5 h-5 shrink-0" />
                           <span>{uploadError}</span>
                         </div>
                       )}
                       
                       {submission.status === 'rejected' && submission.rejectionReason && (
-                        <div className="flex items-center gap-3 text-rose-400 text-sm font-medium bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4">
+                        <div className="flex items-center gap-3 text-white text-sm font-bold bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4">
                           <AlertTriangle className="w-5 h-5 shrink-0" />
                           <span>Brand Feedback: "{submission.rejectionReason}"</span>
                         </div>
@@ -1406,11 +1433,11 @@ export default function CreatorWorkspace({
                       <button
                         onClick={handleSubmitPublishedLink}
                         disabled={isUploadingThis || !contentLink.trim()}
-                        className="w-full py-4 px-6 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50 text-white text-base font-black rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-3 shadow-[0_0_30px_-5px_rgba(16,185,129,0.4)] hover:shadow-[0_0_40px_-5px_rgba(16,185,129,0.6)] hover:-translate-y-0.5 active:translate-y-0"
+                        className="w-full py-4 px-6 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50 text-white text-base font-semibold rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-3 shadow-[0_0_30px_-5px_rgba(16,185,129,0.4)] hover:shadow-[0_0_40px_-5px_rgba(16,185,129,0.6)] hover:-translate-y-0.5 active:translate-y-0"
                       >
                         {isUploadingThis ? (
                           <>
-                            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-2xl animate-spin" />
                             <span>Submitting Link...</span>
                           </>
                         ) : (
@@ -1422,39 +1449,39 @@ export default function CreatorWorkspace({
                       </button>
                     </div>
                   ) : submission.status === 'published_uploaded' || submission.status === 'final_verifying' ? (
-                     <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-3xl p-8 flex flex-col md:flex-row gap-8 items-start relative overflow-hidden">
+                     <div className="bg-black/5 border border-zinc-800/20 rounded-2xl p-8 flex flex-col md:flex-row gap-8 items-start relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-50" />
                       
-                      <div className="w-40 h-40 rounded-2xl overflow-hidden border-2 border-indigo-500/30 shrink-0 bg-zinc-900 shadow-2xl relative group flex items-center justify-center">
-                          <ExternalLink className="w-10 h-10 text-indigo-500" />
+                      <div className="w-40 h-40 rounded-2xl overflow-hidden border-2 border-zinc-800/30 shrink-0 bg-zinc-900  relative group flex items-center justify-center">
+                          <ExternalLink className="w-10 h-10 text-white" />
                       </div>
 
                       <div className="flex-1 flex flex-col gap-6">
                         <div className="flex flex-col gap-2">
-                          <h4 className="text-xl font-display font-black text-white flex items-center gap-3">
-                            <ShieldCheck className="w-6 h-6 text-indigo-400" />
+                          <h4 className="text-xl font-display font-semibold font-semibold text-white flex items-center gap-3">
+                            <ShieldCheck className="w-6 h-6 text-white" />
                             {submission.status === 'final_verifying' ? 'Brand Is Reviewing Your Final Post' : 'Final Link Submitted Successfully'}
                           </h4>
-                          <p className="text-sm text-zinc-400 leading-relaxed max-w-xl">
+                          <p className="text-sm text-white leading-relaxed max-w-xl">
                             <span className="text-white font-bold">{camp.brandName}</span> is reviewing your published post. Payout releases instantly via smart escrow once they approve it.
                           </p>
                         </div>
-                        <div className="grid grid-cols-2 gap-4 bg-zinc-900/50 rounded-2xl p-4 border border-zinc-800">
+                        <div className="grid grid-cols-2 gap-4 bg-zinc-900 rounded-2xl p-4 border border-zinc-800">
                           <div className="flex flex-col gap-1">
-                            <span className="text-[10px] text-zinc-500 font-mono tracking-widest uppercase">Status</span>
-                            <span className="text-sm text-indigo-400 font-bold flex items-center gap-2">
-                              <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+                            <span className="text-[10px] text-white font-mono tracking-widest uppercase">Status</span>
+                            <span className="text-sm text-white font-bold flex items-center gap-2">
+                              <div className="w-1.5 h-1.5 rounded-2xl bg-black animate-pulse" />
                               {submission.status === 'final_verifying' ? 'In Final Review' : 'Awaiting Final Review'}
                             </span>
                           </div>
                           {submission.contentUrl && (
                             <div className="flex flex-col gap-1">
-                              <span className="text-[10px] text-zinc-500 font-mono tracking-widest uppercase">Live Link</span>
+                              <span className="text-[10px] text-white font-mono tracking-widest uppercase">Live Link</span>
                               <a
                                 href={submission.contentUrl}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="text-sm text-indigo-400 font-bold truncate hover:text-indigo-300 transition-colors"
+                                className="text-sm text-white font-bold truncate hover:text-white transition-colors"
                               >
                                 View Live Post ↗
                               </a>
@@ -1464,17 +1491,17 @@ export default function CreatorWorkspace({
                       </div>
                     </div>
                   ) : (
-                    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-3xl p-8 flex flex-col items-center text-center gap-5 animate-fade-in relative overflow-hidden">
+                    <div className="bg-black/10 border border-zinc-800/20 rounded-2xl p-8 flex flex-col items-center text-center gap-5 animate-fade-in relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-50" />
-                      <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-[0_0_30px_-5px_rgba(16,185,129,0.4)]">
+                      <div className="w-16 h-16 rounded-full bg-black/20 flex items-center justify-center text-white shadow-[0_0_30px_-5px_rgba(16,185,129,0.4)]">
                         <CheckCircle2 className="w-8 h-8" />
                       </div>
 
                       <div className="flex flex-col gap-2 max-w-md">
-                        <h4 className="text-xl font-display font-black text-emerald-400">Final Post Approved — Payout Released!</h4>
-                        <p className="text-sm text-zinc-400 leading-relaxed">
+                        <h4 className="text-xl font-display font-semibold font-semibold text-white">Final Post Approved — Payout Released!</h4>
+                        <p className="text-sm text-white leading-relaxed">
                           <span className="text-white font-bold">{camp.brandName}</span> approved your final post. Your payout of{' '}
-                          <span className="text-emerald-400 font-bold">₹{Math.round((camp.budget * 0.95) / camp.spotsTotal)}</span> (after 5% platform fee) has been transferred directly into your creator account.
+                          <span className="text-white font-bold">₹{Math.round((camp.budget * 0.95) / camp.spotsTotal)}</span> (after 5% platform fee) has been transferred directly into your creator account.
                         </p>
                       </div>
 
@@ -1496,13 +1523,13 @@ export default function CreatorWorkspace({
             );
           })
         ) : (
-          <div className="bg-zinc-950/80 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-16 shadow-2xl text-center max-w-2xl mx-auto flex flex-col items-center gap-6">
-            <div className="w-20 h-20 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center shadow-inner">
-              <Briefcase className="w-10 h-10 text-zinc-600 animate-pulse" />
+          <div className="bg-zinc-900  border border-white/10 rounded-2xl-[2rem] p-16  text-center max-w-2xl mx-auto flex flex-col items-center gap-6">
+            <div className="w-20 h-20 rounded-2xl bg-zinc-900 border border-white/10 flex items-center justify-center shadow-inner">
+              <Briefcase className="w-10 h-10 text-white animate-pulse" />
             </div>
             <div className="flex flex-col gap-2">
-              <h4 className="text-2xl font-display font-black text-white">No Active Campaigns</h4>
-              <p className="text-base text-zinc-400 max-w-md mx-auto leading-relaxed">
+              <h4 className="text-2xl font-display font-semibold font-semibold text-white">No Active Campaigns</h4>
+              <p className="text-base text-white max-w-md mx-auto leading-relaxed">
                 Accept a hyperlocal campaign from the Active Radar to lock contract payouts. Payout releases once you submit your deliverable and the brand approves it.
               </p>
             </div>
@@ -1513,156 +1540,67 @@ export default function CreatorWorkspace({
   }
 
   if (activeSubTab === 'wallet') {
-    return (
-      <div className="flex flex-col gap-6 animate-fade-in">
-        {/* Quick Balance Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-3">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Unclaimed Escrow Balance</span>
-            <span className="text-3xl font-display font-black text-emerald-600">
-              {earnings === undefined ? (
-                <span className="inline-block w-24 h-8 bg-zinc-100 rounded animate-pulse" />
-              ) : (
-                `₹${earnings.totalPending.toFixed(2)}`
-              )}
-            </span>
-            <p className="text-xs text-zinc-400">Locked in verified smart contracts. Instant bank payout available.</p>
-            <button className="w-full py-2 bg-zinc-950 hover:bg-zinc-900 text-white font-mono text-[11px] rounded-xl font-bold transition-all active:scale-[0.98] cursor-pointer">
-              WITHDRAW TO BANK ACCOUNT
-            </button>
-          </div>
-          <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-2">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Total Payouts Released</span>
-            <span className="text-3xl font-display font-black text-zinc-950">
-              {earnings === undefined ? (
-                <span className="inline-block w-24 h-8 bg-zinc-100 rounded animate-pulse" />
-              ) : (
-                `₹${earnings.totalReleased.toFixed(2)}`
-              )}
-            </span>
-            <p className="text-xs text-zinc-400">All historical geofence runs cleared without disputes.</p>
-          </div>
-          <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-2">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Velocity Tier Status</span>
-            <span className="text-3xl font-display font-black text-indigo-600">{velocitySubscribed ? 'Active' : 'Basic'}</span>
-            <p className="text-xs text-zinc-400">2x frequency boost in priority queue offers.</p>
-          </div>
-        </div>
-
-        {/* History + Earnings Chart Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Chart card */}
-          <div className="lg:col-span-7 bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-6">
-            <div>
-              <h3 className="text-base font-display font-semibold text-zinc-900">Monthly Localized Earnings</h3>
-              <p className="text-xs text-zinc-500 mt-0.5">Your monthly payout progression in the Delhi NCR Grid network.</p>
-            </div>
-
-            <div className="flex items-end justify-between gap-4 h-48 pt-6 border-b border-zinc-150 px-4">
-              {[
-                { month: 'Oct 26', amount: 320, height: 'h-[40%]' },
-                { month: 'Nov 26', amount: 480, height: 'h-[60%]' },
-                { month: 'Dec 26', amount: 750, height: 'h-[90%]' },
-                { month: 'Jan 27 (Est)', amount: 620, height: 'h-[75%]' },
-              ].map((bar, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                  <span className="text-[11px] font-mono font-bold text-zinc-800">₹${bar.amount}</span>
-                  <div className={`w-full bg-indigo-600/90 rounded-t-sm ${bar.height} transition-all duration-500 hover:bg-indigo-700`} />
-                  <span className="text-[11px] font-mono text-zinc-400 mt-1">{bar.month}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Historical Logs */}
-          <div className="lg:col-span-5 bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm flex flex-col gap-4">
-            <div>
-              <h3 className="text-base font-display font-semibold text-zinc-900">Cryptographic Escrow History</h3>
-              <p className="text-xs text-zinc-500 mt-0.5">Logs of recent automated smart contract payouts.</p>
-            </div>
-
-            <div className="flex flex-col gap-2.5 max-h-[300px] overflow-y-auto pr-1">
-              {[
-                { campaign: 'Connaught Place Patio Tour', date: 'Yesterday', amount: 250, status: 'Completed' },
-                { campaign: 'Sunder Nursery Aesthetics', date: '3 days ago', amount: 300, status: 'Completed' },
-                { campaign: 'HKV Cafe Crawl', date: '1 week ago', amount: 180, status: 'Completed' },
-              ].map((log, i) => (
-                <div key={i} className="p-3 border border-zinc-100 rounded-xl flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-zinc-800">{log.campaign}</span>
-                    <span className="text-[11px] text-zinc-400 font-mono">{log.date}</span>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <span className="font-mono font-bold text-emerald-600">+₹${log.amount}</span>
-                    <span className="text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-100 px-1.5 py-0.2 rounded font-medium">Secured</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <CreatorWallet currentUser={currentCreator} velocitySubscribed={velocitySubscribed} />;
   }
 
   if (activeSubTab === 'portfolio') {
     return (
       <div className="max-w-5xl mx-auto flex flex-col gap-8 animate-fade-in">
         {/* Portfolio Header */}
-        <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm">
+        <div className="bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl p-6 ">
           <div className="flex items-start gap-5">
             <img
               src={currentCreator.avatar}
               alt={currentCreator.name}
-              className="w-20 h-20 rounded-2xl object-cover border-2 border-indigo-100 shadow-sm"
+              className="w-20 h-20 rounded-2xl object-cover border-2 border-zinc-800 "
               referrerPolicy="no-referrer"
             />
             <div className="flex-1 flex flex-col gap-1.5">
               <div className="flex items-center gap-2.5">
-                <h2 className="text-2xl font-display font-black text-zinc-900">{currentCreator.name}</h2>
+                <h2 className="text-2xl font-display font-semibold font-semibold text-white font-mono uppercase">{currentCreator.name}</h2>
                 {currentCreator.velocityTier === 'Velocity' && (
-                  <span className="bg-amber-50 text-amber-700 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-amber-200 flex items-center gap-1">
+                  <span className="bg-amber-50 text-amber-700 text-[10px] font-mono font-bold px-2 py-0.5 rounded-2xl border border-amber-200 flex items-center gap-1">
                     <Zap className="w-3 h-3 fill-amber-500 text-amber-500" />
                     VELOCITY
                   </span>
                 )}
               </div>
-              <span className="text-sm text-indigo-600 font-mono font-medium">{currentCreator.handle || 'No handle set'}</span>
+              <span className="text-sm text-white font-mono font-bold">{currentCreator.handle || 'No handle set'}</span>
               {currentCreator.bio && (
-                <p className="text-sm text-zinc-500 leading-relaxed mt-1 max-w-xl">{currentCreator.bio}</p>
+                <p className="text-sm text-white leading-relaxed mt-1 max-w-xl">{currentCreator.bio}</p>
               )}
             </div>
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-5 border-t border-zinc-100">
-            <div className="flex flex-col items-center text-center p-3 bg-zinc-50 rounded-xl">
-              <span className="text-xl font-black text-zinc-900 font-display">{currentCreator.followers || '0'}</span>
-              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Followers</span>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-5 border-t border-zinc-800">
+            <div className="flex flex-col items-center text-center p-3 bg-zinc-900 rounded-2xl">
+              <span className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500 font-display font-semibold">{currentCreator.followers || '0'}</span>
+              <span className="text-[10px] font-mono text-white uppercase tracking-wider mt-1">Followers</span>
             </div>
-            <div className="flex flex-col items-center text-center p-3 bg-zinc-50 rounded-xl">
-              <span className="text-xl font-black text-emerald-600 font-display">{currentCreator.audienceInLocality}%</span>
-              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Local Audience</span>
+            <div className="flex flex-col items-center text-center p-3 bg-zinc-900 rounded-2xl">
+              <span className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500 font-display font-semibold">{currentCreator.audienceInLocality}%</span>
+              <span className="text-[10px] font-mono text-white uppercase tracking-wider mt-1">Local Audience</span>
             </div>
-            <div className="flex flex-col items-center text-center p-3 bg-zinc-50 rounded-xl">
-              <span className="text-xl font-black text-indigo-600 font-display">{currentCreator.niche || 'N/A'}</span>
-              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Niche</span>
+            <div className="flex flex-col items-center text-center p-3 bg-zinc-900 rounded-2xl">
+              <span className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500 font-display font-semibold">{currentCreator.niche || 'N/A'}</span>
+              <span className="text-[10px] font-mono text-white uppercase tracking-wider mt-1">Niche</span>
             </div>
-            <div className="flex flex-col items-center text-center p-3 bg-zinc-50 rounded-xl">
-              <span className="text-xl font-black text-zinc-900 font-display">{currentCreator.locality || 'N/A'}</span>
-              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-1">Location</span>
+            <div className="flex flex-col items-center text-center p-3 bg-zinc-900 rounded-2xl">
+              <span className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500 font-display font-semibold">{currentCreator.locality || 'N/A'}</span>
+              <span className="text-[10px] font-mono text-white uppercase tracking-wider mt-1">Location</span>
             </div>
           </div>
         </div>
 
         {/* Past Work Gallery */}
-        <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm">
+        <div className="bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl p-6 ">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h3 className="text-lg font-display font-bold text-zinc-900">Portfolio & Past Work</h3>
-              <p className="text-xs text-zinc-500 mt-0.5">Previous brand collaborations and content samples.</p>
+              <h3 className="text-lg font-display font-semibold font-bold text-white font-mono uppercase">Portfolio & Past Work</h3>
+              <p className="text-xs text-white mt-0.5">Previous brand collaborations and content samples.</p>
             </div>
-            <span className="text-[11px] font-mono text-zinc-400 bg-zinc-50 px-2.5 py-1 rounded-full border border-zinc-100">
+            <span className="text-[11px] font-mono text-white bg-zinc-900 px-2.5 py-1 rounded-2xl border border-zinc-800">
               {currentCreator.pastWork?.length || 0} items
             </span>
           </div>
@@ -1670,7 +1608,7 @@ export default function CreatorWorkspace({
           {currentCreator.pastWork && currentCreator.pastWork.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {currentCreator.pastWork.map((work, idx) => (
-                <div key={idx} className="group relative overflow-hidden rounded-xl border border-zinc-200/80 bg-zinc-50 aspect-square">
+                <div key={idx} className="group relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 aspect-square">
                   <img
                     src={work.imgUrl}
                     alt={`${work.brand} - ${work.type}`}
@@ -1681,16 +1619,16 @@ export default function CreatorWorkspace({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                     <span className="text-sm font-bold text-white">{work.brand}</span>
-                    <span className="text-[11px] text-zinc-300 font-mono uppercase">{work.type}</span>
+                    <span className="text-[11px] text-white font-sans">{work.type}</span>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-16 px-4 bg-zinc-50/50 rounded-xl border border-dashed border-zinc-200">
-              <Briefcase className="w-10 h-10 text-zinc-300 mb-3" />
-              <h4 className="text-base font-display font-bold text-zinc-600">No portfolio items yet</h4>
-              <p className="text-sm text-zinc-400 text-center max-w-sm mt-2">
+            <div className="flex flex-col items-center justify-center py-16 px-4 bg-zinc-900 rounded-2xl border border-dashed border-zinc-800">
+              <Briefcase className="w-10 h-10 text-white mb-3" />
+              <h4 className="text-base font-display font-semibold font-bold text-white">No portfolio items yet</h4>
+              <p className="text-sm text-white text-center max-w-sm mt-2">
                 Complete your first campaign to build your portfolio. Past work will appear here automatically.
               </p>
             </div>
@@ -1698,8 +1636,8 @@ export default function CreatorWorkspace({
         </div>
 
         {/* Reviews Section */}
-        <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm">
-          <h3 className="text-lg font-display font-bold text-zinc-900 mb-4">Brand Reviews</h3>
+        <div className="bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl p-6 ">
+          <h3 className="text-lg font-display font-semibold font-bold text-white mb-4 font-mono uppercase">Brand Reviews</h3>
           <ReviewsCard userId={currentCreator.id} label="Reviews from brands" />
         </div>
       </div>

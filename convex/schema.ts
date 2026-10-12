@@ -14,6 +14,35 @@ export default defineSchema({
     domain: v.optional(v.string()),
     sector: v.optional(v.string()),
     escrowBalance: v.optional(v.number()),
+    contactPerson: v.optional(v.string()),
+    contactPhone: v.optional(v.string()),
+    teamMembers: v.optional(
+      v.array(
+        v.object({
+          name: v.string(),
+          email: v.string(),
+          role: v.string(),
+        })
+      )
+    ),
+    website: v.optional(v.string()),
+    instagramHandle: v.optional(v.string()),
+    otherSocialLinks: v.optional(
+      v.array(
+        v.object({
+          platform: v.string(),
+          url: v.string(),
+        })
+      )
+    ),
+    brandBio: v.optional(v.string()),
+    brandAssets: v.optional(
+      v.object({
+        logoUrl: v.optional(v.string()),
+        productImages: v.optional(v.array(v.string())),
+        guidelinesDocUrl: v.optional(v.string()),
+      })
+    ),
     // Creator-specific fields
     handle: v.optional(v.string()),
     locality: v.optional(v.string()),
@@ -36,6 +65,7 @@ export default defineSchema({
       )
     ),
     bio: v.optional(v.string()),
+    upiId: v.optional(v.string()), // Added for creator wallet withdrawals
     acceptedCampaignIds: v.optional(v.array(v.id("campaigns"))),
   })
     .index("by_clerk_id", ["clerkId"])
@@ -52,6 +82,14 @@ export default defineSchema({
     creativeGuidelines: v.optional(v.string()),
     targetAudience: v.optional(v.string()),
     submissionDeadlineDays: v.optional(v.number()),
+    description: v.optional(v.string()),
+    productPromoted: v.optional(v.string()),
+    brandLogoUrl: v.optional(v.string()),
+    referenceAssetUrls: v.optional(v.array(v.string())),
+    startDate: v.optional(v.number()),
+    endDate: v.optional(v.number()),
+    perCreatorPayout: v.optional(v.number()),
+    isTieredPayout: v.optional(v.boolean()),
     centerLocality: v.string(),
     centerLat: v.number(),
     centerLng: v.number(),
@@ -114,6 +152,7 @@ export default defineSchema({
       v.literal("expired")
     ),
     respondedAt: v.optional(v.number()),
+    declineReason: v.optional(v.string()),
   })
     .index("by_creator", ["creatorUserId"])
     .index("by_campaign", ["campaignId"])
@@ -158,6 +197,19 @@ export default defineSchema({
     amount: v.number(),
     txHash: v.string(),
   }).index("by_campaign", ["campaignId"]),
+
+  // ── Withdrawals ────────────────────────────────────────────────────
+  withdrawals: defineTable({
+    creatorUserId: v.id("users"),
+    amount: v.number(),
+    upiId: v.string(),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("processing"),
+      v.literal("completed"),
+      v.literal("failed")
+    ),
+  }).index("by_creator", ["creatorUserId"]),
 
   // ── Ratings ────────────────────────────────────────────────────────
   // One row per (submission, direction). A collab produces up to two rows:

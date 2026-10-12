@@ -320,3 +320,115 @@ function formatNumber(num: number): string {
   if (num >= 1_000) return (num / 1_000).toFixed(1) + "K";
   return num.toString();
 }
+
+/**
+ * Connect to Meta Graph API to fetch real Instagram audience insights.
+ * Expects a user access token obtained via Facebook Login.
+ */
+export const connectMetaOAuth = action({
+  args: {
+    accessToken: v.string(),
+    locality: v.optional(v.string()),
+  },
+  handler: async (_ctx, args): Promise<{
+    audienceInLocality: number;
+    source: "meta_oauth";
+    topCities?: any[];
+  } | null> => {
+    try {
+      console.log(`[Meta OAuth] Fetching connected Facebook Pages...`);
+      // 1. Get Facebook Pages connected to the user
+      const pagesRes = await fetch(
+        `https://graph.facebook.com/v19.0/me/accounts?access_token=${args.accessToken}`
+      );
+      if (!pagesRes.ok) throw new Error("Failed to fetch FB pages");
+      const pagesData = await pagesRes.json();
+      
+      if (!pagesData.data || pagesData.data.length === 0) {
+        throw new Error("No Facebook Pages found for this user.");
+      }
+
+      let igAccountId = null;
+      let pageToken = null;
+
+      // 2. Find a page with a connected Instagram Business Account
+      for (const page of pagesData.data) {
+        const pageRes = await fetch(
+          `https://graph.facebook.com/v19.0/${page.id}?fields=instagram_business_account&access_token=${args.accessToken}`
+        );
+        if (pageRes.ok) {
+          const pageDetail = await pageRes.json();
+          if (pageDetail.instagram_business_account) {
+            igAccountId = pageDetail.instagram_business_account.id;
+            pageToken = page.access_token; // Some endpoints require the page token
+            break;
+          }
+        }
+      }
+
+      if (!igAccountId) {
+        throw new Error("No connected Instagram Professional Account found.");
+      }
+
+      console.log(`[Meta OAuth] Found IG Account: ${igAccountId}. Fetching insights...`);
+      
+      // 3. Fetch audience insights (e.g. audience_city)
+      // Note: Getting lifetime audience insights might require specific metrics and access.
+      // This endpoint and metric name depend on the Graph API version and account type.
+      const insightsRes = await fetch(
+        `https://graph.facebook.com/v19.0/${igAccountId}/insights?metric=audience_city&period=lifetime&access_token=${args.accessToken}`
+      );
+      
+      if (!insightsRes.ok) {
+        const err = await insightsRes.text();
+        console.error(`[Meta OAuth] Insights fetch failed: ${err}`);
+        throw new Error("Failed to fetch audience insights");
+      }
+
+      const insightsData = await insightsRes.json();
+      const cityData = insightsData.data?.[0]?.values?.[0]?.value;
+
+      if (!cityData) {
+        throw new Error("No audience city data returned from Instagram API");
+      }
+
+      // 4. Calculate percentage in the target locality
+      const targetLocality = (args.locality || "").toLowerCase();
+      let totalAudience = 0;
+      let matchedAudience = 0;
+
+      // cityData is typically an object like: { "Mumbai, Maharashtra": 4500, "Delhi": 2000, ... }
+      const topCities = [];
+      for (const [city, count] of Object.entries(cityData)) {
+        const numericCount = count as number;
+        totalAudience += numericCount;
+        topCities.push({ name: city, count: numericCount });
+        
+        if (targetLocality && city.toLowerCase().includes(targetLocality)) {
+          matchedAudience += numericCount;
+        }
+      }
+
+      // Sort cities by count for returning the top ones if needed
+      topCities.sort((a, b) => b.count - a.count);
+
+      let audienceInLocality = 0;
+      if (totalAudience > 0) {
+        audienceInLocality = Math.round((matchedAudience / totalAudience) * 100);
+      }
+
+      console.log(`[Meta OAuth] Success. Calculated ${audienceInLocality}% in ${targetLocality}`);
+
+      return {
+        audienceInLocality,
+        source: "meta_oauth",
+        topCities: topCities.slice(0, 5)
+      };
+
+    } catch (err: any) {
+      console.error("[Meta OAuth Action Error]", err.message);
+      return null;
+    }
+  },
+});
+

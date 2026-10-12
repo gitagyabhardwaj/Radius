@@ -50,6 +50,14 @@ export interface Campaign {
   creativeGuidelines?: string;
   targetAudience?: string;
   submissionDeadlineDays?: number;
+  description?: string;
+  productPromoted?: string;
+  brandLogoUrl?: string;
+  referenceAssetUrls?: string[];
+  startDate?: number;
+  endDate?: number;
+  perCreatorPayout?: number;
+  isTieredPayout?: boolean;
   durationHours: number;
   createdAt: number;
   status: 'draft' | 'active' | 'completed';

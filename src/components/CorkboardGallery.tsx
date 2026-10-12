@@ -7,9 +7,9 @@ import {
   CheckCircle2, 
   X, 
   Sparkles, 
-  Calendar,
+  Award,
   Eye,
-  Award
+  Camera
 } from 'lucide-react';
 import RatingWidget from './RatingWidget';
 
@@ -38,10 +38,78 @@ interface CorkboardGalleryProps {
   centerLocality?: string;
 }
 
+// Demo sample deliverables shown when no posts are live yet so users can experience the gallery
+export const DEMO_DELIVERABLES: DeliverableSubmission[] = [
+  {
+    _id: 'demo-1',
+    creatorUserId: 'u1',
+    fileUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80',
+    contentUrl: 'https://instagram.com/p/delhi_cafe',
+    caption: 'Visited the new outlet in CP! The ambience & handcrafted matcha are top notch ☕✨ #DelhiFoodie #Radius',
+    status: 'approved',
+    geoMatchPercentage: 96,
+    verifiedAt: Date.now() - 3600000 * 2,
+    creator: {
+      name: 'Aarav Sharma',
+      handle: 'aarav_eats',
+      avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
+      locality: 'Connaught Place, Central Delhi',
+    },
+  },
+  {
+    _id: 'demo-2',
+    creatorUserId: 'u2',
+    fileUrl: 'https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=800&auto=format&fit=crop&q=80',
+    contentUrl: 'https://instagram.com/p/live_music',
+    caption: 'Sunset acoustic session featuring the brand product spotlight! 🎸🌇 Crowd loved the merchandise.',
+    status: 'approved',
+    geoMatchPercentage: 92,
+    verifiedAt: Date.now() - 3600000 * 5,
+    creator: {
+      name: 'Priya Mehra',
+      handle: 'priya_tunes',
+      avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&auto=format&fit=crop&q=80',
+      locality: 'Hauz Khas Village, South Delhi',
+    },
+  },
+  {
+    _id: 'demo-3',
+    creatorUserId: 'u3',
+    fileUrl: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
+    contentUrl: 'https://instagram.com/p/street_style',
+    caption: 'Street style reel live from Khan Market! 🛍️ Captured the full collection drop.',
+    status: 'approved',
+    geoMatchPercentage: 89,
+    verifiedAt: Date.now() - 3600000 * 12,
+    creator: {
+      name: 'Kabir Malhotra',
+      handle: 'kabir_fits',
+      avatarUrl: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=120&auto=format&fit=crop&q=80',
+      locality: 'Khan Market, New Delhi',
+    },
+  },
+  {
+    _id: 'demo-4',
+    creatorUserId: 'u4',
+    fileUrl: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=800&auto=format&fit=crop&q=80',
+    contentUrl: 'https://instagram.com/p/cyberhub_run',
+    caption: 'Morning fitness workshop & creator haul in CyberHub 💪 500+ attendees joined the activation!',
+    status: 'approved',
+    geoMatchPercentage: 94,
+    verifiedAt: Date.now() - 3600000 * 24,
+    creator: {
+      name: 'Rhea Sen',
+      handle: 'rhea_moves',
+      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
+      locality: 'DLF CyberHub, Gurugram',
+    },
+  },
+];
+
 // Preset realistic organic tilt angles for pinned polaroids
 const TILT_ANGLES = [-4.5, 3.2, -2.8, 4.8, -3.2, 2.5, -5.1, 3.8, -1.9, 4.2];
 
-// Pushpin colors (crimson, brass, emerald, obsidian)
+// Pushpin colors (crimson, brass, emerald, blue, purple)
 const PIN_COLORS = [
   { head: '#ef4444', ring: '#b91c1c', highlight: '#fca5a5' }, // Crimson
   { head: '#eab308', ring: '#ca8a04', highlight: '#fef08a' }, // Brass Gold
@@ -56,15 +124,10 @@ function PushPin({ colorIndex = 0 }: { colorIndex?: number }) {
   return (
     <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20 pointer-events-none filter drop-shadow-[0_4px_3px_rgba(0,0,0,0.45)]">
       <svg width="22" height="24" viewBox="0 0 22 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Needle Tip shadow */}
         <path d="M11 16L11 23" stroke="#1f2937" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
-        {/* Needle Metal */}
         <path d="M11 14L11 22" stroke="#9ca3af" strokeWidth="1.8" strokeLinecap="round" />
-        {/* Pin base collar */}
         <ellipse cx="11" cy="14" rx="4.5" ry="1.8" fill={pin.ring} />
-        {/* Pin Body / Spherical Top */}
         <circle cx="11" cy="8.5" r="7" fill={pin.head} />
-        {/* Specular Highlight */}
         <circle cx="8.5" cy="6" r="2.2" fill={pin.highlight} opacity="0.75" />
       </svg>
     </div>
@@ -92,32 +155,78 @@ export default function CorkboardGallery({
 }: CorkboardGalleryProps) {
   const [selectedSub, setSelectedSub] = useState<DeliverableSubmission | null>(null);
 
-  const isVideo = (url?: string | null) => !!url && /\.(mp4|mov|webm)(\?|$)/i.test(url);
-
   // Filter only approved / verified submissions for the corkboard showcase
-  const verifiedSubmissions = submissions.filter(
+  const realVerified = submissions.filter(
     (s) => s.status === 'approved' || s.status === 'published_uploaded' || s.status === 'final_verifying'
   );
+
+  // Default to showing Demo deliverables if no verified posts exist yet
+  const [showDemo, setShowDemo] = useState(realVerified.length === 0);
+
+  const displayList = (showDemo || realVerified.length === 0) ? DEMO_DELIVERABLES : realVerified;
+
+  const isVideo = (url?: string | null) => !!url && /\.(mp4|mov|webm)(\?|$)/i.test(url);
 
   return (
     <div className="relative flex flex-col gap-3 mt-4">
       {/* Gallery Header Bar */}
-      <div className="flex items-center justify-between px-1">
+      <div className="flex items-center justify-between flex-wrap gap-2 px-1">
         <div className="flex items-center gap-2">
           <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-          <h3 className="text-sm font-sans font-bold text-white tracking-wide uppercase">
-            Deliverable Corkboard ({verifiedSubmissions.length} Verified)
+          <h3 className="text-sm font-sans font-bold text-white tracking-wide uppercase flex items-center gap-2">
+            <span>Deliverable Corkboard</span>
+            {realVerified.length > 0 ? (
+              <span className="text-xs font-mono font-normal text-emerald-400">({realVerified.length} Live)</span>
+            ) : (
+              <span className="text-xs font-mono font-normal text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">
+                Demo Preview Mode
+              </span>
+            )}
           </h3>
         </div>
-        <div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          <span>Click any Polaroid to inspect</span>
+
+        {/* Demo Toggle Control */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowDemo(!showDemo)}
+            className={`px-3 py-1 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
+              showDemo
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white'
+            }`}
+          >
+            <Camera className="w-3.5 h-3.5" />
+            <span>{showDemo ? 'Viewing Sample Polaroids (4)' : 'View Demo Preview'}</span>
+          </button>
+
+          <div className="hidden sm:flex items-center gap-1.5 text-xs font-mono text-zinc-400">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>Click photo to inspect</span>
+          </div>
         </div>
       </div>
 
+      {/* Demo Mode Banner Notice */}
+      {showDemo && realVerified.length === 0 && (
+        <div className="flex items-center justify-between p-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500/15 to-indigo-500/15 border border-amber-500/20 text-xs text-amber-200">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>
+              <strong>Sample Preview:</strong> Showing 4 demonstration polaroids so you can experience the corkboard layout. As soon as your creators upload verified posts, their authentic submissions will drop onto this board!
+            </span>
+          </div>
+          <button
+            onClick={() => setShowDemo(false)}
+            className="text-[11px] underline font-bold hover:text-white shrink-0 ml-3 cursor-pointer"
+          >
+            Show Blank Board
+          </button>
+        </div>
+      )}
+
       {/* Corkboard Container */}
       <div 
-        className="relative w-full min-h-[380px] rounded-3xl p-6 sm:p-8 overflow-hidden select-none border-4 border-[#3c2a1e] shadow-[inset_0_4px_30px_rgba(0,0,0,0.85),0_12px_32px_rgba(0,0,0,0.6)]"
+        className="relative w-full min-h-[440px] rounded-3xl p-6 sm:p-10 overflow-hidden select-none border-4 border-[#3c2a1e] shadow-[inset_0_4px_30px_rgba(0,0,0,0.85),0_12px_32px_rgba(0,0,0,0.6)]"
         style={{
           backgroundColor: '#9a6a42',
           backgroundImage: `
@@ -138,9 +247,8 @@ export default function CorkboardGallery({
         {/* Ambient Cork Surface Vignette */}
         <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_80px_rgba(20,10,5,0.7)]" />
 
-        {/* Corkboard Grid / Cards */}
-        {verifiedSubmissions.length === 0 ? (
-          /* Empty state: Pinned Sticky Note */
+        {/* Empty state: Pinned Sticky Note if user turned off demo and no posts exist */}
+        {!showDemo && realVerified.length === 0 ? (
           <div className="h-64 flex items-center justify-center">
             <motion.div 
               initial={{ y: -60, opacity: 0, rotate: -4 }}
@@ -157,19 +265,21 @@ export default function CorkboardGallery({
                   No verified posts pinned yet!
                 </h4>
                 <p className="text-xs text-zinc-700 leading-relaxed">
-                  As creators submit their content and you approve their deliverables, their authentic, geo-verified Polaroids will drop in here on this board.
+                  As creators submit deliverables and you approve them, their authentic, geo-verified Polaroids will drop onto this board.
                 </p>
-                {campaignTitle && (
-                  <span className="text-[10px] font-mono text-zinc-600 mt-1 border-t border-yellow-300/60 pt-2">
-                    Campaign: {campaignTitle}
-                  </span>
-                )}
+                <button
+                  onClick={() => setShowDemo(true)}
+                  className="mt-2 text-xs font-bold text-amber-900 bg-amber-300/80 hover:bg-amber-300 py-1.5 px-3 rounded text-center transition-colors cursor-pointer"
+                >
+                  ✨ Preview Sample Polaroids
+                </button>
               </div>
             </motion.div>
           </div>
         ) : (
+          /* Corkboard Polaroids Grid */
           <div className="relative z-10 flex flex-wrap gap-8 sm:gap-10 justify-center items-start py-4">
-            {verifiedSubmissions.map((sub, index) => {
+            {displayList.map((sub, index) => {
               const tilt = TILT_ANGLES[index % TILT_ANGLES.length];
               const creatorName = sub.creator?.name || 'Local Creator';
               const creatorHandle = sub.creator?.handle ? `@${sub.creator.handle}` : '@creator';
@@ -179,7 +289,7 @@ export default function CorkboardGallery({
               return (
                 <motion.div
                   key={sub._id}
-                  initial={{ y: -140, opacity: 0, scale: 0.8, rotate: 0 }}
+                  initial={{ y: -160, opacity: 0, scale: 0.8, rotate: 0 }}
                   animate={{ y: 0, opacity: 1, scale: 1, rotate: tilt }}
                   transition={{ 
                     type: "spring", 
@@ -296,7 +406,7 @@ export default function CorkboardGallery({
                 </div>
                 <button
                   onClick={() => setSelectedSub(null)}
-                  className="p-1.5 text-zinc-400 hover:text-white rounded-xl hover:bg-zinc-800 transition-colors"
+                  className="p-1.5 text-zinc-400 hover:text-white rounded-xl hover:bg-zinc-800 transition-colors cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>

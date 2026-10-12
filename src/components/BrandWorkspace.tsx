@@ -78,7 +78,7 @@ function SubmissionsReviewPanel({
   const [busyId, setBusyId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'corkboard' | 'review'>('corkboard');
 
-  if (!submissions || submissions.length === 0) return null;
+  if (submissions === undefined) return null; // loading state
 
   const isVideo = (url?: string | null) => !!url && /\.(mp4|mov|webm)(\?|$)/i.test(url);
 

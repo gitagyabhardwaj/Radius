@@ -9,6 +9,7 @@ import CreatorWorkspace from './components/CreatorWorkspace';
 import EntryGate from './components/EntryGate';
 import ErrorBoundary from './components/ErrorBoundary';
 import { Campaign, Creator } from './types';
+import { CREATORS } from './data';
 import {
   Compass,
   Briefcase,
@@ -137,7 +138,7 @@ export default function App() {
 
   // Convert Convex data to frontend format
   const creators: Creator[] = useMemo(() => {
-    if (!allCreators) return [];
+    if (!allCreators || allCreators.length === 0) return CREATORS;
     return allCreators.map(convexUserToCreator);
   }, [allCreators]);
 

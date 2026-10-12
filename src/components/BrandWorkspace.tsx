@@ -37,6 +37,7 @@ import RatingWidget, { ReviewsCard } from './RatingWidget';
 import DispatchFeed from './DispatchFeed';
 import DispatchQueue from './DispatchQueue';
 import BrandProfileEditor from './BrandProfileEditor';
+import CorkboardGallery from './CorkboardGallery';
 import { Id } from '../../convex/_generated/dataModel';
 
 interface BrandWorkspaceProps {
@@ -57,7 +58,15 @@ interface BrandWorkspaceProps {
   creators?: Creator[];
 }
 
-function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
+function SubmissionsReviewPanel({ 
+  campaignId,
+  campaignTitle,
+  centerLocality,
+}: { 
+  campaignId: string;
+  campaignTitle?: string;
+  centerLocality?: string;
+}) {
   const submissions = useQuery(api.submissions.getByCampaign, { campaignId: campaignId as any });
   const startDraftReview = useMutation(api.submissions.startDraftReview);
   const approveDraft = useMutation(api.submissions.approveDraft);
@@ -66,183 +75,269 @@ function SubmissionsReviewPanel({ campaignId }: { campaignId: string }) {
   const approveFinal = useMutation(api.submissions.approveFinal);
   const rejectFinal = useMutation(api.submissions.rejectFinal);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'corkboard' | 'review'>('corkboard');
 
   if (!submissions || submissions.length === 0) return null;
 
   const isVideo = (url?: string | null) => !!url && /\.(mp4|mov|webm)(\?|$)/i.test(url);
 
+  const pendingReview = submissions.filter((sub: any) =>
+    sub.status === 'draft_uploaded' ||
+    sub.status === 'draft_verifying' ||
+    sub.status === 'published_uploaded' ||
+    sub.status === 'final_verifying'
+  );
+
+  const verifiedSubmissions = submissions.filter((sub: any) =>
+    sub.status === 'approved' ||
+    sub.status === 'published_uploaded' ||
+    sub.status === 'final_verifying'
+  );
+
   return (
-    <div className="mt-2 pt-5 border-t border-zinc-800 flex flex-col gap-3">
-      <span className="text-[11px] font-sans tracking-wide text-white font-bold">
-        Deliverables To Review ({submissions.length})
-      </span>
+    <div className="mt-2 pt-5 border-t border-zinc-800 flex flex-col gap-4">
+      {/* Header with Switcher Tabs */}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-sans tracking-wide text-white font-bold uppercase">
+            Campaign Deliverables ({submissions.length})
+          </span>
+          {pendingReview.length > 0 && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              {pendingReview.length} Action Needed
+            </span>
+          )}
+        </div>
 
-      <div className="flex flex-col gap-3">
-        {submissions.map((sub: any) => (
-          <div
-            key={sub._id}
-            className="border border-zinc-800 rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-start bg-zinc-900"
+        <div className="flex items-center gap-1 bg-zinc-900 border border-zinc-800 p-1 rounded-2xl">
+          <button
+            onClick={() => setActiveTab('corkboard')}
+            className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'corkboard'
+                ? 'bg-zinc-800 text-white shadow-sm'
+                : 'text-zinc-400 hover:text-white'
+            }`}
           >
-            <div className="w-20 h-20 rounded-2xl overflow-hidden border border-zinc-800 shrink-0 bg-zinc-900 flex items-center justify-center">
-              {sub.fileUrl ? (
-                isVideo(sub.fileUrl) ? (
-                  <video src={sub.fileUrl} className="w-full h-full object-cover" muted />
-                ) : (
-                  <img src={sub.fileUrl} alt="Deliverable" className="w-full h-full object-cover" />
-                )
-              ) : (
-                <ImageIcon className="w-6 h-6 text-white" />
-              )}
-            </div>
+            <span>📌 Corkboard Wall</span>
+            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-zinc-950 text-zinc-300">
+              {verifiedSubmissions.length}
+            </span>
+          </button>
+          <button
+            onClick={() => setActiveTab('review')}
+            className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'review'
+                ? 'bg-zinc-800 text-white shadow-sm'
+                : 'text-zinc-400 hover:text-white'
+            }`}
+          >
+            <span>📋 Review Queue</span>
+            {pendingReview.length > 0 && (
+              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-amber-500 text-black font-black">
+                {pendingReview.length}
+              </span>
+            )}
+          </button>
+        </div>
+      </div>
 
-            <div className="flex-1 flex flex-col gap-1.5 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm font-bold text-white">{sub.creator?.name || 'Creator'}</span>
-                <span
-                  className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded-2xl border ${
-                    sub.status === 'approved' || sub.status === 'draft_approved'
-                      ? 'bg-emerald-500 border-none text-white'
-                      : sub.status === 'rejected' || sub.status === 'draft_rejected'
-                      ? 'bg-rose-500 border-none text-white'
-                      : 'bg-indigo-500 border-none text-white'
-                  }`}
-                >
-                  {sub.status === 'draft_uploaded' ? 'Draft Awaiting Review' : 
-                   sub.status === 'draft_verifying' ? 'Draft In Review' : 
-                   sub.status === 'draft_approved' ? 'Draft Approved (Pending Publish)' : 
-                   sub.status === 'draft_rejected' ? 'Draft Rejected' : 
-                   sub.status === 'published_uploaded' ? 'Published Awaiting Review' : 
-                   sub.status === 'final_verifying' ? 'Final In Review' : 
-                   sub.status === 'approved' ? 'Final Approved' : 'Rejected'}
+      {/* VIEW: CORKBOARD WALL */}
+      {activeTab === 'corkboard' && (
+        <div className="flex flex-col gap-3">
+          {pendingReview.length > 0 && (
+            <div className="flex items-center justify-between p-3 px-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>
+                  <strong>{pendingReview.length} deliverable{pendingReview.length > 1 ? 's' : ''}</strong> waiting for your approval. Approved posts drop directly onto this board!
                 </span>
               </div>
+              <button
+                onClick={() => setActiveTab('review')}
+                className="underline font-bold hover:text-white shrink-0 ml-2 cursor-pointer"
+              >
+                Review Now &rarr;
+              </button>
+            </div>
+          )}
 
-              {sub.contentUrl && (
-                <a
-                  href={sub.contentUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-xs text-white hover:underline flex items-center gap-1 w-max"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  Open live post
-                </a>
+          <CorkboardGallery 
+            submissions={submissions}
+            campaignTitle={campaignTitle}
+            centerLocality={centerLocality}
+          />
+        </div>
+      )}
+
+      {/* VIEW: REVIEW QUEUE */}
+      {activeTab === 'review' && (
+        <div className="flex flex-col gap-3 animate-fade-in">
+          {submissions.map((sub: any) => (
+            <div
+              key={sub._id}
+              className="border border-zinc-800 rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-start bg-zinc-900"
+            >
+              <div className="w-20 h-20 rounded-2xl overflow-hidden border border-zinc-800 shrink-0 bg-zinc-900 flex items-center justify-center">
+                {sub.fileUrl ? (
+                  isVideo(sub.fileUrl) ? (
+                    <video src={sub.fileUrl} className="w-full h-full object-cover" muted />
+                  ) : (
+                    <img src={sub.fileUrl} alt="Deliverable" className="w-full h-full object-cover" />
+                  )
+                ) : (
+                  <ImageIcon className="w-6 h-6 text-white" />
+                )}
+              </div>
+
+              <div className="flex-1 flex flex-col gap-1.5 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm font-bold text-white">{sub.creator?.name || 'Creator'}</span>
+                  <span
+                    className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded-2xl border ${
+                      sub.status === 'approved' || sub.status === 'draft_approved'
+                        ? 'bg-emerald-500 border-none text-white'
+                        : sub.status === 'rejected' || sub.status === 'draft_rejected'
+                        ? 'bg-rose-500 border-none text-white'
+                        : 'bg-indigo-500 border-none text-white'
+                    }`}
+                  >
+                    {sub.status === 'draft_uploaded' ? 'Draft Awaiting Review' : 
+                     sub.status === 'draft_verifying' ? 'Draft In Review' : 
+                     sub.status === 'draft_approved' ? 'Draft Approved (Pending Publish)' : 
+                     sub.status === 'draft_rejected' ? 'Draft Rejected' : 
+                     sub.status === 'published_uploaded' ? 'Published Awaiting Review' : 
+                     sub.status === 'final_verifying' ? 'Final In Review' : 
+                     sub.status === 'approved' ? 'Final Approved' : 'Rejected'}
+                  </span>
+                </div>
+
+                {sub.contentUrl && (
+                  <a
+                    href={sub.contentUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs text-white hover:underline flex items-center gap-1 w-max"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    Open live post
+                  </a>
+                )}
+
+                {sub.fileUrl && !sub.contentUrl && (
+                  <a
+                    href={sub.fileUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs text-white hover:underline flex items-center gap-1 w-max"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    Open full-size upload
+                  </a>
+                )}
+
+                {sub.rejectionReason && (
+                  <span className="text-[11px] text-white">Reason: {sub.rejectionReason}</span>
+                )}
+
+                {sub.status === 'approved' && (
+                  <div className="pt-2">
+                    <RatingWidget
+                      submissionId={sub._id}
+                      subjectLabel={sub.creator?.name || 'this creator'}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* DRAFT REVIEW BUTTONS */}
+              {(sub.status === 'draft_uploaded' || sub.status === 'draft_verifying') && (
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={async () => {
+                      setBusyId(sub._id);
+                      try {
+                        if (sub.status === 'draft_uploaded') await startDraftReview({ submissionId: sub._id });
+                        await approveDraft({ submissionId: sub._id });
+                      } catch (err) {
+                        console.error('Approve failed:', err);
+                      } finally {
+                        setBusyId(null);
+                      }
+                    }}
+                    disabled={busyId === sub._id}
+                    className="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-bold rounded-2xl flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    Approve Draft
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const reason = window.prompt('Reason for rejecting this draft (optional):') || undefined;
+                      setBusyId(sub._id);
+                      try {
+                        if (sub.status === 'draft_uploaded') await startDraftReview({ submissionId: sub._id });
+                        await rejectDraft({ submissionId: sub._id, reason });
+                      } catch (err) {
+                        console.error('Reject failed:', err);
+                      } finally {
+                        setBusyId(null);
+                      }
+                    }}
+                    disabled={busyId === sub._id}
+                    className="py-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 border border-zinc-800 text-white text-xs font-bold rounded-2xl flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                    Reject Draft
+                  </button>
+                </div>
               )}
 
-              {sub.fileUrl && !sub.contentUrl && (
-                <a
-                  href={sub.fileUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-xs text-white hover:underline flex items-center gap-1 w-max"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  Open full-size upload
-                </a>
-              )}
-
-              {sub.rejectionReason && (
-                <span className="text-[11px] text-white">Reason: {sub.rejectionReason}</span>
-              )}
-
-              {sub.status === 'approved' && (
-                <div className="pt-2">
-                  <RatingWidget
-                    submissionId={sub._id}
-                    subjectLabel={sub.creator?.name || 'this creator'}
-                  />
+              {/* FINAL REVIEW BUTTONS */}
+              {(sub.status === 'published_uploaded' || sub.status === 'final_verifying') && (
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={async () => {
+                      setBusyId(sub._id);
+                      try {
+                        if (sub.status === 'published_uploaded') await startFinalReview({ submissionId: sub._id });
+                        await approveFinal({ submissionId: sub._id });
+                      } catch (err) {
+                        console.error('Approve failed:', err);
+                      } finally {
+                        setBusyId(null);
+                      }
+                    }}
+                    disabled={busyId === sub._id}
+                    className="py-1.5 px-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-bold rounded-2xl flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    Approve Final & Release
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const reason = window.prompt('Reason for rejecting this final post (optional):') || undefined;
+                      setBusyId(sub._id);
+                      try {
+                        if (sub.status === 'published_uploaded') await startFinalReview({ submissionId: sub._id });
+                        await rejectFinal({ submissionId: sub._id, reason });
+                      } catch (err) {
+                        console.error('Reject failed:', err);
+                      } finally {
+                        setBusyId(null);
+                      }
+                    }}
+                    disabled={busyId === sub._id}
+                    className="py-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 border border-zinc-800 text-white text-xs font-bold rounded-2xl flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                    Reject Final
+                  </button>
                 </div>
               )}
             </div>
-
-            {/* DRAFT REVIEW BUTTONS */}
-            {(sub.status === 'draft_uploaded' || sub.status === 'draft_verifying') && (
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  onClick={async () => {
-                    setBusyId(sub._id);
-                    try {
-                      if (sub.status === 'draft_uploaded') await startDraftReview({ submissionId: sub._id });
-                      await approveDraft({ submissionId: sub._id });
-                    } catch (err) {
-                      console.error('Approve failed:', err);
-                    } finally {
-                      setBusyId(null);
-                    }
-                  }}
-                  disabled={busyId === sub._id}
-                  className="py-1.5 px-3 bg-black hover:bg-black disabled:opacity-50 text-white text-xs font-bold rounded-2xl flex items-center gap-1 cursor-pointer transition-colors"
-                >
-                  <Check className="w-3.5 h-3.5" />
-                  Approve Draft
-                </button>
-                <button
-                  onClick={async () => {
-                    const reason = window.prompt('Reason for rejecting this draft (optional):') || undefined;
-                    setBusyId(sub._id);
-                    try {
-                      if (sub.status === 'draft_uploaded') await startDraftReview({ submissionId: sub._id });
-                      await rejectDraft({ submissionId: sub._id, reason });
-                    } catch (err) {
-                      console.error('Reject failed:', err);
-                    } finally {
-                      setBusyId(null);
-                    }
-                  }}
-                  disabled={busyId === sub._id}
-                  className="py-1.5 px-3 bg-zinc-900 hover:bg-zinc-900 disabled:opacity-50 border border-zinc-800 text-white text-xs font-bold rounded-2xl flex items-center gap-1 cursor-pointer transition-colors"
-                >
-                  <X className="w-3.5 h-3.5" />
-                  Reject Draft
-                </button>
-              </div>
-            )}
-
-            {/* FINAL REVIEW BUTTONS */}
-            {(sub.status === 'published_uploaded' || sub.status === 'final_verifying') && (
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  onClick={async () => {
-                    setBusyId(sub._id);
-                    try {
-                      if (sub.status === 'published_uploaded') await startFinalReview({ submissionId: sub._id });
-                      await approveFinal({ submissionId: sub._id });
-                    } catch (err) {
-                      console.error('Approve failed:', err);
-                    } finally {
-                      setBusyId(null);
-                    }
-                  }}
-                  disabled={busyId === sub._id}
-                  className="py-1.5 px-3 bg-black hover:bg-black disabled:opacity-50 text-white text-xs font-bold rounded-2xl flex items-center gap-1 cursor-pointer transition-colors"
-                >
-                  <Check className="w-3.5 h-3.5" />
-                  Approve Final & Release
-                </button>
-                <button
-                  onClick={async () => {
-                    const reason = window.prompt('Reason for rejecting this final post (optional):') || undefined;
-                    setBusyId(sub._id);
-                    try {
-                      if (sub.status === 'published_uploaded') await startFinalReview({ submissionId: sub._id });
-                      await rejectFinal({ submissionId: sub._id, reason });
-                    } catch (err) {
-                      console.error('Reject failed:', err);
-                    } finally {
-                      setBusyId(null);
-                    }
-                  }}
-                  disabled={busyId === sub._id}
-                  className="py-1.5 px-3 bg-zinc-900 hover:bg-zinc-900 disabled:opacity-50 border border-zinc-800 text-white text-xs font-bold rounded-2xl flex items-center gap-1 cursor-pointer transition-colors"
-                >
-                  <X className="w-3.5 h-3.5" />
-                  Reject Final
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -1281,7 +1376,11 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
                 <CreatorApprovalPanel campaignId={camp.id} creators={creators || CREATORS} />
 
-                <SubmissionsReviewPanel campaignId={camp.id} />
+                <SubmissionsReviewPanel 
+                  campaignId={camp.id} 
+                  campaignTitle={camp.title}
+                  centerLocality={camp.centerLocality}
+                />
 
                 <DispatchQueue campaignId={camp.id} />
 

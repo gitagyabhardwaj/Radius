@@ -29,36 +29,14 @@ import CreatorWallet from './CreatorWallet';
 
 const generateAudienceLocations = (creator: any) => {
   // If real audience cities exist from Meta Graph API sync, use them!
-  if (creator.audienceCities && Array.isArray(creator.audienceCities) && creator.audienceCities.length > 0) {
+  if (creator?.audienceCities && Array.isArray(creator.audienceCities) && creator.audienceCities.length > 0) {
     return creator.audienceCities.map((c: any) => ({
       name: c.name,
       value: c.percentage,
     }));
   }
 
-  const indianCities = [
-    'Mumbai', 'Delhi', 'Bengaluru', 'Hyderabad', 'Ahmedabad', 
-    'Chennai', 'Kolkata', 'Surat', 'Pune', 'Jaipur',
-    'Lucknow', 'Kanpur', 'Nagpur', 'Indore', 'Thane',
-    'Bhopal', 'Visakhapatnam', 'Gurgaon', 'Noida', 'Chandigarh'
-  ].filter(city => city.toLowerCase() !== (creator.locality || '').toLowerCase());
-  
-  // Use character codes of creator handle to deterministically pick cities
-  const hash = (creator.handle || '').split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
-  
-  const selectedCities = [
-    indianCities[(hash + 1) % indianCities.length],
-    indianCities[(hash + 2) % indianCities.length],
-    indianCities[(hash + 3) % indianCities.length],
-  ];
-
-  return [
-    { name: creator.locality || 'Primary Hub', value: creator.audienceInLocality || 35 },
-    { name: selectedCities[0], value: 25 },
-    { name: selectedCities[1], value: 15 },
-    { name: selectedCities[2], value: 15 },
-    { name: 'Rest of World', value: 10 },
-  ];
+  return [];
 };
 
 interface CreatorWorkspaceProps {
@@ -475,14 +453,18 @@ export default function CreatorWorkspace({
   };
 
   const handleConnectInstagram = () => {
-    const appId = import.meta.env.VITE_META_APP_ID;
-    if (!appId) {
-      setHandleVerifyMessage({ text: "Missing Instagram App ID configuration.", type: "error" });
-      return;
-    }
+    const appId =
+      import.meta.env.VITE_META_APP_ID ||
+      '973990292335513';
     
-    // Meta Facebook Login for Instagram Professional Insights
-    const redirectUri = window.location.origin + window.location.pathname;
+    // Ensure trailing slash matches registered Meta redirect URI exactly
+    const origin = window.location.origin;
+    const pathname = window.location.pathname.endsWith('/')
+      ? window.location.pathname
+      : `${window.location.pathname}/`;
+    const redirectUri = `${origin}${pathname}`;
+    
+    // Facebook Login for Instagram Professional Insights
     const scopes = [
       'instagram_basic',
       'instagram_manage_insights',
@@ -490,7 +472,9 @@ export default function CreatorWorkspace({
       'pages_read_engagement',
     ].join(',');
     
-    const authUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}&response_type=code&state=radius_ig_oauth`;
+    const authUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(
+      redirectUri
+    )}&scope=${encodeURIComponent(scopes)}&response_type=code&state=radius_ig_oauth`;
     
     window.location.href = authUrl;
   };
@@ -845,40 +829,52 @@ export default function CreatorWorkspace({
                       </span>
                     )}
                   </div>
-                  <div className="flex-1 w-full h-full min-h-0 min-w-0 relative">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={generateAudienceLocations(currentCreator)}
-                          cx="50%"
-                          cy="45%"
-                          innerRadius={30}
-                          outerRadius={55}
-                          paddingAngle={3}
-                          dataKey="value"
-                          stroke="transparent"
-                        >
-                          <Cell fill="#10b981" />
-                          <Cell fill="#3b82f6" />
-                          <Cell fill="#6366f1" />
-                          <Cell fill="#8b5cf6" />
-                          <Cell fill="#3f3f46" />
-                        </Pie>
-                        <Tooltip 
-                          contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px', fontSize: '12px', color: '#fff', zIndex: 1000 }}
-                          itemStyle={{ color: '#fff' }}
-                          formatter={(value: any) => [`${value}%`, 'Audience']}
-                        />
-                        <Legend 
-                          layout="horizontal" 
-                          verticalAlign="bottom" 
-                          align="center"
-                          iconType="circle"
-                          wrapperStyle={{ fontSize: '10px', color: '#a1a1aa', paddingTop: '10px' }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
+                  {generateAudienceLocations(currentCreator).length > 0 ? (
+                    <div className="flex-1 w-full h-full min-h-0 min-w-0 relative">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={generateAudienceLocations(currentCreator)}
+                            cx="50%"
+                            cy="45%"
+                            innerRadius={30}
+                            outerRadius={55}
+                            paddingAngle={3}
+                            dataKey="value"
+                            stroke="transparent"
+                          >
+                            <Cell fill="#10b981" />
+                            <Cell fill="#3b82f6" />
+                            <Cell fill="#6366f1" />
+                            <Cell fill="#8b5cf6" />
+                            <Cell fill="#3f3f46" />
+                          </Pie>
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px', fontSize: '12px', color: '#fff', zIndex: 1000 }}
+                            itemStyle={{ color: '#fff' }}
+                            formatter={(value: any) => [`${value}%`, 'Audience']}
+                          />
+                          <Legend 
+                            layout="horizontal" 
+                            verticalAlign="bottom" 
+                            align="center"
+                            iconType="circle"
+                            wrapperStyle={{ fontSize: '10px', color: '#a1a1aa', paddingTop: '10px' }}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  ) : (
+                    <div className="flex-1 flex flex-col items-center justify-center text-center p-3">
+                      <div className="w-8 h-8 rounded-full bg-zinc-800/80 border border-zinc-700/60 flex items-center justify-center mb-2">
+                        <Radio className="w-4 h-4 text-zinc-500" />
+                      </div>
+                      <span className="text-xs font-mono font-bold text-zinc-400">No Audience Demographics</span>
+                      <span className="text-[10px] text-zinc-500 mt-1 max-w-[85%] leading-tight">
+                        Connect Instagram via Meta to display verified audience locations.
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

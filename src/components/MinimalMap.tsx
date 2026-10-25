@@ -83,7 +83,7 @@ export default function MinimalMap({
   
   // Ensure we have a valid list of creators with real numeric coordinates
   const validCreators = useMemo(() => {
-    const list = (creators && creators.length > 0) ? creators : CREATORS;
+    const list = creators || [];
     return list.filter(
       (c) =>
         typeof c.lat === 'number' &&

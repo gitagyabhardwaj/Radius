@@ -342,11 +342,17 @@ export const exchangeMetaCodeAndSyncDemographics = action({
     audienceCities?: Array<{ name: string; count?: number; percentage: number }>;
     thresholdNotice?: boolean;
   }> => {
-    const appId = process.env.META_APP_ID;
-    const appSecret = process.env.META_APP_SECRET;
+    const appId =
+      process.env.META_APP_ID ||
+      process.env.INSTAGRAM_APP_ID ||
+      "973990292335513";
+    const appSecret =
+      process.env.META_APP_SECRET ||
+      process.env.INSTAGRAM_APP_SECRET ||
+      "1d040f3b6c70389dabff1b0d047688e2";
 
     if (!appId || !appSecret) {
-      console.error("[Meta OAuth] Missing META_APP_ID or META_APP_SECRET environment variables.");
+      console.error("[Meta OAuth] Missing META_APP_SECRET / INSTAGRAM_APP_SECRET environment variables.");
       return { success: false, error: "Server missing Meta App credentials configuration." };
     }
 

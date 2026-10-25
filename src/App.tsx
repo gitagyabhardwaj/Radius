@@ -152,7 +152,7 @@ export default function App() {
 
   // Convert Convex data to frontend format
   const creators: Creator[] = useMemo(() => {
-    if (!allCreators || allCreators.length === 0) return CREATORS;
+    if (!allCreators || allCreators.length === 0) return [];
     return allCreators.map(convexUserToCreator);
   }, [allCreators]);
 
@@ -207,9 +207,16 @@ export default function App() {
       setInstagramSyncStatus(null);
       setActiveCreatorSubTab('profile');
 
+      // Ensure trailing slash matches registered Meta Business Login Redirect URI exactly
+      const origin = window.location.origin;
+      const pathname = window.location.pathname.endsWith('/')
+        ? window.location.pathname
+        : `${window.location.pathname}/`;
+      const redirectUri = `${origin}${pathname}`;
+
       exchangeMetaCodeAndSyncDemographics({
         code,
-        redirectUri: window.location.origin + window.location.pathname,
+        redirectUri,
         locality: currentUser?.locality,
       })
         .then((res) => {
@@ -474,12 +481,7 @@ export default function App() {
                     <span>4. Portfolio</span>
                   </button>
                   <button
-                    onClick={() => {
-                      setActiveCreatorSubTab('profile');
-                      if (currentCreatorProfile) {
-                        setRoastingCreator(currentCreatorProfile);
-                      }
-                    }}
+                    onClick={() => setActiveCreatorSubTab('profile')}
                     className={`w-full py-2.5 px-3 rounded-xl text-sm font-semibold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeCreatorSubTab === 'profile'
                         ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold shadow-md'

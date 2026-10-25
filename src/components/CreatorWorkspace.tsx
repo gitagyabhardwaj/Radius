@@ -476,26 +476,27 @@ export default function CreatorWorkspace({
 
   const handleConnectInstagram = () => {
     const appId =
-      import.meta.env.VITE_INSTAGRAM_APP_ID ||
       import.meta.env.VITE_META_APP_ID ||
-      '2169707260426403';
+      '973990292335513';
     
-    // Ensure trailing slash matches registered Meta Business Login Redirect URI exactly
+    // Ensure trailing slash matches registered Meta redirect URI exactly
     const origin = window.location.origin;
     const pathname = window.location.pathname.endsWith('/')
       ? window.location.pathname
       : `${window.location.pathname}/`;
     const redirectUri = `${origin}${pathname}`;
     
+    // Facebook Login for Instagram Professional Insights
     const scopes = [
-      'instagram_business_basic',
-      'instagram_business_manage_messages',
-      'instagram_business_manage_comments',
+      'instagram_basic',
+      'instagram_manage_insights',
+      'pages_show_list',
+      'pages_read_engagement',
     ].join(',');
     
-    const authUrl = `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_reauth=true&client_id=${appId}&redirect_uri=${encodeURIComponent(
+    const authUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(
       redirectUri
-    )}&response_type=code&scope=${encodeURIComponent(scopes)}`;
+    )}&scope=${encodeURIComponent(scopes)}&response_type=code&state=radius_ig_oauth`;
     
     window.location.href = authUrl;
   };

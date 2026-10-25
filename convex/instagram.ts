@@ -343,12 +343,13 @@ export const exchangeMetaCodeAndSyncDemographics = action({
     thresholdNotice?: boolean;
   }> => {
     const appId =
-      process.env.INSTAGRAM_APP_ID ||
       process.env.META_APP_ID ||
-      "2169707260426403";
+      process.env.INSTAGRAM_APP_ID ||
+      "973990292335513";
     const appSecret =
+      process.env.META_APP_SECRET ||
       process.env.INSTAGRAM_APP_SECRET ||
-      process.env.META_APP_SECRET;
+      "1d040f3b6c70389dabff1b0d047688e2";
 
     if (!appId || !appSecret) {
       console.error("[Meta OAuth] Missing META_APP_SECRET / INSTAGRAM_APP_SECRET environment variables.");

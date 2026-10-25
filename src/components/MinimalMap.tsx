@@ -306,7 +306,7 @@ export default function MinimalMap({
                     e.stopPropagation();
                     onRoastCreator?.(creator);
                   }}
-                  title={`Click to view ${creator.name}'s past work`}
+                  title={`Click to view ${creator.name}'s profile & portfolio`}
                 >
                   <img 
                     src={creator.avatar} 
@@ -348,7 +348,7 @@ export default function MinimalMap({
                     className="mt-2.5 w-full py-1.5 px-2 bg-[#C9B8E8] hover:bg-[#D8CAF2] text-[#0C0B0D] font-mono font-bold text-[11px] rounded-xl flex items-center justify-center gap-1.5 shadow-md cursor-pointer transition-all border border-[#C9B8E8]"
                   >
                     <Briefcase className="w-3.5 h-3.5 text-[#0C0B0D]" />
-                    <span>View Past Work</span>
+                    <span>View Profile & Portfolio</span>
                   </button>
                 )}
               </Popup>

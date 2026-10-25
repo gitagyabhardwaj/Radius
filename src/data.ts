@@ -15,9 +15,12 @@ export const CREATORS: Creator[] = [
     latencyHours: 1,
     velocityTier: 'Velocity',
     followers: '42K',
+    bio: 'Hyperlocal culinary creator documenting authentic Delhi NCR cafes, specialty brews, and hidden patio eateries.',
     pastWork: [
-      { brand: 'Blue Tokai Coffee', type: 'Reel', imgUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=300&q=80' },
-      { brand: 'The Big Chill', type: 'Story', imgUrl: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=300&q=80' }
+      { brand: 'Blue Tokai Coffee', type: 'Reel • Artisanal Cold Brew Experience', imgUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80' },
+      { brand: 'The Big Chill Cafe', type: 'Story • Signature Pasta & Desserts Tour', imgUrl: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=600&q=80' },
+      { brand: 'Blue Door Cafe', type: 'Post • Khan Market Weekend Brunch Fit', imgUrl: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80' },
+      { brand: 'Paul India Bistro', type: 'Reel • Fresh French Sourdough & Patisserie', imgUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80' }
     ]
   },
   {
@@ -34,8 +37,12 @@ export const CREATORS: Creator[] = [
     latencyHours: 2,
     velocityTier: 'Free',
     followers: '28K',
+    bio: 'Delhi-based streetwear and editorial stylist showcasing sustainable fits, local boutiques, and seasonal high-street lookbooks.',
     pastWork: [
-      { brand: 'Zara Connaught Place', type: 'Post', imgUrl: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=300&q=80' }
+      { brand: 'Zara Connaught Place', type: 'Post • Autumn Streetwear Editorial', imgUrl: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=600&q=80' },
+      { brand: 'H&M South Extension', type: 'Reel • City Style Walk & Layering Guide', imgUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&q=80' },
+      { brand: 'Nykaa Luxe', type: 'Story • Minimalist Golden Glow Evening Routine', imgUrl: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=600&q=80' },
+      { brand: 'FabIndia Heritage', type: 'Post • Modern Indigo Handloom Edit', imgUrl: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=600&q=80' }
     ]
   },
   {
@@ -52,8 +59,12 @@ export const CREATORS: Creator[] = [
     latencyHours: 3,
     velocityTier: 'Velocity',
     followers: '85K',
+    bio: 'Tech reviewer, gadget teardown specialist, and esports community streamer breaking down everyday gear and consumer tech.',
     pastWork: [
-      { brand: 'OnePlus India', type: 'Reel', imgUrl: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&q=80' }
+      { brand: 'OnePlus India', type: 'Reel • Flagship Speed & Camera Stress Test', imgUrl: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80' },
+      { brand: 'boAt Lifestyle', type: 'Story • Wireless ANC Earbuds Daily Commute', imgUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80' },
+      { brand: 'Asus ROG Gaming', type: 'Post • Ultimate Minimalist Esports Rig', imgUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80' },
+      { brand: 'Logitech G', type: 'Reel • Pro Mechanical Keyboard Typing Test', imgUrl: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=600&q=80' }
     ]
   },
   {
@@ -70,8 +81,11 @@ export const CREATORS: Creator[] = [
     latencyHours: 2,
     velocityTier: 'Free',
     followers: '19K',
+    bio: 'Visual artist and travel photographer capturing the contrasts of old-world monuments and contemporary metropolitan culture.',
     pastWork: [
-      { brand: 'Pacific Mall', type: 'Reel', imgUrl: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=300&q=80' }
+      { brand: 'Pacific Mall Tagore Garden', type: 'Reel • Architectural Sunset Walkthrough', imgUrl: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=600&q=80' },
+      { brand: 'Nikon India', type: 'Post • Street Portraits at Lodhi Art District', imgUrl: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=600&q=80' },
+      { brand: 'Dilli Haat Crafts', type: 'Story • Vibrant Artisan Textile Story', imgUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=600&q=80' }
     ]
   },
   {
@@ -88,8 +102,11 @@ export const CREATORS: Creator[] = [
     latencyHours: 1,
     velocityTier: 'Velocity',
     followers: '56K',
+    bio: 'DU campus insider, street food hunter, and high-energy lifestyle creator connecting student crowds with local hangouts.',
     pastWork: [
-      { brand: 'Hudson Cafe', type: 'Reel', imgUrl: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=300&q=80' }
+      { brand: 'Hudson Cafe DU', type: 'Reel • Campus Hangout & Signature Shakes', imgUrl: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80' },
+      { brand: 'Ricos North Campus', type: 'Story • Waffle & Pizza Late Night Tasting', imgUrl: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=600&q=80' },
+      { brand: 'Chaayos DU Campus', type: 'Post • Monsoon Kadak Chai & Bun Maska', imgUrl: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80' }
     ]
   },
   {
@@ -106,8 +123,11 @@ export const CREATORS: Creator[] = [
     latencyHours: 4,
     velocityTier: 'Free',
     followers: '33K',
+    bio: 'Corporate stylist turned lifestyle influencer exploring NCR nightlife, luxury hospitality, and everyday workwear aesthetics.',
     pastWork: [
-      { brand: 'CyberHub Cafe', type: 'Story', imgUrl: 'https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=300&q=80' }
+      { brand: 'CyberHub Cafe', type: 'Story • Rooftop Golden Hour Gathering', imgUrl: 'https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=600&q=80' },
+      { brand: 'Mango DLF Promenade', type: 'Post • Tailored Office Chic Lookbook', imgUrl: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=600&q=80' },
+      { brand: 'Sephora India', type: 'Reel • 5-Minute Minimal Morning Glow Routine', imgUrl: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=600&q=80' }
     ]
   }
 ];
@@ -157,12 +177,14 @@ export const DEFAULT_CAMPAIGNS = [
     title: 'Blue Tokai South Delhi Buzz',
     brandName: 'Blue Tokai Coffee',
     niche: 'Food & Lifestyle',
+    targetAudience: 'Foodies, Cafe Explorers & Street Food Fans',
+    contentFormat: 'Instagram Story',
     deliverable: '1 Instagram Story pointing to localized Saket cafe outlet',
     centerLocality: 'South Delhi (Saket)',
     centerLat: 28.5276,
     centerLng: 77.2197,
 
-    budget: 350, // $350
+    budget: 3500, // ₹3,500
     spotsTotal: 3,
     spotsFilled: 1,
     durationHours: 24,
@@ -181,12 +203,14 @@ export const DEFAULT_CAMPAIGNS = [
     title: 'Zara CP Style Flash Walk',
     brandName: 'Zara India',
     niche: 'Fashion & Aesthetics',
+    targetAudience: 'Fashion, Streetwear & Aesthetic Stylists',
+    contentFormat: 'Carousel Post',
     deliverable: '1 Photo Carousel showing the new summer fit inside CP Zara',
     centerLocality: 'Connaught Place',
     centerLat: 28.6304,
     centerLng: 77.2177,
 
-    budget: 600, // $600
+    budget: 6000, // ₹6,000
     spotsTotal: 2,
     spotsFilled: 0,
     durationHours: 48,

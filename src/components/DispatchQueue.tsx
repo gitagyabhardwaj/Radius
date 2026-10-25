@@ -108,7 +108,7 @@ export default function DispatchQueue({
                     });
                   }
                 }}
-                title={onRoastCreator ? `Click to view ${creator.name}'s past work` : undefined}
+                title={onRoastCreator ? `Click to view ${creator.name}'s profile & portfolio` : undefined}
               >
                 <div className="relative">
                   <img src={creator.avatarUrl || `https://api.dicebear.com/7.x/notionists/svg?seed=${creator.handle}`} alt={creator.name} className="w-10 h-10 rounded-full bg-zinc-800 object-cover group-hover:ring-2 group-hover:ring-[#C9B8E8] transition-all" />

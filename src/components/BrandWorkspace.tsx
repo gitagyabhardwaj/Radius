@@ -1139,16 +1139,18 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             </div>
           </div>
 
-          {/* Smart Budget Estimator Widget */}
+          {/* Smart Budget Estimator Widget - Starts from ₹2,000 at least */}
           <div className="bg-[#151417] border border-[#26232B] rounded-2xl p-4 flex flex-col gap-3">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Sparkles className="w-4 h-4 text-[#F1E3A8]" />
                 <span className="text-sm font-semibold text-white">Smart Budget Recommender</span>
+                <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-400/10 px-2 py-0.5 rounded-full border border-amber-400/20">
+                  Starts from ₹2,000 min
+                </span>
               </div>
               <span className="text-xs font-mono text-zinc-400">
-                Estimated range: <span className="text-[#F1E3A8] font-bold">₹{estMin.toLocaleString()} - ₹{estMax.toLocaleString()}</span>
-                <span className="text-[10px] text-zinc-500 ml-1.5">(Min. ₹2,000)</span>
+                Recommended range: <span className="text-[#F1E3A8] font-bold">₹{estMin.toLocaleString()} - ₹{estMax.toLocaleString()}</span>
               </span>
             </div>
 
@@ -1176,6 +1178,67 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                   className="w-16 focus:outline-none text-right font-mono text-[#F1E3A8] bg-transparent"
                 />
               </div>
+            </div>
+
+            {/* Quick Budget Presets Starting from ₹2,000 */}
+            <div className="flex items-center gap-1.5 flex-wrap pt-2 border-t border-[#26232B]/60 text-xs font-mono">
+              <span className="text-[10px] text-zinc-500 uppercase tracking-wider mr-1">Quick Presets:</span>
+              <button
+                type="button"
+                onClick={() => setBudget(2000)}
+                className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                  budget === 2000
+                    ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold border-[#C9B8E8]'
+                    : 'bg-[#0C0B0D] text-zinc-300 border-[#26232B] hover:border-[#C9B8E8]/50'
+                }`}
+              >
+                ₹2,000 (Min)
+              </button>
+              <button
+                type="button"
+                onClick={() => setBudget(3500)}
+                className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                  budget === 3500
+                    ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold border-[#C9B8E8]'
+                    : 'bg-[#0C0B0D] text-zinc-300 border-[#26232B] hover:border-[#C9B8E8]/50'
+                }`}
+              >
+                ₹3,500
+              </button>
+              <button
+                type="button"
+                onClick={() => setBudget(5000)}
+                className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                  budget === 5000
+                    ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold border-[#C9B8E8]'
+                    : 'bg-[#0C0B0D] text-zinc-300 border-[#26232B] hover:border-[#C9B8E8]/50'
+                }`}
+              >
+                ₹5,000
+              </button>
+              <button
+                type="button"
+                onClick={() => setBudget(10000)}
+                className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                  budget === 10000
+                    ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold border-[#C9B8E8]'
+                    : 'bg-[#0C0B0D] text-zinc-300 border-[#26232B] hover:border-[#C9B8E8]/50'
+                }`}
+              >
+                ₹10,000
+              </button>
+              <button
+                type="button"
+                onClick={() => setBudget(Math.max(2000, Math.round((estMin + estMax) / 2)))}
+                className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
+                  budget === Math.round((estMin + estMax) / 2) && budget !== 2000
+                    ? 'bg-[#F1E3A8] text-[#0C0B0D] font-bold border-[#F1E3A8]'
+                    : 'bg-[#0C0B0D] text-[#F1E3A8] border-[#F1E3A8]/30 hover:border-[#F1E3A8]'
+                }`}
+              >
+                <Sparkles className="w-3 h-3" />
+                Auto-Rec: ₹{Math.max(2000, Math.round((estMin + estMax) / 2)).toLocaleString()}
+              </button>
             </div>
           </div>
 
@@ -1280,7 +1343,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                   onRoastCreator?.(creator);
                 }}
                 className="bg-[#151417] border border-[#26232B] hover:border-[#C9B8E8]/50 rounded-2xl p-4 flex flex-col gap-3 transition-all hover:bg-[#1a1820] cursor-pointer group shadow-sm hover:shadow-[#C9B8E8]/5"
-                title={`Click to view ${creator.name}'s past work`}
+                title={`Click to view ${creator.name}'s profile & portfolio`}
               >
                 <div className="flex items-center gap-3">
                   <img
@@ -1328,7 +1391,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                   className="w-full mt-1 py-2 px-3 bg-[#C9B8E8] hover:bg-[#D8CAF2] text-[#0C0B0D] font-mono font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-md cursor-pointer transition-all border border-[#C9B8E8] active:scale-[0.98]"
                 >
                   <Briefcase className="w-3.5 h-3.5 text-[#0C0B0D]" />
-                  <span>View Past Work</span>
+                  <span>View Profile & Portfolio</span>
                 </button>
               </div>
             ))}
@@ -1500,8 +1563,8 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                                     setSelectedCreator(creator);
                                     onRoastCreator?.(creator);
                                   }}
-                                  className="flex items-center gap-1 bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 hover:border-orange-500/50 px-1.5 py-0.5 rounded-2xl text-[11px] cursor-pointer transition-all shrink-0 group"
-                                  title={`Click to view & roast ${creator.name}`}
+                                  className="flex items-center gap-1 bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 hover:border-[#C9B8E8]/50 px-1.5 py-0.5 rounded-2xl text-[11px] cursor-pointer transition-all shrink-0 group"
+                                  title={`Click to view ${creator.name}'s profile & portfolio`}
                                 >
                                   <img
                                     src={creator.avatar}
@@ -1509,8 +1572,8 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                                     className="w-4.5 h-4.5 rounded-2xl object-cover"
                                     referrerPolicy="no-referrer"
                                   />
-                                  <span className="font-bold text-white group-hover:text-orange-400 transition-colors">{creator.name.split(' ')[0]}</span>
-                                  <Flame className="w-2.5 h-2.5 text-orange-400 opacity-60 group-hover:opacity-100" />
+                                  <span className="font-bold text-white group-hover:text-[#C9B8E8] transition-colors">{creator.name.split(' ')[0]}</span>
+                                  <Briefcase className="w-2.5 h-2.5 text-[#C9B8E8] opacity-60 group-hover:opacity-100" />
                                 </div>
                               );
                             })}
@@ -1640,22 +1703,22 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 <div 
                   key={creator.id} 
                   onClick={() => onRoastCreator?.(creator)}
-                  className="p-3 border border-zinc-800 hover:border-orange-500/50 rounded-2xl flex items-center justify-between cursor-pointer transition-all hover:bg-zinc-800/40 group"
-                  title={`Click to roast ${creator.name}'s profile`}
+                  className="p-3 border border-zinc-800 hover:border-[#C9B8E8]/50 rounded-2xl flex items-center justify-between cursor-pointer transition-all hover:bg-zinc-800/40 group"
+                  title={`Click to view ${creator.name}'s profile & portfolio`}
                 >
                   <div className="flex items-center gap-3">
-                    <img src={creator.avatar} alt={creator.name} className="w-8 h-8 rounded-full object-cover border border-zinc-800 group-hover:border-orange-500 transition-colors referrerPolicy='no-referrer'" />
+                    <img src={creator.avatar} alt={creator.name} className="w-8 h-8 rounded-full object-cover border border-zinc-800 group-hover:border-[#C9B8E8] transition-colors referrerPolicy='no-referrer'" />
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-white group-hover:text-orange-400 transition-colors flex items-center gap-1.5">
+                      <span className="text-sm font-bold text-white group-hover:text-[#C9B8E8] transition-colors flex items-center gap-1.5">
                         {creator.name}
-                        <Flame className="w-3 h-3 text-orange-400 fill-orange-400 opacity-60 group-hover:opacity-100" />
                       </span>
                       <span className="text-[11px] text-white font-mono">{creator.locality}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono font-bold text-orange-400 bg-orange-500/10 border border-orange-500/30 px-2 py-0.5 rounded-xl group-hover:bg-orange-500 group-hover:text-black transition-all">
-                      Roast 🔥
+                    <span className="text-xs font-mono font-bold text-[#0C0B0D] bg-[#C9B8E8] hover:bg-[#D8CAF2] px-2.5 py-1 rounded-xl transition-all flex items-center gap-1 shadow-sm">
+                      <Briefcase className="w-3 h-3 text-[#0C0B0D]" />
+                      Portfolio
                     </span>
                     <span className="text-sm font-mono font-bold text-white bg-indigo-500 border-none px-2 py-0.5 rounded-2xl">{creator.followers}</span>
                   </div>

@@ -512,11 +512,11 @@ export default function CreatorWorkspace({
               <button
                 type="button"
                 onClick={() => onRoastCreator?.(currentCreator)}
-                className="bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-600 hover:to-rose-700 text-white text-xs px-3 py-1.5 rounded-xl font-bold font-mono flex items-center gap-1.5 shadow-md cursor-pointer transition-all border border-orange-400/40"
-                title="Roast this profile"
+                className="bg-[#C9B8E8] hover:bg-[#D8CAF2] text-[#0C0B0D] text-xs px-3 py-1.5 rounded-xl font-bold font-mono flex items-center gap-1.5 shadow-md cursor-pointer transition-all border border-[#C9B8E8]"
+                title="View your public profile and portfolio showcase"
               >
-                <Flame className="w-3.5 h-3.5 fill-current" />
-                <span>Roast Profile 🔥</span>
+                <Briefcase className="w-3.5 h-3.5 text-[#0C0B0D]" />
+                <span>View Profile & Portfolio</span>
               </button>
               {currentCreator.velocityTier === 'Velocity' ? (
                 <span className="bg-amber-50 text-amber-700 text-sm px-2.5 py-1 rounded-2xl font-semibold border border-amber-200 flex items-center gap-1.5 animate-pulse">
@@ -817,10 +817,10 @@ export default function CreatorWorkspace({
                 type="button"
                 onClick={() => onRoastCreator?.(currentCreator)}
                 className="shrink-0 py-1.5 px-3 bg-[#C9B8E8]/15 hover:bg-[#C9B8E8]/25 border border-[#C9B8E8]/30 text-[#C9B8E8] text-xs font-bold font-mono rounded-xl flex items-center gap-1.5 cursor-pointer transition-all shadow-sm"
-                title="View your past work"
+                title="View your portfolio showcase"
               >
                 <Briefcase className="w-3.5 h-3.5 text-[#C9B8E8]" />
-                <span>Past Work</span>
+                <span>View Portfolio</span>
               </button>
             </div>
 
@@ -934,7 +934,7 @@ export default function CreatorWorkspace({
               className="w-full py-2 px-3 bg-[#C9B8E8] hover:bg-[#D8CAF2] text-[#0C0B0D] font-mono font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-md cursor-pointer transition-all border border-[#C9B8E8] active:scale-[0.98]"
             >
               <Briefcase className="w-3.5 h-3.5 text-[#0C0B0D]" />
-              <span>View My Past Work</span>
+              <span>View Profile & Portfolio</span>
             </button>
           </div>
 
@@ -1674,7 +1674,7 @@ export default function CreatorWorkspace({
                   title="View past work modal"
                 >
                   <Briefcase className="w-4 h-4 text-[#0C0B0D]" />
-                  <span>View Past Work</span>
+                  <span>View Profile & Portfolio</span>
                 </button>
               </div>
               <span className="text-sm text-white font-mono font-bold">{currentCreator.handle || 'No handle set'}</span>

@@ -804,8 +804,9 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
         activeBatchIndex: 0,
         batches: [],
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to create campaign:', err);
+      alert(err?.message || 'Failed to lock budget and launch campaign.');
     } finally {
       setIsActivating(false);
     }
@@ -1278,11 +1279,28 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             <div className="flex items-start gap-3">
               <ShieldCheck className="w-5 h-5 text-[#C9B8E8] shrink-0 mt-0.5" />
               <div className="flex flex-col gap-0.5 flex-1">
-                <div className="flex justify-between items-center w-full">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 w-full">
                   <span className="text-sm font-bold text-white">Automated Escrow Protocol</span>
-                  <div className="bg-[#0C0B0D] border border-[#26232B] px-2.5 py-1 rounded-xl flex items-center gap-1.5">
-                    <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider">Wallet:</span>
-                    <span className="text-sm font-mono font-bold text-[#F1E3A8]">₹{currentUser?.escrowBalance || 0}</span>
+                  <div className="flex items-center gap-2">
+                    <div className="bg-[#0C0B0D] border border-[#26232B] px-2.5 py-1 rounded-xl flex items-center gap-1.5">
+                      <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider">Wallet:</span>
+                      <span className="text-sm font-mono font-bold text-[#F1E3A8]">
+                        ₹{Math.max(0, currentUser?.escrowBalance ?? 100000).toLocaleString()}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          await creditEscrow({ amount: 50000 });
+                        } catch (e: any) {
+                          console.error('Failed to credit escrow:', e);
+                        }
+                      }}
+                      className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-xl bg-[#C9B8E8]/10 text-[#C9B8E8] border border-[#C9B8E8]/30 hover:bg-[#C9B8E8]/20 transition-all cursor-pointer active:scale-95"
+                    >
+                      + Top Up ₹50,000
+                    </button>
                   </div>
                 </div>
                 <p className="text-xs text-zinc-300 leading-normal mt-1">

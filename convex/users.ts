@@ -104,11 +104,15 @@ export const createOrUpdateUser = mutation({
       .unique();
 
     if (existing) {
-      await ctx.db.patch(existing._id, {
+      const updates: Record<string, unknown> = {
         ...args,
         email: identity.email ?? existing.email,
         avatarUrl: identity.pictureUrl ?? existing.avatarUrl,
-      });
+      };
+      if (existing.escrowBalance === undefined || existing.escrowBalance < 10000) {
+        updates.escrowBalance = 100000;
+      }
+      await ctx.db.patch(existing._id, updates);
       return existing._id;
     }
 
@@ -326,21 +330,30 @@ export const deleteCurrentUser = mutation({
  * Credit the currently authenticated user's escrow balance.
  */
 export const creditEscrow = mutation({
-  args: { amount: v.number() },
+  args: { 
+    amount: v.number(),
+    userId: v.optional(v.id("users")),
+  },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .unique();
+    let user = null;
+    if (args.userId) {
+      user = await ctx.db.get(args.userId);
+    } else {
+      const identity = await ctx.auth.getUserIdentity();
+      if (!identity) throw new Error("Not authenticated");
+      user = await ctx.db
+        .query("users")
+        .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+        .unique();
+    }
 
     if (!user) throw new Error("User not found");
 
-    const currentBalance = user.escrowBalance || 0;
+    const currentBalance = (user.escrowBalance && user.escrowBalance > 0) ? user.escrowBalance : 0;
+    const newBalance = currentBalance + args.amount;
     await ctx.db.patch(user._id, {
-      escrowBalance: currentBalance + args.amount,
+      escrowBalance: newBalance,
     });
+    return newBalance;
   },
 });

@@ -28,6 +28,7 @@ import {
   MapPin,
   Eye,
   FileText,
+  Flame,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useUser, useClerk } from '@clerk/clerk-react';
@@ -51,6 +52,7 @@ interface BrandWorkspaceProps {
   activeCampaigns: Campaign[];
 
   setSelectedCreator: (creator: Creator) => void;
+  onRoastCreator?: (creator: Creator) => void;
   setView: (view: 'brand' | 'creator') => void;
   setSelectedCampaignId: (id: string | null) => void;
   activeSubTab?: 'setup' | 'dispatch' | 'analytics' | 'profile';
@@ -349,7 +351,15 @@ function SubmissionsReviewPanel({
  * Shows creators who have expressed interest (brand_review) and lets the brand
  * approve or reject them. Also shows already accepted creators.
  */
-function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; creators?: Creator[] }) {
+function CreatorApprovalPanel({ 
+  campaignId, 
+  creators,
+  onRoastCreator,
+}: { 
+  campaignId: string; 
+  creators?: Creator[];
+  onRoastCreator?: (creator: Creator) => void;
+}) {
   const campaignOffers = useQuery(api.offers.getByCampaign, { campaignId: campaignId as any });
   const brandApprove = useMutation(api.offers.brandApprove);
   const brandReject = useMutation(api.offers.brandReject);
@@ -376,16 +386,23 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
             if (!creator) return null;
             return (
               <div key={offer._id} className="border border-amber-100 bg-amber-50/30 rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-start">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div 
+                  className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer group"
+                  onClick={() => onRoastCreator?.(creator)}
+                  title={`Click to roast ${creator.name}'s profile`}
+                >
                   <img
                     src={creator.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=random`}
                     alt={creator.name}
-                    className="w-10 h-10 rounded-full object-cover border border-zinc-800"
+                    className="w-10 h-10 rounded-full object-cover border border-zinc-800 group-hover:border-orange-500 transition-colors"
                     referrerPolicy="no-referrer"
                   />
                   <div className="flex flex-col gap-0.5 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-white">{creator.name}</span>
+                      <span className="text-sm font-bold text-white group-hover:text-orange-400 transition-colors flex items-center gap-1">
+                        {creator.name}
+                        <Flame className="w-3 h-3 text-orange-400 fill-orange-400 opacity-60 group-hover:opacity-100" />
+                      </span>
                       {creator.velocityTier === 'Velocity' && (
                         <span className="text-[9px] font-mono bg-amber-400 text-black border border-amber-400 px-1.5 py-0.5 rounded-2xl border border-amber-200 font-bold">VELOCITY</span>
                       )}
@@ -423,6 +440,15 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => onRoastCreator?.(creator)}
+                    className="py-1.5 px-3 bg-gradient-to-r from-orange-500/20 to-rose-500/20 hover:from-orange-500/30 hover:to-rose-500/30 border border-orange-500/40 text-orange-400 text-xs font-bold font-mono rounded-xl flex items-center gap-1 cursor-pointer transition-colors shadow-sm"
+                    title="Roast this applicant's profile"
+                  >
+                    <Flame className="w-3.5 h-3.5 fill-current" />
+                    <span>Roast 🔥</span>
+                  </button>
                   <button
                     onClick={async () => {
                       setBusyId(offer._id);
@@ -466,15 +492,21 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
               const creator = offer.creator;
               if (!creator) return null;
               return (
-                <div key={offer._id} className="flex items-center gap-2 bg-emerald-400/20 border-emerald-400 text-emerald-400 border rounded-2xl px-3 py-1.5">
+                <div 
+                  key={offer._id} 
+                  onClick={() => onRoastCreator?.(creator)}
+                  className="flex items-center gap-2 bg-emerald-400/20 border-emerald-400 text-emerald-400 border rounded-2xl px-3 py-1.5 cursor-pointer hover:bg-emerald-400/30 transition-all group"
+                  title={`Click to roast ${creator.name}'s profile`}
+                >
                   <img
                     src={creator.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=random`}
                     alt={creator.name}
                     className="w-6 h-6 rounded-full object-cover"
                     referrerPolicy="no-referrer"
                   />
-                  <span className="text-xs font-bold text-white">{creator.name}</span>
+                  <span className="text-xs font-bold text-white group-hover:text-orange-300 transition-colors">{creator.name}</span>
                   <span className="text-[9px] font-mono text-black font-bold bg-emerald-400 px-1.5 py-0.5 rounded-2xl">WORKING</span>
+                  <Flame className="w-3 h-3 text-orange-400 fill-orange-400 opacity-70 group-hover:opacity-100" />
                 </div>
               );
             })}
@@ -574,6 +606,7 @@ export default function BrandWorkspace({
   activeCampaigns,
 
   setSelectedCreator,
+  onRoastCreator,
   setView,
   setSelectedCampaignId,
   activeSubTab = 'setup',
@@ -595,12 +628,12 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
   const [brandName, setBrandName] = useState(customBrandName || 'Local Craft Brewers');
   const [niche, setNiche] = useState('Food & Lifestyle');
   const [deliverable, setDeliverable] = useState('1 Instagram Story highlighting local patio dining');
-  const [budget, setBudget] = useState(450);
+  const [budget, setBudget] = useState(2000);
   const [spotsTotal, setSpotsTotal] = useState(3);
   const [durationHours, setDurationHours] = useState(24);
   const [contentFormat, setContentFormat] = useState('Instagram Story');
   const [creativeGuidelines, setCreativeGuidelines] = useState('Must show product clearly. No competitor logos.');
-  const [targetAudience, setTargetAudience] = useState('Gen Z / Millennials');
+  const [targetAudience, setTargetAudience] = useState('Gen Z (18 - 24 years)');
   const [submissionDeadlineDays, setSubmissionDeadlineDays] = useState(3);
   const [description, setDescription] = useState('');
   const [productPromoted, setProductPromoted] = useState('');
@@ -663,24 +696,27 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
     return closestRegion.name;
   };
 
-  // Smart Budget Estimator
+  // Smart Budget Estimator - Starts from ₹2000 at least
   const estimatedBudgetRange = () => {
-    // Basic heuristics
-    let baseRate = 120; // base price per creator
-    if (niche.includes('Tech')) baseRate = 180;
-    if (niche.includes('Fashion')) baseRate = 150;
-    if (deliverable.toLowerCase().includes('reel')) baseRate *= 1.8;
+    // Basic heuristics scaled for realistic INR rates
+    let baseRate = 800; // base price per creator
+    if (niche.includes('Tech')) baseRate = 1200;
+    if (niche.includes('Fashion')) baseRate = 1000;
+    if (deliverable.toLowerCase().includes('reel')) baseRate *= 1.5;
 
-    const min = Math.round(baseRate * spotsTotal);
-    const max = Math.round(baseRate * spotsTotal * 1.4);
+    // Minimum budget recommender must start from at least 2000
+    const calculatedMin = Math.round(baseRate * spotsTotal);
+    const min = Math.max(2000, calculatedMin);
+    const max = Math.max(min + 1000, Math.round(min * 1.45));
     return { min, max };
   };
 
   const { min: estMin, max: estMax } = estimatedBudgetRange();
 
-  // Handle slider auto-recommender
+  // Handle slider auto-recommender (starts from 2000 at least)
   useEffect(() => {
-    setBudget(Math.round((estMin + estMax) / 2));
+    const recommended = Math.round((estMin + estMax) / 2);
+    setBudget(Math.max(2000, recommended));
   }, [spotsTotal, niche, deliverable, estMin, estMax]);
 
   // Find creators
@@ -697,6 +733,11 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
   // Create Campaign via Convex mutation
   const handleLaunchCampaign = async () => {
+    if (budget < 2000) {
+      alert("Smart budget recommender requires a minimum budget of ₹2,000.");
+      setBudget(2000);
+      return;
+    }
     setIsActivating(true);
     try {
       const campaignId = await createCampaign({
@@ -907,14 +948,38 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               </select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-sans tracking-wider text-white font-bold">Target Audience</label>
-              <input
-                type="text"
-                value={targetAudience || ''}
+              <label className="text-xs font-sans tracking-wider text-white font-bold">Target Audience Category</label>
+              <select
+                value={targetAudience || 'Gen Z (18 - 24 years)'}
                 onChange={(e) => setTargetAudience(e.target.value)}
-                placeholder="e.g. Gen Z / Millennials"
-                className="w-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl px-3.5 py-2 text-base text-white placeholder-zinc-400 focus:outline-none focus:border-zinc-800 focus:bg-zinc-900 transition-colors"
-              />
+                className="w-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl px-3.5 py-2 text-base text-white focus:outline-none focus:border-zinc-800 focus:bg-zinc-900 transition-colors cursor-pointer"
+              >
+                <optgroup label="Demographics & Age Groups" className="bg-[#151417] text-zinc-300">
+                  <option value="Gen Z (18 - 24 years)">Gen Z (18 - 24 years)</option>
+                  <option value="Millennials (25 - 34 years)">Millennials (25 - 34 years)</option>
+                  <option value="College Students & Campus Youth">College Students & Campus Youth</option>
+                  <option value="Young Working Professionals">Young Working Professionals</option>
+                  <option value="Parents & Family Households">Parents & Family Households</option>
+                  <option value="Kids & Teenagers (Under 18)">Kids & Teenagers (Under 18)</option>
+                </optgroup>
+                <optgroup label="Interests & Lifestyle" className="bg-[#151417] text-zinc-300">
+                  <option value="Foodies, Cafe Explorers & Street Food Fans">Foodies, Cafe Explorers & Street Food Fans</option>
+                  <option value="Fashion, Streetwear & Aesthetic Stylists">Fashion, Streetwear & Aesthetic Stylists</option>
+                  <option value="Fitness, Gym, Yoga & Wellness">Fitness, Gym, Yoga & Wellness</option>
+                  <option value="Tech Geeks, Developers & Gamers">Tech Geeks, Developers & Gamers</option>
+                  <option value="Travel, Backpackers & Adventure Seekers">Travel, Backpackers & Adventure Seekers</option>
+                  <option value="Beauty, Skincare & Grooming">Beauty, Skincare & Grooming</option>
+                  <option value="Luxury & High-Net-Worth Consumers">Luxury & High-Net-Worth Consumers</option>
+                  <option value="Artists, Creators & Designers">Artists, Creators & Designers</option>
+                </optgroup>
+                <optgroup label="Geographic & Shopping Intent" className="bg-[#151417] text-zinc-300">
+                  <option value="Hyperlocal Neighborhood Shoppers">Hyperlocal Neighborhood Shoppers</option>
+                  <option value="Delhi NCR Metro Commuters & Urbanites">Delhi NCR Metro Commuters & Urbanites</option>
+                  <option value="Weekend Mall & High-Street Shoppers">Weekend Mall & High-Street Shoppers</option>
+                  <option value="Corporate Tech Park Employees (Gurgaon/Noida)">Corporate Tech Park Employees (Gurgaon/Noida)</option>
+                  <option value="University Area Locals (North Campus/South Campus)">University Area Locals (North Campus/South Campus)</option>
+                </optgroup>
+              </select>
             </div>
           </div>
 
@@ -1083,7 +1148,8 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 <span className="text-sm font-semibold text-white">Smart Budget Recommender</span>
               </div>
               <span className="text-xs font-mono text-zinc-400">
-                Estimated range: <span className="text-[#F1E3A8] font-bold">₹{estMin} - ₹{estMax}</span>
+                Estimated range: <span className="text-[#F1E3A8] font-bold">₹{estMin.toLocaleString()} - ₹{estMax.toLocaleString()}</span>
+                <span className="text-[10px] text-zinc-500 ml-1.5">(Min. ₹2,000)</span>
               </span>
             </div>
 
@@ -1091,20 +1157,24 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               <div className="flex-1">
                 <input
                   type="range"
-                  min={estMin - 100 > 50 ? estMin - 100 : 50}
-                  max={estMax + 200}
-                  step="10"
-                  value={budget}
-                  onChange={(e) => setBudget(Number(e.target.value))}
+                  min="2000"
+                  max={Math.max(50000, estMax + 5000)}
+                  step="100"
+                  value={Math.max(2000, budget)}
+                  onChange={(e) => setBudget(Math.max(2000, Number(e.target.value)))}
                   className="w-full accent-[#C9B8E8] cursor-pointer"
                 />
               </div>
               <div className="bg-[#0C0B0D] border border-[#26232B] rounded-xl px-3 py-1.5 font-mono text-base font-bold text-[#F1E3A8] flex items-center shadow-sm">
                 ₹<input
                   type="number"
+                  min="2000"
                   value={isNaN(budget) || budget === 0 ? '' : budget}
                   onChange={(e) => setBudget(Number(e.target.value))}
-                  className="w-14 focus:outline-none text-right font-mono text-[#F1E3A8] bg-transparent"
+                  onBlur={() => {
+                    if (!budget || budget < 2000) setBudget(2000);
+                  }}
+                  className="w-16 focus:outline-none text-right font-mono text-[#F1E3A8] bg-transparent"
                 />
               </div>
             </div>
@@ -1341,16 +1411,21 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                               return (
                                 <div
                                   key={cid}
-                                  onClick={() => setSelectedCreator(creator)}
-                                  className="flex items-center gap-1 bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 hover:border-zinc-800 px-1.5 py-0.5 rounded-2xl text-[11px] cursor-pointer transition-all shrink-0"
-                                  title={`Click to view ${creator.name}`}
+                                  onClick={() => {
+                                    setSelectedCreator(creator);
+                                    onRoastCreator?.(creator);
+                                  }}
+                                  className="flex items-center gap-1 bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 hover:border-orange-500/50 px-1.5 py-0.5 rounded-2xl text-[11px] cursor-pointer transition-all shrink-0 group"
+                                  title={`Click to view & roast ${creator.name}`}
                                 >
                                   <img
                                     src={creator.avatar}
                                     alt={creator.name}
-                                    className="w-4.5 h-4.5 rounded-2xl object-cover referrerPolicy='no-referrer'"
+                                    className="w-4.5 h-4.5 rounded-2xl object-cover"
+                                    referrerPolicy="no-referrer"
                                   />
-                                  <span className="font-bold text-white">{creator.name.split(' ')[0]}</span>
+                                  <span className="font-bold text-white group-hover:text-orange-400 transition-colors">{creator.name.split(' ')[0]}</span>
+                                  <Flame className="w-2.5 h-2.5 text-orange-400 opacity-60 group-hover:opacity-100" />
                                 </div>
                               );
                             })}
@@ -1377,7 +1452,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
                 <CampaignDetailPanel camp={camp as any} />
 
-                <CreatorApprovalPanel campaignId={camp.id} creators={creators || CREATORS} />
+                <CreatorApprovalPanel campaignId={camp.id} creators={creators || CREATORS} onRoastCreator={onRoastCreator} />
 
                 <SubmissionsReviewPanel 
                   campaignId={camp.id} 
@@ -1477,15 +1552,28 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
 
             <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-1 font-sans font-medium">
               {(creators || CREATORS).map((creator) => (
-                <div key={creator.id} className="p-3 border border-zinc-800 rounded-2xl flex items-center justify-between">
+                <div 
+                  key={creator.id} 
+                  onClick={() => onRoastCreator?.(creator)}
+                  className="p-3 border border-zinc-800 hover:border-orange-500/50 rounded-2xl flex items-center justify-between cursor-pointer transition-all hover:bg-zinc-800/40 group"
+                  title={`Click to roast ${creator.name}'s profile`}
+                >
                   <div className="flex items-center gap-3">
-                    <img src={creator.avatar} alt={creator.name} className="w-8 h-8 rounded-full object-cover border border-zinc-800 referrerPolicy='no-referrer'" />
+                    <img src={creator.avatar} alt={creator.name} className="w-8 h-8 rounded-full object-cover border border-zinc-800 group-hover:border-orange-500 transition-colors referrerPolicy='no-referrer'" />
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-white">{creator.name}</span>
+                      <span className="text-sm font-bold text-white group-hover:text-orange-400 transition-colors flex items-center gap-1.5">
+                        {creator.name}
+                        <Flame className="w-3 h-3 text-orange-400 fill-orange-400 opacity-60 group-hover:opacity-100" />
+                      </span>
                       <span className="text-[11px] text-white font-mono">{creator.locality}</span>
                     </div>
                   </div>
-                  <span className="text-sm font-mono font-bold text-white bg-indigo-500 border-none px-2 py-0.5 rounded-2xl border border-zinc-800">{creator.followers}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-bold text-orange-400 bg-orange-500/10 border border-orange-500/30 px-2 py-0.5 rounded-xl group-hover:bg-orange-500 group-hover:text-black transition-all">
+                      Roast 🔥
+                    </span>
+                    <span className="text-sm font-mono font-bold text-white bg-indigo-500 border-none px-2 py-0.5 rounded-2xl">{creator.followers}</span>
+                  </div>
                 </div>
               ))}
             </div>

@@ -40,8 +40,8 @@ export default function DispatchQueue({ campaignId }: { campaignId: string }) {
     <div className="flex flex-col gap-3 mt-4">
       <h4 className="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
         <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F1E3A8] opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F1E3A8]" />
         </span>
         Live Dispatch Queue
       </h4>
@@ -56,24 +56,24 @@ export default function DispatchQueue({ campaignId }: { campaignId: string }) {
           }
 
           // Determine status visual style
-          let statusColor = 'bg-zinc-800 text-zinc-400 border-zinc-700/50';
+          let statusColor = 'bg-[#151417] text-zinc-400 border-[#26232B]';
           let StatusIcon = Clock;
           let statusText = 'Pending';
 
           if (status === 'pending' && batchDispatchedAt) {
-            statusColor = 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20';
+            statusColor = 'bg-[#C9B8E8]/15 text-[#C9B8E8] border border-[#C9B8E8]/30';
             statusText = 'Notified';
             StatusIcon = User;
           } else if (status === 'accepted') {
-            statusColor = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+            statusColor = 'bg-[#C9B8E8] text-[#0C0B0D] font-bold border-none shadow-sm';
             statusText = 'Accepted';
             StatusIcon = UserCheck;
           } else if (status === 'declined') {
-            statusColor = 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+            statusColor = 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
             statusText = 'Declined';
             StatusIcon = UserX;
           } else if (status === 'expired') {
-            statusColor = 'bg-amber-500/10 text-amber-500 border-amber-500/20';
+            statusColor = 'bg-[#F1E3A8]/15 text-[#F1E3A8] border border-[#F1E3A8]/30';
             statusText = 'Expired';
             StatusIcon = TimerReset;
           }

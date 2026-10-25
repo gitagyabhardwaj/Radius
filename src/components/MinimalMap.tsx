@@ -107,13 +107,13 @@ export default function MinimalMap({
 
   // Create glowing animated Leaflet markers
   const createIcon = (isSelected: boolean, isInside: boolean) => {
-    const color = isSelected ? '#6366F1' : isInside ? '#10B981' : '#71717A';
+    const color = isSelected ? '#C9B8E8' : isInside ? '#C9B8E8' : '#525252';
     const size = isSelected ? 18 : 14;
     const offset = size / 2;
     const pulseRing = isSelected
-      ? `<div style="position:absolute;inset:-6px;border-radius:50%;background:rgba(99,102,241,0.35);animation:radarPulse 1.8s infinite;"></div>`
+      ? `<div style="position:absolute;inset:-6px;border-radius:50%;background:rgba(201,184,232,0.4);animation:radarPulse 1.8s infinite;"></div>`
       : isInside
-      ? `<div style="position:absolute;inset:-4px;border-radius:50%;background:rgba(16,185,129,0.25);animation:radarPulse 2.4s infinite;"></div>`
+      ? `<div style="position:absolute;inset:-4px;border-radius:50%;background:rgba(201,184,232,0.2);animation:radarPulse 2.4s infinite;"></div>`
       : '';
 
     return L.divIcon({
@@ -125,8 +125,8 @@ export default function MinimalMap({
             width:${size}px;height:${size}px;
             border-radius:50%;
             background:${color};
-            border:2px solid #ffffff;
-            box-shadow:0 0 10px ${color}80, 0 2px 5px rgba(0,0,0,0.4);
+            border:2px solid #0C0B0D;
+            box-shadow:0 0 10px ${color}90, 0 2px 5px rgba(0,0,0,0.6);
             position:relative;z-index:2;
             cursor:pointer;
             transition:transform 0.15s ease;
@@ -139,21 +139,21 @@ export default function MinimalMap({
   };
 
   return (
-    <div className="relative w-full h-[380px] md:h-[450px] bg-[#0c0d12] border border-zinc-800 rounded-2xl overflow-hidden select-none z-0 shadow-lg">
+    <div className="relative w-full h-[380px] md:h-[450px] bg-[#0C0B0D] border border-[#26232B] rounded-2xl overflow-hidden select-none z-0 shadow-2xl">
       <style>{`
         @keyframes radarPulse {
           0% { transform: scale(1); opacity: 0.8; }
           100% { transform: scale(2.4); opacity: 0; }
         }
         .leaflet-container {
-          background-color: #0c0d12 !important;
+          background-color: #0C0B0D !important;
         }
         .custom-popup .leaflet-popup-content-wrapper {
-          background: #18181b !important;
+          background: #151417 !important;
           color: #ffffff !important;
-          border: 1px solid #27272a !important;
+          border: 1px solid #26232B !important;
           border-radius: 16px !important;
-          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7) !important;
           padding: 0 !important;
         }
         .custom-popup .leaflet-popup-content {
@@ -161,8 +161,8 @@ export default function MinimalMap({
           line-height: 1.4 !important;
         }
         .custom-popup .leaflet-popup-tip {
-          background: #18181b !important;
-          border: 1px solid #27272a !important;
+          background: #151417 !important;
+          border: 1px solid #26232B !important;
         }
         .custom-popup .leaflet-popup-close-button {
           color: #a1a1aa !important;
@@ -172,39 +172,43 @@ export default function MinimalMap({
       
       {/* Top-Left Engine Status Badge */}
       <div className="absolute top-4 left-4 z-[400] flex flex-col gap-2 pointer-events-none">
-        <div className="bg-zinc-900/90 backdrop-blur-md border border-zinc-800 px-3 py-1.5 rounded-xl flex items-center gap-2 shadow-md">
-          <Compass className="w-3.5 h-3.5 text-indigo-400 animate-spin-slow" />
+        <div className="bg-[#151417] border border-[#26232B] px-3.5 py-1.5 rounded-full flex items-center gap-2 shadow-md">
+          <Compass className="w-3.5 h-3.5 text-[#C9B8E8] animate-spin-slow" />
           <span className="text-xs font-mono font-bold text-white tracking-wide uppercase">
             Delhi Geo-Radial Engine
           </span>
         </div>
-        <div className="bg-indigo-500/10 backdrop-blur-md border border-indigo-500/25 text-white px-3 py-1.5 rounded-xl shadow-md flex items-center gap-2">
-          <Users className="w-3.5 h-3.5 text-indigo-400" />
+        <div className="bg-[#0C0B0D] border border-[#26232B] text-white px-3.5 py-1.5 rounded-full shadow-md flex items-center gap-2">
+          <Users className="w-3.5 h-3.5 text-[#C9B8E8]" />
           <span className="text-xs font-mono">
             <span className="text-zinc-400">Target Density: </span>
-            <strong className="text-emerald-400">{activeMatchesCount} matched creators</strong>
+            <strong className="text-[#F1E3A8]">{activeMatchesCount} matched creators</strong>
           </span>
         </div>
       </div>
 
       {/* Bottom-Right Coordinates Tag */}
-      <div className="absolute bottom-5 right-4 z-[400] bg-zinc-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-zinc-800 text-[10px] font-mono text-zinc-400 shadow-md flex flex-col gap-0.5 pointer-events-none">
+      <div className="absolute bottom-5 right-4 z-[400] bg-[#151417] px-3 py-1.5 rounded-xl border border-[#26232B] text-[10px] font-mono text-zinc-400 shadow-md flex flex-col gap-0.5 pointer-events-none">
         <div>LAT: {centerLat.toFixed(4)}</div>
         <div>LNG: {centerLng.toFixed(4)}</div>
       </div>
 
       {/* Bottom-Left Legend */}
-      <div className="absolute bottom-5 left-4 z-[400] flex gap-3 bg-zinc-900/90 backdrop-blur-md border border-zinc-800 px-3 py-1.5 rounded-xl text-[10px] font-mono text-zinc-300 shadow-md pointer-events-none">
+      <div className="absolute bottom-5 left-4 z-[400] flex gap-3 bg-[#151417] border border-[#26232B] px-3.5 py-2 rounded-xl text-[10px] font-mono text-zinc-300 shadow-md pointer-events-none">
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-[0_0_6px_rgba(99,102,241,0.6)]" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#C9B8E8] shadow-[0_0_6px_rgba(201,184,232,0.6)]" />
           <span>Selected</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.6)]" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#C9B8E8] border border-[#0C0B0D] shadow-[0_0_6px_rgba(201,184,232,0.3)]" />
           <span>Within Geofence</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-zinc-500" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#F1E3A8] shadow-[0_0_6px_rgba(241,227,168,0.6)]" />
+          <span>Target Pin</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-zinc-600" />
           <span>Outer Ring</span>
         </div>
       </div>
@@ -229,11 +233,11 @@ export default function MinimalMap({
           center={[centerLat, centerLng]}
           radius={12000}
           pathOptions={{
-            color: '#6366f1',
-            fillColor: '#6366f1',
-            fillOpacity: 0.08,
+            color: '#C9B8E8',
+            fillColor: '#C9B8E8',
+            fillOpacity: 0.05,
             weight: 1.5,
-            dashArray: '4, 8',
+            dashArray: '6, 6',
           }}
         />
 
@@ -242,9 +246,9 @@ export default function MinimalMap({
           center={[centerLat, centerLng]}
           radius={5000}
           pathOptions={{
-            color: '#10b981',
-            fillColor: '#10b981',
-            fillOpacity: 0.06,
+            color: '#26232B',
+            fillColor: '#C9B8E8',
+            fillOpacity: 0.03,
             weight: 1,
           }}
         />
@@ -257,13 +261,13 @@ export default function MinimalMap({
             className: 'custom-center-marker',
             html: `
               <div style="position:relative;width:16px;height:16px;">
-                <div style="position:absolute;inset:-8px;border-radius:50%;background:rgba(99,102,241,0.3);animation:radarPulse 1.8s infinite;"></div>
+                <div style="position:absolute;inset:-8px;border-radius:50%;background:rgba(241,227,168,0.35);animation:radarPulse 1.8s infinite;"></div>
                 <div style="
                   width:16px;height:16px;
                   border-radius:50%;
-                  background:#6366f1;
-                  border:2.5px solid #ffffff;
-                  box-shadow:0 0 15px rgba(99,102,241,0.8), 0 2px 6px rgba(0,0,0,0.5);
+                  background:#F1E3A8;
+                  border:2.5px solid #0C0B0D;
+                  box-shadow:0 0 15px rgba(241,227,168,0.8), 0 2px 6px rgba(0,0,0,0.6);
                   position:relative;z-index:2;
                 "></div>
               </div>
@@ -292,7 +296,7 @@ export default function MinimalMap({
                   <img 
                     src={creator.avatar} 
                     alt={creator.name} 
-                    className="w-8 h-8 rounded-full object-cover border border-indigo-500/40 shrink-0" 
+                    className="w-8 h-8 rounded-full object-cover border border-[#C9B8E8]/50 shrink-0" 
                   />
                   <div className="min-w-0">
                     <div className="text-xs font-bold text-white leading-tight truncate">{creator.name}</div>
@@ -306,11 +310,11 @@ export default function MinimalMap({
                   </div>
                   <div className="flex justify-between items-center text-zinc-300">
                     <span className="text-zinc-500">Match Score:</span>
-                    <strong className="text-indigo-400">{creator.matchScore}%</strong>
+                    <strong className="text-[#C9B8E8]">{creator.matchScore}%</strong>
                   </div>
                   <div className="flex justify-between items-center text-zinc-300">
                     <span className="text-zinc-500">Local Audience:</span>
-                    <strong className="text-emerald-400">{creator.audienceInLocality}%</strong>
+                    <strong className="text-white">{creator.audienceInLocality}%</strong>
                   </div>
                 </div>
               </Popup>

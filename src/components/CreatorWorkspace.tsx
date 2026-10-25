@@ -530,7 +530,7 @@ export default function CreatorWorkspace({
                   type="button"
                   onClick={handleVerifySocials}
                   disabled={isVerifyingHandle || !!handleVerifiedData}
-                  className="shrink-0 px-4 py-2.5 bg-indigo-500 border-none text-white hover:bg-black disabled:opacity-50 font-bold font-mono text-xs uppercase rounded-2xl transition-colors border border-zinc-800"
+                  className="shrink-0 px-4 py-2.5 bg-[#C9B8E8] text-[#0C0B0D] hover:bg-[#D8CAF2] disabled:opacity-50 font-bold font-mono text-xs uppercase rounded-xl transition-colors shadow-sm cursor-pointer"
                 >
                   {isVerifyingHandle ? 'Scanning...' : (handleVerifiedData ? 'Verified' : 'Verify')}
                 </button>
@@ -729,7 +729,7 @@ export default function CreatorWorkspace({
                   setTimeout(() => setProfileSaveStatus('idle'), 3000);
                 }
               }}
-              className="py-3 px-6 bg-slate-900 hover:bg-slate-800 text-white font-mono text-sm rounded-2xl font-bold tracking-wider uppercase transition-all  shadow-slate-900/20 hover: hover:scale-[1.02] active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:scale-100"
+              className="py-3 px-6 bg-[#C9B8E8] hover:bg-[#D8CAF2] text-[#0C0B0D] font-mono text-sm rounded-xl font-bold tracking-wider uppercase transition-all shadow-md active:scale-[0.98] cursor-pointer disabled:opacity-50"
             >
               {profileSaveStatus === 'saving' ? 'SAVING...' : 'COMMIT LOCAL PROFILE CHANGES'}
             </button>
@@ -858,8 +858,8 @@ export default function CreatorWorkspace({
               </div>
               <button
                 onClick={() => setIsRadarActive(!isRadarActive)}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center justify-center rounded-2xl transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-                  isRadarActive ? 'bg-black' : 'bg-zinc-200'
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors focus:outline-none ${
+                  isRadarActive ? 'bg-[#C9B8E8]' : 'bg-[#26232B]'
                 }`}
                 role="switch"
                 aria-checked={isRadarActive}
@@ -867,7 +867,7 @@ export default function CreatorWorkspace({
                 <span className="sr-only">Toggle Radar</span>
                 <span
                   aria-hidden="true"
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-2xl bg-zinc-900 shadow ring-0 transition duration-200 ease-in-out ${
+                  className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-[#0C0B0D] shadow transition-transform ${
                     isRadarActive ? 'translate-x-2.5' : '-translate-x-2.5'
                   }`}
                 />
@@ -1015,10 +1015,10 @@ export default function CreatorWorkspace({
                         onClick={() => {
                           setViewingCampaignId(camp.id);
                         }}
-                        className="py-1.5 px-3 bg-zinc-900 hover:bg-black text-white text-xs font-bold rounded-2xl transition-colors flex items-center gap-1 cursor-pointer"
+                        className="py-1.5 px-3.5 bg-[#C9B8E8] hover:bg-[#D8CAF2] text-[#0C0B0D] text-xs font-bold rounded-xl transition-colors flex items-center gap-1 cursor-pointer shadow-sm"
                       >
                         <span>Express Interest</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
+                        <ChevronRight className="w-3.5 h-3.5 text-[#0C0B0D]" />
                       </button>
                     </div>
                   </div>
@@ -1342,16 +1342,16 @@ export default function CreatorWorkspace({
                         <button
                           onClick={handleFileUploadAndSubmit}
                           disabled={isUploadingThis}
-                          className="w-full py-4 px-6 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 disabled:opacity-50 text-white text-base font-semibold rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-3 shadow-[0_0_30px_-5px_rgba(99,102,241,0.4)] hover:shadow-[0_0_40px_-5px_rgba(99,102,241,0.6)] hover:-translate-y-0.5 active:translate-y-0"
+                          className="w-full py-3.5 px-6 bg-[#C9B8E8] hover:bg-[#D8CAF2] text-[#0C0B0D] text-base font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-3 shadow-md hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50"
                         >
                           {isUploadingThis ? (
                             <>
-                              <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-2xl animate-spin" />
+                              <div className="w-5 h-5 border-2 border-[#0C0B0D]/30 border-t-[#0C0B0D] rounded-full animate-spin" />
                               <span>Uploading & Submitting...</span>
                             </>
                           ) : (
                             <>
-                              <Upload className="w-5 h-5" />
+                              <Upload className="w-5 h-5 text-[#0C0B0D]" />
                               <span>Submit Draft Securely</span>
                             </>
                           )}
@@ -1433,16 +1433,16 @@ export default function CreatorWorkspace({
                       <button
                         onClick={handleSubmitPublishedLink}
                         disabled={isUploadingThis || !contentLink.trim()}
-                        className="w-full py-4 px-6 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50 text-white text-base font-semibold rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-3 shadow-[0_0_30px_-5px_rgba(16,185,129,0.4)] hover:shadow-[0_0_40px_-5px_rgba(16,185,129,0.6)] hover:-translate-y-0.5 active:translate-y-0"
+                        className="w-full py-3.5 px-6 bg-[#C9B8E8] hover:bg-[#D8CAF2] text-[#0C0B0D] text-base font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-3 shadow-md hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50"
                       >
                         {isUploadingThis ? (
                           <>
-                            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-2xl animate-spin" />
+                            <div className="w-5 h-5 border-2 border-[#0C0B0D]/30 border-t-[#0C0B0D] rounded-full animate-spin" />
                             <span>Submitting Link...</span>
                           </>
                         ) : (
                           <>
-                            <Check className="w-5 h-5" />
+                            <Check className="w-5 h-5 text-[#0C0B0D]" />
                             <span>Submit Published Link</span>
                           </>
                         )}

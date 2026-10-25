@@ -5,14 +5,59 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
+
+  /* Radius Creator Moodboard Tokens: Dusty Lilac + Butter */
+  --color-base: #0C0B0D;
+  --color-card: #151417;
+  --color-border: #26232B;
+  --color-lilac: #C9B8E8;
+  --color-butter: #F1E3A8;
+  --color-accent: #C9B8E8;
+  --color-accent-secondary: #F1E3A8;
+
+  /* Overriding zinc scale to match base, card, border & soft lilac-tinted neutrals */
+  --color-zinc-950: #0C0B0D;
+  --color-zinc-900: #151417;
+  --color-zinc-850: #1C1B1F;
+  --color-zinc-800: #26232B;
+  --color-zinc-700: #383440;
+  --color-zinc-600: #555060;
+  --color-zinc-500: #7A7486;
+  --color-zinc-400: #A8A1B5;
+  --color-zinc-300: #CDC7D8;
+  --color-zinc-200: #E6E2EE;
+
+  /* Remap primary accent utilities to Lilac and Butter */
+  --color-indigo-500: #C9B8E8;
+  --color-indigo-400: #C9B8E8;
+  --color-indigo-600: #B5A1DB;
+  --color-cyan-400: #C9B8E8;
+  --color-amber-400: #F1E3A8;
+  --color-yellow-400: #F1E3A8;
+}
+
+:root {
+  --color-base: #0C0B0D;
+  --color-card: #151417;
+  --color-border: #26232B;
+  --color-lilac: #C9B8E8;
+  --color-butter: #F1E3A8;
+  --color-accent: #C9B8E8;
+  --color-accent-secondary: #F1E3A8;
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: #0C0B0D;
+  color: #EDE8F5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Butter for selected text */
+::selection {
+  background: #F1E3A8;
+  color: #0C0B0D;
 }
 
 /* Ensure headings & sub-headings default to Outfit typography */
@@ -32,14 +77,14 @@ p, span, label, input, select, textarea, button, a, div:not(.font-display) {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #0C0B0D;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #26232B;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #C9B8E8;
 }
 
 /* Animated Background Orbs */

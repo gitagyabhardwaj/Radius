@@ -20,18 +20,16 @@ export function ReviewsCard({
 }) {
   const summary = useQuery(api.ratings.getForUser, { userId: userId as any });
 
-  const textMuted = dark ? 'text-white' : 'text-white';
-  const textBase = dark ? 'text-white' : 'text-white';
-  const cardBg = dark
-    ? 'bg-zinc-900 border-zinc-800'
-    : 'bg-zinc-900 border-zinc-800';
+  const textMuted = 'text-zinc-400';
+  const textBase = 'text-white';
+  const cardBg = 'bg-[#151417] border-[#26232B]';
 
   if (!summary) return null;
 
   return (
-    <div className={`p-4 rounded-none border flex flex-col gap-3 ${cardBg}`}>
+    <div className={`p-4 rounded-2xl border flex flex-col gap-3 ${cardBg}`}>
       <div className="flex items-center justify-between">
-        <span className={`text-[11px] font-sans tracking-widest font-bold ${textMuted}`}>
+        <span className={`text-[11px] font-sans tracking-widest font-bold uppercase ${textMuted}`}>
           {label}
         </span>
         {summary.count > 0 ? (
@@ -41,7 +39,7 @@ export function ReviewsCard({
                 <Star
                   key={n}
                   className={`w-3.5 h-3.5 ${
-                    n <= Math.round(summary.average) ? 'fill-amber-400 text-amber-400' : 'text-white'
+                    n <= Math.round(summary.average) ? 'fill-[#F1E3A8] text-[#F1E3A8]' : 'text-zinc-700'
                   }`}
                 />
               ))}
@@ -66,7 +64,7 @@ export function ReviewsCard({
                     <Star
                       key={n}
                       className={`w-3 h-3 ${
-                        n <= r.stars ? 'fill-amber-400 text-amber-400' : 'text-white'
+                        n <= r.stars ? 'fill-[#F1E3A8] text-[#F1E3A8]' : 'text-zinc-700'
                       }`}
                     />
                   ))}
@@ -109,8 +107,8 @@ export default function RatingWidget({
   if (!status) return null;
   if (!status.canRate && !status.alreadyRated) return null;
 
-  const textMuted = dark ? 'text-white' : 'text-white';
-  const textBase = dark ? 'text-white' : 'text-white';
+  const textMuted = 'text-zinc-400';
+  const textBase = 'text-white';
 
   if (status.alreadyRated && status.myRating) {
     return (
@@ -123,7 +121,7 @@ export default function RatingWidget({
             <Star
               key={n}
               className={`w-4 h-4 ${
-                n <= status.myRating.stars ? 'fill-amber-400 text-amber-400' : 'text-white'
+                n <= status.myRating.stars ? 'fill-[#F1E3A8] text-[#F1E3A8]' : 'text-zinc-700'
               }`}
             />
           ))}
@@ -152,7 +150,7 @@ export default function RatingWidget({
           >
             <Star
               className={`w-5 h-5 transition-colors ${
-                n <= (hoverStars || stars) ? 'fill-amber-400 text-amber-400' : 'text-white'
+                n <= (hoverStars || stars) ? 'fill-[#F1E3A8] text-[#F1E3A8]' : 'text-zinc-700'
               }`}
             />
           </button>
@@ -164,13 +162,9 @@ export default function RatingWidget({
         onChange={(e) => setComment(e.target.value)}
         placeholder="Optional comment"
         maxLength={280}
-        className={`text-xs rounded-none px-3 py-1.5 border outline-none ${
-          dark
-            ? 'bg-zinc-900 border-zinc-800 text-white placeholder:text-white'
-            : 'bg-zinc-900 border-zinc-800 text-white placeholder:text-white'
-        }`}
+        className="text-xs rounded-xl px-3 py-1.5 border border-[#26232B] outline-none bg-[#0C0B0D] text-white placeholder:text-zinc-500 focus:border-[#C9B8E8]"
       />
-      {error && <span className="text-[11px] text-white">{error}</span>}
+      {error && <span className="text-[11px] text-rose-400">{error}</span>}
       <button
         type="button"
         disabled={stars === 0 || submitting}
@@ -189,7 +183,7 @@ export default function RatingWidget({
             setSubmitting(false);
           }
         }}
-        className="w-max py-1.5 px-3 bg-amber-400 hover:bg-amber-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold rounded-none transition-colors"
+        className="w-max py-1.5 px-4 bg-[#C9B8E8] hover:bg-[#D8CAF2] disabled:opacity-40 disabled:cursor-not-allowed text-[#0C0B0D] text-xs font-bold rounded-xl transition-colors cursor-pointer shadow-sm"
       >
         {submitting ? 'Submitting…' : 'Submit Rating'}
       </button>

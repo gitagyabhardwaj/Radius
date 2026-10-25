@@ -230,12 +230,12 @@ export default function App() {
   // --- LOADING STATE ---
   if (!isAuthLoaded) {
     return (
-      <div className="min-h-screen bg-zinc-900 flex items-center justify-center">
+      <div className="min-h-screen bg-[#0C0B0D] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500 font-display font-semibold font-semibold tracking-tighter text-base animate-pulse">
+          <div className="w-10 h-10 rounded-2xl bg-[#151417] border border-[#26232B] flex items-center justify-center text-[#C9B8E8] font-display font-semibold tracking-tighter text-base animate-pulse shadow-xl">
             R.
           </div>
-          <span className="text-white font-mono text-sm">Initializing Radius...</span>
+          <span className="text-zinc-400 font-mono text-sm">Initializing Radius...</span>
         </div>
       </div>
     );
@@ -250,12 +250,12 @@ export default function App() {
   if (currentUser === undefined) {
     // Still loading from Convex
     return (
-      <div className="min-h-screen bg-zinc-900 flex items-center justify-center">
+      <div className="min-h-screen bg-[#0C0B0D] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500 font-display font-semibold font-semibold tracking-tighter text-base animate-pulse">
+          <div className="w-10 h-10 rounded-2xl bg-[#151417] border border-[#26232B] flex items-center justify-center text-[#C9B8E8] font-display font-semibold tracking-tighter text-base animate-pulse shadow-xl">
             R.
           </div>
-          <span className="text-white font-mono text-sm">Loading profile...</span>
+          <span className="text-zinc-400 font-mono text-sm">Loading profile...</span>
         </div>
       </div>
     );
@@ -278,92 +278,91 @@ export default function App() {
   const showMap = view === 'brand' && activeBrandSubTab === 'setup';
 
   return (
-    <div className="h-screen overflow-hidden bg-black text-white selection:bg-indigo-500/30 selection:text-white flex flex-row relative z-0 font-sans">
+    <div className="h-screen overflow-hidden bg-[#0C0B0D] text-white selection:bg-[#F1E3A8] selection:text-[#0C0B0D] flex flex-row relative z-0 font-sans">
       
-      {/* Premium Ambient Lighting Glows */}
+      {/* Subtle Ambient Beacon */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-indigo-500/10 blur-[120px] rounded-full mix-blend-screen opacity-50 animate-pulse" />
-        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-purple-500/10 blur-[120px] rounded-full mix-blend-screen opacity-50" />
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-[#C9B8E8]/5 blur-[140px] rounded-full mix-blend-screen opacity-40" />
       </div>
 
       {/* MINIMALIST PERSISTENT SIDEBAR NAVIGATION */}
-      <aside className="w-64 bg-black/50 text-white border-r border-zinc-800/50 flex flex-col justify-between shrink-0 h-screen overflow-y-auto z-20 backdrop-blur-xl transition-glass">
+      <aside className="w-64 bg-[#151417] text-white border-r border-[#26232B] flex flex-col justify-between shrink-0 h-screen overflow-y-auto z-20 backdrop-blur-xl transition-glass">
         <div className="flex flex-col">
           {/* Logo Brand Header */}
-          <div className="p-5 border-b border-zinc-800 flex items-center gap-2.5 bg-transparent text-white">
-            <div className="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-white font-semibold text-base border-2 border-zinc-800">
+          <div className="p-5 border-b border-[#26232B] flex items-center gap-2.5 bg-[#151417] text-white">
+            <div className="w-8 h-8 rounded-xl bg-[#C9B8E8] flex items-center justify-center text-[#0C0B0D] font-bold text-base shadow-sm">
               R.
             </div>
             <div className="flex flex-col">
               <span className="font-display font-semibold font-bold text-base tracking-tight text-white uppercase leading-none">
                 RADIUS
               </span>
-              <span className="text-[11px] font-mono tracking-wider text-white mt-0.5 uppercase leading-none">
+              <span className="text-[11px] font-mono tracking-wider text-zinc-500 mt-0.5 uppercase leading-none">
                 Hyperlocal Escrow
               </span>
             </div>
           </div>
-          <div className="px-5 py-4 border-b border-zinc-800 bg-zinc-900 flex flex-col gap-3">
+          <div className="px-5 py-4 border-b border-[#26232B] bg-[#151417] flex flex-col gap-3">
             <div className="flex items-center gap-3">
-              <img src={currentUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name || 'U')}&background=random`} alt="User" className="w-8 h-8 rounded-full" />
+              <img src={currentUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name || 'U')}&background=random`} alt="User" className="w-8 h-8 rounded-full border border-[#26232B]" />
               <div className="flex flex-col">
                 <span className="font-bold text-sm text-white">{currentUser.name}</span>
-                <span className="text-[10px] uppercase font-mono text-white">{currentUser.role}</span>
+                <span className="text-[10px] uppercase font-mono text-zinc-400">{currentUser.role}</span>
               </div>
             </div>
-            <div className="bg-zinc-900 rounded-2xl p-2.5 border border-zinc-800 flex justify-between items-center">
-              <span className="text-xs font-mono text-white">Wallet</span>
-              <span className="text-sm font-bold text-white font-mono">₹{currentUser.escrowBalance || 0}</span>
+            <div className="bg-[#0C0B0D] rounded-xl p-2.5 border border-[#26232B] flex justify-between items-center">
+              <span className="text-xs font-mono text-zinc-400">Wallet</span>
+              <span className="text-sm font-bold text-[#F1E3A8] font-mono">₹{currentUser.escrowBalance || 0}</span>
             </div>
           </div>
           {/* Subtab Navigation */}
           <div className="p-4 flex flex-col gap-2">
-            <span className="text-[11px] font-sans tracking-widest text-white font-bold px-1.5">Navigation Features</span>
-            <nav className="flex flex-col gap-1">
+            <span className="text-[11px] font-mono uppercase tracking-widest text-zinc-500 font-bold px-1.5">Navigation Features</span>
+            <nav className="flex flex-col gap-1.5">
               {view === 'brand' ? (
                 <>
                   <button
                     onClick={() => setActiveBrandSubTab('setup')}
-                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2.5 px-3 rounded-xl text-sm font-semibold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeBrandSubTab === 'setup'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
-                        : 'text-white hover:text-white hover:bg-zinc-900'
+                        ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold shadow-md'
+                        : 'text-zinc-400 hover:text-white hover:bg-[#26232B]/50'
                     }`}
                   >
-                    <Compass className="w-4 h-4" />
+                    <Compass className={`w-4 h-4 ${activeBrandSubTab === 'setup' ? 'text-[#0C0B0D]' : 'text-zinc-400'}`} />
                     <span>1. Launch Engine</span>
                   </button>
                   <button
                     onClick={() => setActiveBrandSubTab('dispatch')}
-                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2.5 px-3 rounded-xl text-sm font-semibold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeBrandSubTab === 'dispatch'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
-                        : 'text-white hover:text-white hover:bg-zinc-900'
+                        ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold shadow-md'
+                        : 'text-zinc-400 hover:text-white hover:bg-[#26232B]/50'
                     }`}
                   >
-                    <Activity className="w-4 h-4" />
+                    <Activity className={`w-4 h-4 ${activeBrandSubTab === 'dispatch' ? 'text-[#0C0B0D]' : 'text-zinc-400'}`} />
                     <span>2. Dispatch Room</span>
                   </button>
                   <button
                     onClick={() => setActiveBrandSubTab('analytics')}
-                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2.5 px-3 rounded-xl text-sm font-semibold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeBrandSubTab === 'analytics'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
-                        : 'text-white hover:text-white hover:bg-zinc-900'
+                        ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold shadow-md'
+                        : 'text-zinc-400 hover:text-white hover:bg-[#26232B]/50'
                     }`}
                   >
-                    <ShieldCheck className="w-4 h-4" />
+                    <ShieldCheck className={`w-4 h-4 ${activeBrandSubTab === 'analytics' ? 'text-[#0C0B0D]' : 'text-zinc-400'}`} />
                     <span>3. Analytics Logs</span>
                   </button>
                   <button
                     onClick={() => setActiveBrandSubTab('profile')}
-                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2.5 px-3 rounded-xl text-sm font-semibold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeBrandSubTab === 'profile'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
-                        : 'text-white hover:text-white hover:bg-zinc-900'
+                        ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold shadow-md'
+                        : 'text-zinc-400 hover:text-white hover:bg-[#26232B]/50'
                     }`}
                   >
-                    <User className="w-4 h-4" />
+                    <User className={`w-4 h-4 ${activeBrandSubTab === 'profile' ? 'text-[#0C0B0D]' : 'text-zinc-400'}`} />
                     <span>4. Brand Profile</span>
                   </button>
                 </>
@@ -371,57 +370,57 @@ export default function App() {
                 <>
                   <button
                     onClick={() => setActiveCreatorSubTab('radar')}
-                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2.5 px-3 rounded-xl text-sm font-semibold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeCreatorSubTab === 'radar'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
-                        : 'text-white hover:text-white hover:bg-zinc-900'
+                        ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold shadow-md'
+                        : 'text-zinc-400 hover:text-white hover:bg-[#26232B]/50'
                     }`}
                   >
-                    <Radio className="w-4 h-4" />
+                    <Radio className={`w-4 h-4 ${activeCreatorSubTab === 'radar' ? 'text-[#0C0B0D]' : 'text-zinc-400'}`} />
                     <span>1. Active Radar</span>
                   </button>
                   <button
                     onClick={() => setActiveCreatorSubTab('escrow')}
-                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2.5 px-3 rounded-xl text-sm font-semibold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeCreatorSubTab === 'escrow'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
-                        : 'text-white hover:text-white hover:bg-zinc-900'
+                        ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold shadow-md'
+                        : 'text-zinc-400 hover:text-white hover:bg-[#26232B]/50'
                     }`}
                   >
-                    <Compass className="w-4 h-4" />
+                    <Compass className={`w-4 h-4 ${activeCreatorSubTab === 'escrow' ? 'text-[#0C0B0D]' : 'text-zinc-400'}`} />
                     <span className="truncate">2. Active Campaigns</span>
                   </button>
                   <button
                     onClick={() => setActiveCreatorSubTab('wallet')}
-                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2.5 px-3 rounded-xl text-sm font-semibold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeCreatorSubTab === 'wallet'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
-                        : 'text-white hover:text-white hover:bg-zinc-900'
+                        ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold shadow-md'
+                        : 'text-zinc-400 hover:text-white hover:bg-[#26232B]/50'
                     }`}
                   >
-                    <DollarSign className="w-4 h-4" />
+                    <DollarSign className={`w-4 h-4 ${activeCreatorSubTab === 'wallet' ? 'text-[#0C0B0D]' : 'text-zinc-400'}`} />
                     <span>3. Secure Wallet</span>
                   </button>
                   <button
                     onClick={() => setActiveCreatorSubTab('portfolio')}
-                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2.5 px-3 rounded-xl text-sm font-semibold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeCreatorSubTab === 'portfolio'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
-                        : 'text-white hover:text-white hover:bg-zinc-900'
+                        ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold shadow-md'
+                        : 'text-zinc-400 hover:text-white hover:bg-[#26232B]/50'
                     }`}
                   >
-                    <Image className="w-4 h-4" />
+                    <Image className={`w-4 h-4 ${activeCreatorSubTab === 'portfolio' ? 'text-[#0C0B0D]' : 'text-zinc-400'}`} />
                     <span>4. Portfolio</span>
                   </button>
                   <button
                     onClick={() => setActiveCreatorSubTab('profile')}
-                    className={`w-full py-2 px-3 rounded-2xl text-sm font-bold flex items-center gap-2.5 transition-all cursor-pointer ${
+                    className={`w-full py-2.5 px-3 rounded-xl text-sm font-semibold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeCreatorSubTab === 'profile'
-                        ? 'bg-zinc-900 text-white font-semibold border-l-2 border-zinc-800 rounded-none rounded-r-2xl'
-                        : 'text-white hover:text-white hover:bg-zinc-900'
+                        ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold shadow-md'
+                        : 'text-zinc-400 hover:text-white hover:bg-[#26232B]/50'
                     }`}
                   >
-                    <User className="w-4 h-4" />
+                    <User className={`w-4 h-4 ${activeCreatorSubTab === 'profile' ? 'text-[#0C0B0D]' : 'text-zinc-400'}`} />
                     <span>5. Creator Profile</span>
                   </button>
                 </>
@@ -431,17 +430,17 @@ export default function App() {
         </div>
 
         {/* Bottom profile info */}
-        <div className="p-4 border-t border-zinc-800 flex flex-col gap-3">
+        <div className="p-4 border-t border-[#26232B] bg-[#151417] flex flex-col gap-3">
           <div className="flex items-center gap-2.5 px-1">
             {clerkUser?.imageUrl ? (
               <img
                 src={clerkUser.imageUrl}
                 alt="Profile"
-                className="w-8 h-8 rounded-full object-cover border border-zinc-800"
+                className="w-8 h-8 rounded-full object-cover border border-[#26232B]"
                 referrerPolicy="no-referrer"
               />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 flex items-center justify-center font-bold text-sm text-white uppercase">
+              <div className="w-8 h-8 rounded-xl bg-[#0C0B0D] border border-[#26232B] flex items-center justify-center font-bold text-sm text-[#C9B8E8] uppercase font-mono">
                 {view === 'brand' ? brandDisplayName.substring(0, 2) : '?'}
               </div>
             )}
@@ -449,7 +448,7 @@ export default function App() {
               <span className="text-xs font-bold text-white tracking-tight line-clamp-1 leading-none">
                 {view === 'brand' ? brandDisplayName : currentCreatorProfile?.name || 'Creator'}
               </span>
-              <span className="text-[10px] font-mono text-white mt-1 leading-none truncate max-w-[120px]" title={clerkUser?.primaryEmailAddress?.emailAddress || ''}>
+              <span className="text-[10px] font-mono text-zinc-500 mt-1 leading-none truncate max-w-[120px]" title={clerkUser?.primaryEmailAddress?.emailAddress || ''}>
                 {clerkUser?.primaryEmailAddress?.emailAddress || (view === 'brand' ? 'Active Brand Admin' : 'Grid Operator')}
               </span>
             </div>
@@ -459,33 +458,36 @@ export default function App() {
               await signOut();
               window.location.reload();
             }}
-            className="w-full py-2 border border-zinc-800 rounded-2xl text-[11px] font-mono font-bold tracking-wider uppercase text-white hover:text-white hover:bg-zinc-900 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+            className="w-full py-2 border border-[#26232B] rounded-xl text-[11px] font-mono font-bold tracking-wider uppercase text-zinc-400 hover:text-white hover:bg-[#0C0B0D] flex items-center justify-center gap-1.5 transition-all cursor-pointer"
           >
-            <LogOut className="w-3.5 h-3.5" />
+            <LogOut className="w-3.5 h-3.5 text-[#C9B8E8]" />
             <span>Sign Out</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto relative custom-scrollbar">
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto relative custom-scrollbar bg-[#0C0B0D]">
         
         {/* Dynamic header status bar */}
-        <header className="border-b border-zinc-800 bg-zinc-900  sticky top-0 z-30 px-6 py-4  transition-glass">
+        <header className="border-b border-[#26232B] bg-[#151417] sticky top-0 z-30 px-6 py-4 transition-glass">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <span className="text-sm font-mono font-bold text-white uppercase">Current Node:</span>
-              <span className="text-sm font-mono font-bold text-white bg-indigo-500 border border-indigo-500 px-2 py-0.5 rounded-2xl uppercase">
+              <span className="text-sm font-mono font-bold text-zinc-400 uppercase">Current Node:</span>
+              <span className="text-xs font-mono font-bold text-[#0C0B0D] bg-[#C9B8E8] border border-[#C9B8E8] px-3 py-1 rounded-full uppercase shadow-sm">
                 {view === 'brand' ? `${brandDisplayName} Admin` : `${currentCreatorProfile?.name || 'Creator'} Terminal`}
               </span>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 text-sm font-mono font-bold text-white">
-                <Activity className="w-3.5 h-3.5 text-white animate-pulse" />
+              <div className="flex items-center gap-2 text-sm font-mono font-medium text-zinc-300">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F1E3A8] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F1E3A8]"></span>
+                </span>
                 <span className="hidden sm:inline">{view === 'brand' ? 'Escrow Node: Connected' : 'Radar Status: Listening for Offers'}</span>
               </div>
-              <div className="flex items-center justify-center p-2 rounded-2xl hover:bg-zinc-900 transition-all text-white hover:text-white border border-zinc-800 hover:border-zinc-800  cursor-pointer group">
+              <div className="flex items-center justify-center p-2 rounded-xl hover:bg-[#0C0B0D] transition-all text-zinc-400 hover:text-white border border-[#26232B] hover:border-[#C9B8E8]/50 cursor-pointer group">
                 <button 
                   className="flex items-center justify-center transition-transform group-hover:scale-110" 
                   aria-label="Sign out"
@@ -494,7 +496,7 @@ export default function App() {
                     window.location.reload();
                   }}
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="w-4 h-4 text-zinc-400 group-hover:text-[#C9B8E8]" />
                 </button>
               </div>
             </div>
@@ -508,11 +510,11 @@ export default function App() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-fade-in">
               <div className="lg:col-span-12 flex flex-col gap-3">
                 <div className="flex items-start justify-between">
-                  <div className="flex-1 bg-zinc-900  p-6 rounded-2xl border border-zinc-800  ">
+                  <div className="flex-1 bg-[#151417] p-6 rounded-2xl border border-[#26232B]">
                     <h1 className="text-xl font-display font-semibold font-bold text-white tracking-tight font-mono uppercase">
                       Hyperlocal Match Engine
                     </h1>
-                    <p className="text-sm text-white mt-1 mb-5">
+                    <p className="text-sm text-zinc-400 mt-1 mb-5">
                       Search an address or place the target pin to visualize creator match density.
                     </p>
                     <AddressSearch 
@@ -523,9 +525,9 @@ export default function App() {
                       }} 
                     />
                   </div>
-                  <div className="flex items-center gap-2 text-sm font-mono font-bold text-white mt-1">
-                    <Compass className="w-4 h-4 text-white animate-spin-slow" />
-                    <span>Delhi Grid (CP Centered)</span>
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#C9B8E8] text-[#0C0B0D] rounded-full text-xs font-mono font-bold shadow-sm">
+                    <Compass className="w-4 h-4 animate-spin-slow" />
+                    <span>GRID: DELHI_NCR</span>
                   </div>
                 </div>
 

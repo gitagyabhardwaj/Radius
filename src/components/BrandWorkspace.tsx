@@ -110,31 +110,33 @@ function SubmissionsReviewPanel({
           )}
         </div>
 
-        <div className="flex items-center gap-1 bg-zinc-900 border border-zinc-800 p-1 rounded-2xl">
+        <div className="flex items-center gap-1 bg-[#0C0B0D] border border-[#26232B] p-1 rounded-xl">
           <button
             onClick={() => setActiveTab('corkboard')}
-            className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'corkboard'
-                ? 'bg-zinc-800 text-white shadow-sm'
+                ? 'bg-[#C9B8E8] text-[#0C0B0D] shadow-sm'
                 : 'text-zinc-400 hover:text-white'
             }`}
           >
             <span>📌 Corkboard Wall</span>
-            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-zinc-950 text-zinc-300">
+            <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
+              activeTab === 'corkboard' ? 'bg-[#0C0B0D] text-[#C9B8E8]' : 'bg-[#151417] text-zinc-400'
+            }`}>
               {verifiedSubmissions.length}
             </span>
           </button>
           <button
             onClick={() => setActiveTab('review')}
-            className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'review'
-                ? 'bg-zinc-800 text-white shadow-sm'
+                ? 'bg-[#C9B8E8] text-[#0C0B0D] shadow-sm'
                 : 'text-zinc-400 hover:text-white'
             }`}
           >
             <span>📋 Review Queue</span>
             {pendingReview.length > 0 && (
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-amber-500 text-black font-black">
+              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-[#F1E3A8] text-[#0C0B0D] font-bold">
                 {pendingReview.length}
               </span>
             )}
@@ -428,9 +430,9 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                       finally { setBusyId(null); }
                     }}
                     disabled={busyId === offer._id}
-                    className="py-1.5 px-3 bg-black hover:bg-black disabled:opacity-50 text-white text-xs font-bold rounded-2xl flex items-center gap-1 cursor-pointer transition-colors"
+                    className="py-1.5 px-3.5 bg-[#C9B8E8] hover:bg-[#D8CAF2] disabled:opacity-50 text-[#0C0B0D] text-xs font-bold rounded-xl flex items-center gap-1 cursor-pointer transition-colors shadow-sm"
                   >
-                    <Check className="w-3.5 h-3.5" />
+                    <Check className="w-3.5 h-3.5 text-[#0C0B0D]" />
                     Approve
                   </button>
                   <button
@@ -440,9 +442,9 @@ function CreatorApprovalPanel({ campaignId, creators }: { campaignId: string; cr
                       finally { setBusyId(null); }
                     }}
                     disabled={busyId === offer._id}
-                    className="py-1.5 px-3 bg-zinc-900 hover:bg-zinc-900 disabled:opacity-50 border border-zinc-800 text-white text-xs font-bold rounded-2xl flex items-center gap-1 cursor-pointer transition-colors"
+                    className="py-1.5 px-3 bg-[#151417] hover:bg-[#26232B] disabled:opacity-50 border border-[#26232B] text-zinc-300 text-xs font-bold rounded-xl flex items-center gap-1 cursor-pointer transition-colors"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-3.5 h-3.5 text-zinc-400" />
                     Reject
                   </button>
                 </div>
@@ -827,8 +829,8 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 Set localized radius. Creators in this geofence will be programmatically dispatched.
               </p>
             </div>
-            <span className="bg-indigo-500 border-none text-white text-sm px-2.5 py-1 rounded-2xl font-semibold border border-zinc-800 flex items-center gap-1.5 animate-pulse">
-              <Radio className="w-3.5 h-3.5" />
+            <span className="bg-[#C9B8E8] text-[#0C0B0D] text-xs px-3 py-1 rounded-full font-bold shadow-sm flex items-center gap-1.5 font-mono uppercase">
+              <Radio className="w-3.5 h-3.5 text-[#0C0B0D]" />
               Geo-targeted
             </span>
           </div>
@@ -1010,31 +1012,31 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 max="14"
                 value={submissionDeadlineDays}
                 onChange={(e) => setSubmissionDeadlineDays(Number(e.target.value))}
-                className="w-full accent-zinc-800 cursor-pointer flex-1"
+                className="w-full accent-[#C9B8E8] cursor-pointer flex-1"
               />
-              <div className="bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl px-2 py-1 font-mono text-sm font-bold text-white flex items-center shrink-0">
+              <div className="bg-[#151417] border border-[#26232B] rounded-xl px-2.5 py-1 font-mono text-sm font-bold text-white flex items-center shrink-0">
                 <input
                   type="number"
                   min="1"
                   max="14"
                   value={isNaN(submissionDeadlineDays) || submissionDeadlineDays === 0 ? '' : submissionDeadlineDays}
                   onChange={(e) => setSubmissionDeadlineDays(Number(e.target.value))}
-                  className="w-10 focus:outline-none text-right font-mono"
+                  className="w-10 focus:outline-none text-right font-mono bg-transparent"
                 />
-                <span className="ml-1 text-white font-normal">days</span>
+                <span className="ml-1 text-zinc-400 font-normal">days</span>
               </div>
             </div>
           </div>
 
           {/* Map Location Coordinates indicator */}
-          <div className="bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl p-3.5 flex items-center justify-between">
+          <div className="bg-[#151417] border border-[#26232B] rounded-xl p-3.5 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-white">
+              <div className="w-8 h-8 rounded-full bg-[#C9B8E8]/10 flex items-center justify-center text-[#C9B8E8]">
                 <Navigation className="w-4 h-4" />
               </div>
               <div className="flex flex-col">
                 <span className="text-sm font-mono font-bold text-white">{resolvedLocalityLabel()}</span>
-                <span className="text-[11px] text-white">Centered at: {centerLat.toFixed(4)}N, {centerLng.toFixed(4)}E</span>
+                <span className="text-[11px] text-zinc-400">Centered at: {centerLat.toFixed(4)}N, {centerLng.toFixed(4)}E</span>
               </div>
             </div>
 
@@ -1055,33 +1057,33 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                   step="1"
                   value={spotsTotal}
                   onChange={(e) => setSpotsTotal(Number(e.target.value))}
-                  className="w-full accent-zinc-800 cursor-pointer flex-1"
+                  className="w-full accent-[#C9B8E8] cursor-pointer flex-1"
                 />
-                <div className="bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl px-2 py-1 font-mono text-sm font-bold text-white flex items-center shrink-0">
+                <div className="bg-[#151417] border border-[#26232B] rounded-xl px-2.5 py-1 font-mono text-sm font-bold text-white flex items-center shrink-0">
                   <input
                     type="number"
                     min="1"
                     max="100"
                     value={isNaN(spotsTotal) || spotsTotal === 0 ? '' : spotsTotal}
                     onChange={(e) => setSpotsTotal(Number(e.target.value))}
-                    className="w-12 focus:outline-none text-right font-mono"
+                    className="w-12 focus:outline-none text-right font-mono bg-transparent"
                   />
-                  <span className="ml-1 text-white font-normal">creators</span>
+                  <span className="ml-1 text-zinc-400 font-normal">creators</span>
                 </div>
               </div>
-              <span className="text-[11px] text-white">Platform automatically sends offers to next batch until filled</span>
+              <span className="text-[11px] text-zinc-400">Platform automatically sends offers to next batch until filled</span>
             </div>
           </div>
 
           {/* Smart Budget Estimator Widget */}
-          <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 flex flex-col gap-3">
+          <div className="bg-[#151417] border border-[#26232B] rounded-2xl p-4 flex flex-col gap-3">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-slate-800" />
-                <span className="text-sm font-semibold text-slate-800">Smart Budget Recommender</span>
+                <Sparkles className="w-4 h-4 text-[#F1E3A8]" />
+                <span className="text-sm font-semibold text-white">Smart Budget Recommender</span>
               </div>
-              <span className="text-xs font-mono text-slate-600">
-                Estimated range: <span className="text-slate-800 font-bold">₹{estMin} - ₹{estMax}</span>
+              <span className="text-xs font-mono text-zinc-400">
+                Estimated range: <span className="text-[#F1E3A8] font-bold">₹{estMin} - ₹{estMax}</span>
               </span>
             </div>
 
@@ -1094,15 +1096,15 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                   step="10"
                   value={budget}
                   onChange={(e) => setBudget(Number(e.target.value))}
-                  className="w-full accent-indigo-600 cursor-pointer"
+                  className="w-full accent-[#C9B8E8] cursor-pointer"
                 />
               </div>
-              <div className="bg-white border border-slate-200 rounded-2xl px-3 py-1.5 font-mono text-base font-bold text-slate-800 flex items-center shadow-sm">
+              <div className="bg-[#0C0B0D] border border-[#26232B] rounded-xl px-3 py-1.5 font-mono text-base font-bold text-[#F1E3A8] flex items-center shadow-sm">
                 ₹<input
                   type="number"
                   value={isNaN(budget) || budget === 0 ? '' : budget}
                   onChange={(e) => setBudget(Number(e.target.value))}
-                  className="w-14 focus:outline-none text-right font-mono text-slate-800"
+                  className="w-14 focus:outline-none text-right font-mono text-[#F1E3A8] bg-transparent"
                 />
               </div>
             </div>
@@ -1116,7 +1118,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 value={perCreatorPayout === '' ? '' : perCreatorPayout}
                 onChange={(e) => setPerCreatorPayout(e.target.value ? Number(e.target.value) : '')}
                 placeholder="Leave empty to divide budget equally"
-                className="w-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl px-3.5 py-2 text-base text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-800 focus:bg-zinc-900 transition-colors font-mono"
+                className="w-full bg-[#151417] border border-[#26232B] rounded-xl px-3.5 py-2 text-base text-white placeholder-zinc-500 focus:outline-none focus:border-[#C9B8E8] transition-colors font-mono"
               />
             </div>
             <div className="flex flex-col gap-1.5 justify-center mt-4">
@@ -1125,7 +1127,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                   type="checkbox"
                   checked={isTieredPayout}
                   onChange={(e) => setIsTieredPayout(e.target.checked)}
-                  className="w-4 h-4 rounded border-zinc-800 text-indigo-500 focus:ring-indigo-500 bg-zinc-900"
+                  className="w-4 h-4 rounded border-[#26232B] text-[#C9B8E8] focus:ring-[#C9B8E8] bg-[#0C0B0D]"
                 />
                 <span className="text-sm font-sans tracking-wider text-white font-bold">Use Tiered Rates by Follower/Engagement</span>
               </label>
@@ -1136,19 +1138,19 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
           </div>
 
           {/* Escrow Contract Terms Notice & Balance */}
-          <div className="border border-zinc-800 rounded-2xl p-4 bg-zinc-900 flex flex-col gap-3">
+          <div className="border border-[#26232B] rounded-2xl p-4 bg-[#151417] flex flex-col gap-3">
             <div className="flex items-start gap-3">
-              <ShieldCheck className="w-5 h-5 text-white shrink-0 mt-0.5" />
+              <ShieldCheck className="w-5 h-5 text-[#C9B8E8] shrink-0 mt-0.5" />
               <div className="flex flex-col gap-0.5 flex-1">
                 <div className="flex justify-between items-center w-full">
                   <span className="text-sm font-bold text-white">Automated Escrow Protocol</span>
-                  <div className="bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 px-2 py-1 rounded-2xl flex items-center gap-1.5">
-                    <span className="text-[11px] font-mono text-white uppercase tracking-wider">Wallet Balance:</span>
-                    <span className="text-sm font-mono font-bold text-white">₹{currentUser?.escrowBalance || 0}</span>
+                  <div className="bg-[#0C0B0D] border border-[#26232B] px-2.5 py-1 rounded-xl flex items-center gap-1.5">
+                    <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider">Wallet:</span>
+                    <span className="text-sm font-mono font-bold text-[#F1E3A8]">₹{currentUser?.escrowBalance || 0}</span>
                   </div>
                 </div>
-                <p className="text-xs text-white leading-normal mt-1">
-                  Your budget of <span className="font-semibold text-white">₹{budget}</span> will be locked in smart escrow. A 5% platform fee is deducted — creators share <span className="font-semibold text-white">₹{Math.round(budget * 0.95)}</span> equally, so each creator receives <span className="font-semibold text-white">₹{spotsTotal > 0 ? Math.round((budget * 0.95) / spotsTotal) : '—'}</span>.
+                <p className="text-xs text-zinc-300 leading-normal mt-1">
+                  Your budget of <span className="font-semibold text-white">₹{budget}</span> will be locked in smart escrow. A 5% platform fee is deducted — creators share <span className="font-semibold text-[#F1E3A8]">₹{Math.round(budget * 0.95)}</span> equally, so each creator receives <span className="font-semibold text-[#F1E3A8]">₹{spotsTotal > 0 ? Math.round((budget * 0.95) / spotsTotal) : '—'}</span>.
                 </p>
               </div>
             </div>
@@ -1158,20 +1160,20 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
           <button
             onClick={handleLaunchCampaign}
             disabled={isActivating}
-            className={`w-full py-3 px-4 rounded-2xl font-display font-semibold font-bold text-base flex items-center justify-center gap-2 transition-all ${
+            className={`w-full py-3.5 px-4 rounded-xl font-display font-bold text-base flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer ${
               isActivating
-                ? 'bg-zinc-900 text-white cursor-not-allowed border border-zinc-800'
-                : 'bg-zinc-900 text-white hover:bg-zinc-900 active:scale-[0.98] cursor-pointer  '
+                ? 'bg-[#C9B8E8]/50 text-[#0C0B0D] cursor-not-allowed border border-[#26232B]'
+                : 'bg-[#C9B8E8] text-[#0C0B0D] hover:bg-[#D8CAF2] active:scale-[0.98]'
             }`}
           >
             {isActivating ? (
               <>
-                <div className="w-4 h-4 border-2 border-white/25 border-t-white rounded-2xl animate-spin" />
+                <div className="w-4 h-4 border-2 border-[#0C0B0D]/30 border-t-[#0C0B0D] rounded-full animate-spin" />
                 <span>Locking Budget & Dispersing Batches...</span>
               </>
             ) : (
               <>
-                <Play className="w-4 h-4 fill-current" />
+                <Play className="w-4 h-4 fill-[#0C0B0D] text-[#0C0B0D]" />
                 <span>Lock ₹{budget} in Escrow & Launch Campaign</span>
               </>
             )}

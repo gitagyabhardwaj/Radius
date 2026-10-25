@@ -187,6 +187,7 @@ export default function App() {
     setSelectedCreatorId(creatorId);
     const creator = creators.find((c) => c.id === creatorId);
     if (creator) {
+      setRoastingCreator(creator);
       const matchingCamp = activeCampaigns.find((camp) => {
         const activeBatch = camp.batches[camp.activeBatchIndex];
         return activeBatch && activeBatch.creatorIds.includes(creator.id);
@@ -416,7 +417,12 @@ export default function App() {
                     <span>4. Portfolio</span>
                   </button>
                   <button
-                    onClick={() => setActiveCreatorSubTab('profile')}
+                    onClick={() => {
+                      setActiveCreatorSubTab('profile');
+                      if (currentCreatorProfile) {
+                        setRoastingCreator(currentCreatorProfile);
+                      }
+                    }}
                     className={`w-full py-2.5 px-3 rounded-xl text-sm font-semibold flex items-center gap-2.5 transition-all cursor-pointer ${
                       activeCreatorSubTab === 'profile'
                         ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold shadow-md'

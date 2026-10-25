@@ -1,7 +1,7 @@
 import React, { useMemo, useEffect } from 'react';
 import { Creator } from '../types';
 import { CREATORS } from '../data';
-import { Compass, Users, Flame } from 'lucide-react';
+import { Compass, Users, Briefcase } from 'lucide-react';
 import { MapContainer, TileLayer, Circle, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -306,7 +306,7 @@ export default function MinimalMap({
                     e.stopPropagation();
                     onRoastCreator?.(creator);
                   }}
-                  title={`Click to roast ${creator.name}'s profile`}
+                  title={`Click to view ${creator.name}'s past work`}
                 >
                   <img 
                     src={creator.avatar} 
@@ -314,9 +314,8 @@ export default function MinimalMap({
                     className="w-8 h-8 rounded-full object-cover border border-[#C9B8E8]/50 shrink-0" 
                   />
                   <div className="min-w-0">
-                    <div className="text-xs font-bold text-white leading-tight truncate flex items-center gap-1">
-                      <span>{creator.name}</span>
-                      <Flame className="w-3 h-3 text-orange-400 fill-orange-400 shrink-0" />
+                    <div className="text-xs font-bold text-white leading-tight truncate">
+                      {creator.name}
                     </div>
                     <div className="text-[10px] text-zinc-400 font-mono truncate">{creator.handle}</div>
                   </div>
@@ -346,10 +345,10 @@ export default function MinimalMap({
                       e.stopPropagation();
                       onRoastCreator(creator);
                     }}
-                    className="mt-2.5 w-full py-1.5 px-2 bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-600 hover:to-rose-700 text-white font-mono font-bold text-[11px] rounded-xl flex items-center justify-center gap-1.5 shadow-md cursor-pointer transition-all border border-orange-400/40"
+                    className="mt-2.5 w-full py-1.5 px-2 bg-[#C9B8E8] hover:bg-[#D8CAF2] text-[#0C0B0D] font-mono font-bold text-[11px] rounded-xl flex items-center justify-center gap-1.5 shadow-md cursor-pointer transition-all border border-[#C9B8E8]"
                   >
-                    <Flame className="w-3.5 h-3.5 fill-current" />
-                    <span>Roast Profile 🔥</span>
+                    <Briefcase className="w-3.5 h-3.5 text-[#0C0B0D]" />
+                    <span>View Past Work</span>
                   </button>
                 )}
               </Popup>

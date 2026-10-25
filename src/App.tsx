@@ -517,11 +517,10 @@ export default function App() {
                   setRoastingCreator(currentCreatorProfile);
                 }
               }}
-              title={view === 'creator' ? 'Click to roast your profile' : undefined}
+              title={view === 'creator' ? 'Click to view profile & past work' : undefined}
             >
               <span className="text-xs font-bold text-white tracking-tight line-clamp-1 leading-none flex items-center gap-1">
                 {view === 'brand' ? brandDisplayName : currentCreatorProfile?.name || 'Creator'}
-                {view === 'creator' && <Flame className="w-2.5 h-2.5 text-orange-400 fill-orange-400" />}
               </span>
               <span className="text-[10px] font-mono text-zinc-500 mt-1 leading-none truncate max-w-[120px]" title={clerkUser?.primaryEmailAddress?.emailAddress || ''}>
                 {clerkUser?.primaryEmailAddress?.emailAddress || (view === 'brand' ? 'Active Brand Admin' : 'Grid Operator')}
@@ -556,10 +555,9 @@ export default function App() {
                   }
                 }}
                 className={`text-xs font-mono font-bold text-[#0C0B0D] bg-[#C9B8E8] border border-[#C9B8E8] px-3 py-1 rounded-full uppercase shadow-sm flex items-center gap-1.5 ${view === 'creator' ? 'cursor-pointer hover:bg-[#D8CAF2]' : ''}`}
-                title={view === 'creator' ? 'Click to roast your profile' : undefined}
+                title={view === 'creator' ? 'Click to view profile & past work' : undefined}
               >
                 {view === 'brand' ? `${brandDisplayName} Admin` : `${currentCreatorProfile?.name || 'Creator'} Terminal`}
-                {view === 'creator' && <Flame className="w-3 h-3 text-orange-600 fill-orange-600" />}
               </span>
             </div>
 

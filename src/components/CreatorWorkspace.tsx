@@ -481,7 +481,7 @@ export default function CreatorWorkspace({
       return;
     }
     
-    // Redirect to Meta OAuth dialog for Instagram Graph API insights
+    // Meta Facebook Login for Instagram Professional Insights
     const redirectUri = window.location.origin + window.location.pathname;
     const scopes = [
       'instagram_basic',

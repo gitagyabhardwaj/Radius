@@ -16,8 +16,8 @@ export const CREATORS: Creator[] = [
     velocityTier: 'Velocity',
     followers: '42K',
     pastWork: [
-      { brand: 'Blue Tokai Coffee', type: 'Reel', imgUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=300&q=80' },
-      { brand: 'The Big Chill', type: 'Story', imgUrl: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=300&q=80' }
+      { brand: 'Blue Tokai Coffee', type: 'Reel', imgUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80' },
+      { brand: 'The Big Chill', type: 'Story', imgUrl: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=600&q=80' }
     ]
   },
   {
@@ -35,7 +35,7 @@ export const CREATORS: Creator[] = [
     velocityTier: 'Free',
     followers: '28K',
     pastWork: [
-      { brand: 'Zara Connaught Place', type: 'Post', imgUrl: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=300&q=80' }
+      { brand: 'Zara Connaught Place', type: 'Post', imgUrl: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=600&q=80' }
     ]
   },
   {
@@ -53,7 +53,7 @@ export const CREATORS: Creator[] = [
     velocityTier: 'Velocity',
     followers: '85K',
     pastWork: [
-      { brand: 'OnePlus India', type: 'Reel', imgUrl: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&q=80' }
+      { brand: 'OnePlus India', type: 'Reel', imgUrl: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80' }
     ]
   },
   {
@@ -71,7 +71,7 @@ export const CREATORS: Creator[] = [
     velocityTier: 'Free',
     followers: '19K',
     pastWork: [
-      { brand: 'Pacific Mall', type: 'Reel', imgUrl: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=300&q=80' }
+      { brand: 'Pacific Mall', type: 'Reel', imgUrl: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=600&q=80' }
     ]
   },
   {
@@ -89,7 +89,7 @@ export const CREATORS: Creator[] = [
     velocityTier: 'Velocity',
     followers: '56K',
     pastWork: [
-      { brand: 'Hudson Cafe', type: 'Reel', imgUrl: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=300&q=80' }
+      { brand: 'Hudson Cafe', type: 'Reel', imgUrl: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80' }
     ]
   },
   {
@@ -107,7 +107,7 @@ export const CREATORS: Creator[] = [
     velocityTier: 'Free',
     followers: '33K',
     pastWork: [
-      { brand: 'CyberHub Cafe', type: 'Story', imgUrl: 'https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=300&q=80' }
+      { brand: 'CyberHub Cafe', type: 'Story', imgUrl: 'https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=600&q=80' }
     ]
   }
 ];
@@ -157,12 +157,14 @@ export const DEFAULT_CAMPAIGNS = [
     title: 'Blue Tokai South Delhi Buzz',
     brandName: 'Blue Tokai Coffee',
     niche: 'Food & Lifestyle',
+    targetAudience: 'Foodies, Cafe Explorers & Street Food Fans',
+    contentFormat: 'Instagram Story',
     deliverable: '1 Instagram Story pointing to localized Saket cafe outlet',
     centerLocality: 'South Delhi (Saket)',
     centerLat: 28.5276,
     centerLng: 77.2197,
 
-    budget: 350, // $350
+    budget: 3500, // ₹3,500
     spotsTotal: 3,
     spotsFilled: 1,
     durationHours: 24,
@@ -181,12 +183,14 @@ export const DEFAULT_CAMPAIGNS = [
     title: 'Zara CP Style Flash Walk',
     brandName: 'Zara India',
     niche: 'Fashion & Aesthetics',
+    targetAudience: 'Fashion, Streetwear & Aesthetic Stylists',
+    contentFormat: 'Carousel Post',
     deliverable: '1 Photo Carousel showing the new summer fit inside CP Zara',
     centerLocality: 'Connaught Place',
     centerLat: 28.6304,
     centerLng: 77.2177,
 
-    budget: 600, // $600
+    budget: 6000, // ₹6,000
     spotsTotal: 2,
     spotsFilled: 0,
     durationHours: 48,

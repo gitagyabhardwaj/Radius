@@ -45,6 +45,7 @@ export const create = mutation({
 
     if (!user) throw new Error("User not found");
     if (user.role !== "brand") throw new Error("Only brands can create campaigns");
+    if (args.budget < 2000) throw new Error("Campaign budget must be at least ₹2,000");
     if ((user.escrowBalance || 0) < args.budget) {
       throw new Error("Insufficient escrow balance");
     }

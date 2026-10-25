@@ -108,18 +108,17 @@ export default function DispatchQueue({
                     });
                   }
                 }}
-                title={onRoastCreator ? `Click to roast ${creator.name}'s profile` : undefined}
+                title={onRoastCreator ? `Click to view ${creator.name}'s profile & portfolio` : undefined}
               >
                 <div className="relative">
-                  <img src={creator.avatarUrl || `https://api.dicebear.com/7.x/notionists/svg?seed=${creator.handle}`} alt={creator.name} className="w-10 h-10 rounded-full bg-zinc-800 object-cover group-hover:ring-2 group-hover:ring-orange-400 transition-all" />
+                  <img src={creator.avatarUrl || `https://api.dicebear.com/7.x/notionists/svg?seed=${creator.handle}`} alt={creator.name} className="w-10 h-10 rounded-full bg-zinc-800 object-cover group-hover:ring-2 group-hover:ring-[#C9B8E8] transition-all" />
                   <div className="absolute -bottom-1 -right-1 bg-zinc-900 border border-zinc-800 rounded-md px-1 py-0.5 text-[8px] font-mono text-emerald-400">
                     {creator.matchScore}%
                   </div>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-white leading-tight group-hover:text-orange-400 transition-colors flex items-center gap-1">
+                  <span className="text-sm font-semibold text-white leading-tight group-hover:text-[#C9B8E8] transition-colors flex items-center gap-1">
                     <span>{creator.name}</span>
-                    <Flame className="w-3 h-3 text-orange-400 fill-orange-400 opacity-60 group-hover:opacity-100" />
                   </span>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="text-[10px] text-zinc-400 font-mono">@{creator.handle}</span>

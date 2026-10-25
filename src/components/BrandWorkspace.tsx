@@ -389,19 +389,18 @@ function CreatorApprovalPanel({
                 <div 
                   className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer group"
                   onClick={() => onRoastCreator?.(creator)}
-                  title={`Click to roast ${creator.name}'s profile`}
+                  title={`Click to view ${creator.name}'s past work`}
                 >
                   <img
                     src={creator.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=random`}
                     alt={creator.name}
-                    className="w-10 h-10 rounded-full object-cover border border-zinc-800 group-hover:border-orange-500 transition-colors"
+                    className="w-10 h-10 rounded-full object-cover border border-zinc-800 group-hover:border-[#C9B8E8] transition-colors"
                     referrerPolicy="no-referrer"
                   />
                   <div className="flex flex-col gap-0.5 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-white group-hover:text-orange-400 transition-colors flex items-center gap-1">
+                      <span className="text-sm font-bold text-white group-hover:text-[#C9B8E8] transition-colors flex items-center gap-1">
                         {creator.name}
-                        <Flame className="w-3 h-3 text-orange-400 fill-orange-400 opacity-60 group-hover:opacity-100" />
                       </span>
                       {creator.velocityTier === 'Velocity' && (
                         <span className="text-[9px] font-mono bg-amber-400 text-black border border-amber-400 px-1.5 py-0.5 rounded-2xl border border-amber-200 font-bold">VELOCITY</span>
@@ -443,11 +442,11 @@ function CreatorApprovalPanel({
                   <button
                     type="button"
                     onClick={() => onRoastCreator?.(creator)}
-                    className="py-1.5 px-3 bg-gradient-to-r from-orange-500/20 to-rose-500/20 hover:from-orange-500/30 hover:to-rose-500/30 border border-orange-500/40 text-orange-400 text-xs font-bold font-mono rounded-xl flex items-center gap-1 cursor-pointer transition-colors shadow-sm"
-                    title="Roast this applicant's profile"
+                    className="py-1.5 px-3 bg-[#C9B8E8]/15 hover:bg-[#C9B8E8]/25 border border-[#C9B8E8]/30 text-[#C9B8E8] text-xs font-bold font-mono rounded-xl flex items-center gap-1 cursor-pointer transition-colors shadow-sm"
+                    title="View this applicant's past work"
                   >
-                    <Flame className="w-3.5 h-3.5 fill-current" />
-                    <span>Roast 🔥</span>
+                    <Briefcase className="w-3.5 h-3.5 text-[#C9B8E8]" />
+                    <span>Past Work</span>
                   </button>
                   <button
                     onClick={async () => {
@@ -495,8 +494,8 @@ function CreatorApprovalPanel({
                 <div 
                   key={offer._id} 
                   onClick={() => onRoastCreator?.(creator)}
-                  className="flex items-center gap-2 bg-emerald-400/20 border-emerald-400 text-emerald-400 border rounded-2xl px-3 py-1.5 cursor-pointer hover:bg-emerald-400/30 transition-all group"
-                  title={`Click to roast ${creator.name}'s profile`}
+                  className="flex items-center gap-2 bg-[#1B1921] border border-[#26232B] hover:border-[#C9B8E8]/50 rounded-2xl px-3 py-1.5 cursor-pointer hover:bg-[#221F2A] transition-all group"
+                  title={`Click to view ${creator.name}'s past work`}
                 >
                   <img
                     src={creator.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=random`}
@@ -504,9 +503,9 @@ function CreatorApprovalPanel({
                     className="w-6 h-6 rounded-full object-cover"
                     referrerPolicy="no-referrer"
                   />
-                  <span className="text-xs font-bold text-white group-hover:text-orange-300 transition-colors">{creator.name}</span>
-                  <span className="text-[9px] font-mono text-black font-bold bg-emerald-400 px-1.5 py-0.5 rounded-2xl">WORKING</span>
-                  <Flame className="w-3 h-3 text-orange-400 fill-orange-400 opacity-70 group-hover:opacity-100" />
+                  <span className="text-xs font-bold text-white group-hover:text-[#C9B8E8] transition-colors">{creator.name}</span>
+                  <span className="text-[9px] font-mono text-black font-bold bg-[#C9B8E8] px-1.5 py-0.5 rounded-2xl">WORKING</span>
+                  <Briefcase className="w-3 h-3 text-[#C9B8E8] opacity-70 group-hover:opacity-100" />
                 </div>
               );
             })}
@@ -624,15 +623,15 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
   const creditEscrow = useMutation(api.users.creditEscrow);
 
   // Campaign Creator State
-  const [title, setTitle] = useState('New South Delhi Flash Tour');
-  const [brandName, setBrandName] = useState(customBrandName || 'Local Craft Brewers');
+  const [title, setTitle] = useState('');
+  const [brandName, setBrandName] = useState(customBrandName || '');
   const [niche, setNiche] = useState('Food & Lifestyle');
-  const [deliverable, setDeliverable] = useState('1 Instagram Story highlighting local patio dining');
+  const [deliverable, setDeliverable] = useState('');
   const [budget, setBudget] = useState(2000);
   const [spotsTotal, setSpotsTotal] = useState(3);
   const [durationHours, setDurationHours] = useState(24);
   const [contentFormat, setContentFormat] = useState('Instagram Story');
-  const [creativeGuidelines, setCreativeGuidelines] = useState('Must show product clearly. No competitor logos.');
+  const [creativeGuidelines, setCreativeGuidelines] = useState('');
   const [targetAudience, setTargetAudience] = useState('Gen Z (18 - 24 years)');
   const [submissionDeadlineDays, setSubmissionDeadlineDays] = useState(3);
   const [description, setDescription] = useState('');
@@ -882,8 +881,11 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               <input
                 type="text"
                 value={brandName || ''}
-                readOnly
-                className="w-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl px-3.5 py-2 text-base text-white cursor-not-allowed focus:outline-none focus:border-zinc-800 transition-colors"
+                readOnly={!!customBrandName}
+                onChange={(e) => setBrandName(e.target.value)}
+                className={`w-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl px-3.5 py-2 text-base text-white placeholder-zinc-400 focus:outline-none focus:border-zinc-800 transition-colors ${
+                  customBrandName ? 'cursor-not-allowed' : 'focus:bg-zinc-900'
+                }`}
                 placeholder="e.g. Blue Tokai"
               />
             </div>
@@ -927,6 +929,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 type="text"
                 value={deliverable || ''}
                 onChange={(e) => setDeliverable(e.target.value)}
+                placeholder="e.g. 1 Instagram Story highlighting local patio dining"
                 className="w-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl px-3.5 py-2 text-base text-white placeholder-zinc-400 focus:outline-none focus:border-zinc-800 focus:bg-zinc-900 transition-colors"
               />
             </div>
@@ -1140,16 +1143,18 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             </div>
           </div>
 
-          {/* Smart Budget Estimator Widget */}
+          {/* Smart Budget Estimator Widget - Starts from ₹2,000 at least */}
           <div className="bg-[#151417] border border-[#26232B] rounded-2xl p-4 flex flex-col gap-3">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Sparkles className="w-4 h-4 text-[#F1E3A8]" />
                 <span className="text-sm font-semibold text-white">Smart Budget Recommender</span>
+                <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-400/10 px-2 py-0.5 rounded-full border border-amber-400/20">
+                  Starts from ₹2,000 min
+                </span>
               </div>
               <span className="text-xs font-mono text-zinc-400">
-                Estimated range: <span className="text-[#F1E3A8] font-bold">₹{estMin.toLocaleString()} - ₹{estMax.toLocaleString()}</span>
-                <span className="text-[10px] text-zinc-500 ml-1.5">(Min. ₹2,000)</span>
+                Recommended range: <span className="text-[#F1E3A8] font-bold">₹{estMin.toLocaleString()} - ₹{estMax.toLocaleString()}</span>
               </span>
             </div>
 
@@ -1177,6 +1182,67 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                   className="w-16 focus:outline-none text-right font-mono text-[#F1E3A8] bg-transparent"
                 />
               </div>
+            </div>
+
+            {/* Quick Budget Presets Starting from ₹2,000 */}
+            <div className="flex items-center gap-1.5 flex-wrap pt-2 border-t border-[#26232B]/60 text-xs font-mono">
+              <span className="text-[10px] text-zinc-500 uppercase tracking-wider mr-1">Quick Presets:</span>
+              <button
+                type="button"
+                onClick={() => setBudget(2000)}
+                className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                  budget === 2000
+                    ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold border-[#C9B8E8]'
+                    : 'bg-[#0C0B0D] text-zinc-300 border-[#26232B] hover:border-[#C9B8E8]/50'
+                }`}
+              >
+                ₹2,000 (Min)
+              </button>
+              <button
+                type="button"
+                onClick={() => setBudget(3500)}
+                className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                  budget === 3500
+                    ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold border-[#C9B8E8]'
+                    : 'bg-[#0C0B0D] text-zinc-300 border-[#26232B] hover:border-[#C9B8E8]/50'
+                }`}
+              >
+                ₹3,500
+              </button>
+              <button
+                type="button"
+                onClick={() => setBudget(5000)}
+                className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                  budget === 5000
+                    ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold border-[#C9B8E8]'
+                    : 'bg-[#0C0B0D] text-zinc-300 border-[#26232B] hover:border-[#C9B8E8]/50'
+                }`}
+              >
+                ₹5,000
+              </button>
+              <button
+                type="button"
+                onClick={() => setBudget(10000)}
+                className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                  budget === 10000
+                    ? 'bg-[#C9B8E8] text-[#0C0B0D] font-bold border-[#C9B8E8]'
+                    : 'bg-[#0C0B0D] text-zinc-300 border-[#26232B] hover:border-[#C9B8E8]/50'
+                }`}
+              >
+                ₹10,000
+              </button>
+              <button
+                type="button"
+                onClick={() => setBudget(Math.max(2000, Math.round((estMin + estMax) / 2)))}
+                className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer flex items-center gap-1 ${
+                  budget === Math.round((estMin + estMax) / 2) && budget !== 2000
+                    ? 'bg-[#F1E3A8] text-[#0C0B0D] font-bold border-[#F1E3A8]'
+                    : 'bg-[#0C0B0D] text-[#F1E3A8] border-[#F1E3A8]/30 hover:border-[#F1E3A8]'
+                }`}
+              >
+                <Sparkles className="w-3 h-3" />
+                Auto-Rec: ₹{Math.max(2000, Math.round((estMin + estMax) / 2)).toLocaleString()}
+              </button>
             </div>
           </div>
 
@@ -1258,13 +1324,13 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 <h3 className="text-lg font-display font-semibold text-white font-mono uppercase">
                   Verified Creators in Geofence
                 </h3>
-                <span className="bg-amber-500/20 text-orange-400 border border-orange-500/40 text-xs px-2.5 py-0.5 rounded-full font-mono font-bold flex items-center gap-1">
-                  <Flame className="w-3 h-3 fill-orange-400" />
-                  Roaster Ready
+                <span className="bg-[#C9B8E8]/15 text-[#C9B8E8] border border-[#C9B8E8]/30 text-xs px-2.5 py-0.5 rounded-full font-mono font-bold flex items-center gap-1">
+                  <Briefcase className="w-3 h-3 text-[#C9B8E8]" />
+                  Portfolio Ready
                 </span>
               </div>
               <p className="text-sm text-zinc-400 mt-0.5">
-                Click any creator card or the Roast button to see their AI roast profile and stats.
+                Click any creator card or the View Past Work button to see verified deliverables and portfolio.
               </p>
             </div>
             <span className="bg-[#C9B8E8] text-[#0C0B0D] text-xs px-3 py-1 rounded-full font-bold font-mono">
@@ -1280,24 +1346,19 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                   setSelectedCreator(creator);
                   onRoastCreator?.(creator);
                 }}
-                className="bg-[#151417] border border-[#26232B] hover:border-orange-500/60 rounded-2xl p-4 flex flex-col gap-3 transition-all hover:bg-[#1a1820] cursor-pointer group shadow-sm hover:shadow-orange-500/10"
-                title={`Click to roast ${creator.name}'s profile`}
+                className="bg-[#151417] border border-[#26232B] hover:border-[#C9B8E8]/50 rounded-2xl p-4 flex flex-col gap-3 transition-all hover:bg-[#1a1820] cursor-pointer group shadow-sm hover:shadow-[#C9B8E8]/5"
+                title={`Click to view ${creator.name}'s profile & portfolio`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <img
-                      src={creator.avatar}
-                      alt={creator.name}
-                      className="w-12 h-12 rounded-full object-cover border-2 border-[#26232B] group-hover:border-orange-400 transition-colors"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute -bottom-1 -right-1 bg-black/80 border border-orange-500/60 rounded-full p-0.5">
-                      <Flame className="w-3 h-3 text-orange-400 fill-orange-400" />
-                    </div>
-                  </div>
+                  <img
+                    src={creator.avatar}
+                    alt={creator.name}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-[#26232B] group-hover:border-[#C9B8E8] transition-colors"
+                    referrerPolicy="no-referrer"
+                  />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-1">
-                      <h4 className="text-sm font-bold text-white group-hover:text-orange-400 transition-colors truncate">
+                      <h4 className="text-sm font-bold text-white group-hover:text-[#C9B8E8] transition-colors truncate">
                         {creator.name}
                       </h4>
                       <span className="text-[10px] font-mono font-bold text-[#C9B8E8] bg-[#C9B8E8]/10 px-2 py-0.5 rounded-full border border-[#C9B8E8]/30 shrink-0">
@@ -1331,10 +1392,10 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                     setSelectedCreator(creator);
                     onRoastCreator?.(creator);
                   }}
-                  className="w-full mt-1 py-2 px-3 bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-600 hover:to-rose-700 text-white font-mono font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-md cursor-pointer transition-all border border-orange-400/30 group-hover:shadow-lg group-hover:shadow-orange-500/20"
+                  className="w-full mt-1 py-2 px-3 bg-[#C9B8E8] hover:bg-[#D8CAF2] text-[#0C0B0D] font-mono font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-md cursor-pointer transition-all border border-[#C9B8E8] active:scale-[0.98]"
                 >
-                  <Flame className="w-3.5 h-3.5 fill-current" />
-                  <span>Roast Profile 🔥</span>
+                  <Briefcase className="w-3.5 h-3.5 text-[#0C0B0D]" />
+                  <span>View Profile & Portfolio</span>
                 </button>
               </div>
             ))}
@@ -1506,8 +1567,8 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                                     setSelectedCreator(creator);
                                     onRoastCreator?.(creator);
                                   }}
-                                  className="flex items-center gap-1 bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 hover:border-orange-500/50 px-1.5 py-0.5 rounded-2xl text-[11px] cursor-pointer transition-all shrink-0 group"
-                                  title={`Click to view & roast ${creator.name}`}
+                                  className="flex items-center gap-1 bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 hover:border-[#C9B8E8]/50 px-1.5 py-0.5 rounded-2xl text-[11px] cursor-pointer transition-all shrink-0 group"
+                                  title={`Click to view ${creator.name}'s profile & portfolio`}
                                 >
                                   <img
                                     src={creator.avatar}
@@ -1515,8 +1576,8 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                                     className="w-4.5 h-4.5 rounded-2xl object-cover"
                                     referrerPolicy="no-referrer"
                                   />
-                                  <span className="font-bold text-white group-hover:text-orange-400 transition-colors">{creator.name.split(' ')[0]}</span>
-                                  <Flame className="w-2.5 h-2.5 text-orange-400 opacity-60 group-hover:opacity-100" />
+                                  <span className="font-bold text-white group-hover:text-[#C9B8E8] transition-colors">{creator.name.split(' ')[0]}</span>
+                                  <Briefcase className="w-2.5 h-2.5 text-[#C9B8E8] opacity-60 group-hover:opacity-100" />
                                 </div>
                               );
                             })}
@@ -1646,22 +1707,22 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 <div 
                   key={creator.id} 
                   onClick={() => onRoastCreator?.(creator)}
-                  className="p-3 border border-zinc-800 hover:border-orange-500/50 rounded-2xl flex items-center justify-between cursor-pointer transition-all hover:bg-zinc-800/40 group"
-                  title={`Click to roast ${creator.name}'s profile`}
+                  className="p-3 border border-zinc-800 hover:border-[#C9B8E8]/50 rounded-2xl flex items-center justify-between cursor-pointer transition-all hover:bg-zinc-800/40 group"
+                  title={`Click to view ${creator.name}'s profile & portfolio`}
                 >
                   <div className="flex items-center gap-3">
-                    <img src={creator.avatar} alt={creator.name} className="w-8 h-8 rounded-full object-cover border border-zinc-800 group-hover:border-orange-500 transition-colors referrerPolicy='no-referrer'" />
+                    <img src={creator.avatar} alt={creator.name} className="w-8 h-8 rounded-full object-cover border border-zinc-800 group-hover:border-[#C9B8E8] transition-colors referrerPolicy='no-referrer'" />
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-white group-hover:text-orange-400 transition-colors flex items-center gap-1.5">
+                      <span className="text-sm font-bold text-white group-hover:text-[#C9B8E8] transition-colors flex items-center gap-1.5">
                         {creator.name}
-                        <Flame className="w-3 h-3 text-orange-400 fill-orange-400 opacity-60 group-hover:opacity-100" />
                       </span>
                       <span className="text-[11px] text-white font-mono">{creator.locality}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono font-bold text-orange-400 bg-orange-500/10 border border-orange-500/30 px-2 py-0.5 rounded-xl group-hover:bg-orange-500 group-hover:text-black transition-all">
-                      Roast 🔥
+                    <span className="text-xs font-mono font-bold text-[#0C0B0D] bg-[#C9B8E8] hover:bg-[#D8CAF2] px-2.5 py-1 rounded-xl transition-all flex items-center gap-1 shadow-sm">
+                      <Briefcase className="w-3 h-3 text-[#0C0B0D]" />
+                      Portfolio
                     </span>
                     <span className="text-sm font-mono font-bold text-white bg-indigo-500 border-none px-2 py-0.5 rounded-2xl">{creator.followers}</span>
                   </div>

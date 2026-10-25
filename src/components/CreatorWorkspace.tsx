@@ -518,11 +518,11 @@ export default function CreatorWorkspace({
               <button
                 type="button"
                 onClick={() => onRoastCreator?.(currentCreator)}
-                className="bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-600 hover:to-rose-700 text-white text-xs px-3 py-1.5 rounded-xl font-bold font-mono flex items-center gap-1.5 shadow-md cursor-pointer transition-all border border-orange-400/40"
-                title="Roast this profile"
+                className="bg-[#C9B8E8] hover:bg-[#D8CAF2] text-[#0C0B0D] text-xs px-3 py-1.5 rounded-xl font-bold font-mono flex items-center gap-1.5 shadow-md cursor-pointer transition-all border border-[#C9B8E8]"
+                title="View your public profile and portfolio showcase"
               >
-                <Flame className="w-3.5 h-3.5 fill-current" />
-                <span>Roast Profile 🔥</span>
+                <Briefcase className="w-3.5 h-3.5 text-[#0C0B0D]" />
+                <span>View Profile & Portfolio</span>
               </button>
               {currentCreator.velocityTier === 'Velocity' ? (
                 <span className="bg-amber-50 text-amber-700 text-sm px-2.5 py-1 rounded-2xl font-semibold border border-amber-200 flex items-center gap-1.5 animate-pulse">
@@ -805,15 +805,15 @@ export default function CreatorWorkspace({
               <img
                 src={currentCreator.avatar}
                 alt={currentCreator.name}
-                className="w-16 h-16 rounded-full object-cover border-2 border-slate-700/50 referrerPolicy='no-referrer' cursor-pointer hover:border-orange-500 transition-colors"
+                className="w-16 h-16 rounded-full object-cover border-2 border-slate-700/50 referrerPolicy='no-referrer' cursor-pointer hover:border-[#C9B8E8] transition-colors"
                 onClick={() => onRoastCreator?.(currentCreator)}
-                title={`Click to roast ${currentCreator.name}`}
+                title={`Click to view ${currentCreator.name}'s past work`}
               />
               <div className="flex flex-col flex-1 min-w-0">
                 <span 
                   onClick={() => onRoastCreator?.(currentCreator)}
                   className="text-2xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500 tracking-tight leading-none bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent cursor-pointer hover:opacity-85 transition-opacity"
-                  title={`Click to roast ${currentCreator.name}`}
+                  title={`Click to view ${currentCreator.name}'s past work`}
                 >
                   {currentCreator.name}
                 </span>
@@ -822,11 +822,11 @@ export default function CreatorWorkspace({
               <button
                 type="button"
                 onClick={() => onRoastCreator?.(currentCreator)}
-                className="shrink-0 py-1.5 px-3 bg-gradient-to-r from-orange-500/20 to-rose-500/20 hover:from-orange-500/30 hover:to-rose-500/30 border border-orange-500/40 text-orange-400 text-xs font-bold font-mono rounded-xl flex items-center gap-1 cursor-pointer transition-all shadow-sm"
-                title="Roast this creator profile"
+                className="shrink-0 py-1.5 px-3 bg-[#C9B8E8]/15 hover:bg-[#C9B8E8]/25 border border-[#C9B8E8]/30 text-[#C9B8E8] text-xs font-bold font-mono rounded-xl flex items-center gap-1.5 cursor-pointer transition-all shadow-sm"
+                title="View your portfolio showcase"
               >
-                <Flame className="w-3.5 h-3.5 fill-current" />
-                <span>Roast 🔥</span>
+                <Briefcase className="w-3.5 h-3.5 text-[#C9B8E8]" />
+                <span>View Portfolio</span>
               </button>
             </div>
 
@@ -917,23 +917,17 @@ export default function CreatorWorkspace({
             <div 
               className="flex items-center gap-3.5 cursor-pointer group"
               onClick={() => onRoastCreator?.(currentCreator)}
-              title="Click to roast profile"
+              title="Click to view past work"
             >
-              <div className="relative">
-                <img
-                  src={currentCreator.avatar}
-                  alt={currentCreator.name}
-                  className="w-12 h-12 rounded-2xl object-cover border-2 border-zinc-800 group-hover:border-orange-500 transition-colors"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute -bottom-1 -right-1 bg-black/80 border border-orange-500/60 rounded-full p-0.5">
-                  <Flame className="w-3 h-3 text-orange-400 fill-orange-400" />
-                </div>
-              </div>
+              <img
+                src={currentCreator.avatar}
+                alt={currentCreator.name}
+                className="w-12 h-12 rounded-2xl object-cover border-2 border-zinc-800 group-hover:border-[#C9B8E8] transition-colors"
+                referrerPolicy="no-referrer"
+              />
               <div className="flex-1 min-w-0">
-                <h3 className="text-base font-bold text-white group-hover:text-orange-400 transition-colors truncate flex items-center gap-1.5">
+                <h3 className="text-base font-bold text-white group-hover:text-[#C9B8E8] transition-colors truncate flex items-center gap-1.5">
                   <span>{currentCreator.name}</span>
-                  <Flame className="w-3.5 h-3.5 text-orange-400 fill-orange-400 opacity-70 group-hover:opacity-100" />
                 </h3>
                 <span className="text-xs font-mono text-zinc-400 block truncate">{currentCreator.handle}</span>
                 <span className="text-[11px] text-zinc-500 block truncate mt-0.5">{currentCreator.niche}</span>
@@ -943,10 +937,10 @@ export default function CreatorWorkspace({
             <button
               type="button"
               onClick={() => onRoastCreator?.(currentCreator)}
-              className="w-full py-2 px-3 bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-600 hover:to-rose-700 text-white font-mono font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-md cursor-pointer transition-all border border-orange-400/30"
+              className="w-full py-2 px-3 bg-[#C9B8E8] hover:bg-[#D8CAF2] text-[#0C0B0D] font-mono font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-md cursor-pointer transition-all border border-[#C9B8E8] active:scale-[0.98]"
             >
-              <Flame className="w-3.5 h-3.5 fill-current" />
-              <span>Roast My Profile 🔥</span>
+              <Briefcase className="w-3.5 h-3.5 text-[#0C0B0D]" />
+              <span>View Profile & Portfolio</span>
             </button>
           </div>
 
@@ -1653,28 +1647,24 @@ export default function CreatorWorkspace({
             <div 
               className="relative group cursor-pointer shrink-0" 
               onClick={() => onRoastCreator?.(currentCreator)}
-              title={`Click to roast ${currentCreator.name}'s profile`}
+              title={`Click to view ${currentCreator.name}'s past work`}
             >
               <img
                 src={currentCreator.avatar}
                 alt={currentCreator.name}
-                className="w-20 h-20 rounded-2xl object-cover border-2 border-zinc-800 group-hover:border-orange-500 transition-colors"
+                className="w-20 h-20 rounded-2xl object-cover border-2 border-zinc-800 group-hover:border-[#C9B8E8] transition-colors"
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute -bottom-1 -right-1 bg-black/80 border border-orange-500/60 rounded-full p-1 shadow-md">
-                <Flame className="w-3.5 h-3.5 text-orange-400 fill-orange-400" />
-              </div>
             </div>
             <div className="flex-1 flex flex-col gap-1.5 min-w-0">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <h2 
                     onClick={() => onRoastCreator?.(currentCreator)}
-                    className="text-2xl font-display font-semibold font-semibold text-white font-mono uppercase cursor-pointer hover:text-orange-400 transition-colors flex items-center gap-2"
-                    title={`Click to roast ${currentCreator.name}'s profile`}
+                    className="text-2xl font-display font-semibold font-semibold text-white font-mono uppercase cursor-pointer hover:text-[#C9B8E8] transition-colors flex items-center gap-2"
+                    title={`Click to view ${currentCreator.name}'s past work`}
                   >
                     <span>{currentCreator.name}</span>
-                    <Flame className="w-5 h-5 text-orange-400 fill-orange-400" />
                   </h2>
                   {currentCreator.velocityTier === 'Velocity' && (
                     <span className="bg-amber-50 text-amber-700 text-[10px] font-mono font-bold px-2 py-0.5 rounded-2xl border border-amber-200 flex items-center gap-1">
@@ -1686,11 +1676,11 @@ export default function CreatorWorkspace({
                 <button
                   type="button"
                   onClick={() => onRoastCreator?.(currentCreator)}
-                  className="py-2 px-3.5 bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-600 hover:to-rose-700 text-white font-mono font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-md cursor-pointer transition-all border border-orange-400/30 w-fit shrink-0"
-                  title="Roast this profile"
+                  className="py-2 px-3.5 bg-[#C9B8E8] hover:bg-[#D8CAF2] text-[#0C0B0D] font-mono font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-md cursor-pointer transition-all border border-[#C9B8E8] w-fit shrink-0 active:scale-[0.98]"
+                  title="View past work modal"
                 >
-                  <Flame className="w-4 h-4 fill-current" />
-                  <span>Roast Profile 🔥</span>
+                  <Briefcase className="w-4 h-4 text-[#0C0B0D]" />
+                  <span>View Profile & Portfolio</span>
                 </button>
               </div>
               <span className="text-sm text-white font-mono font-bold">{currentCreator.handle || 'No handle set'}</span>

@@ -653,17 +653,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
     setBudget(Math.max(2000, recommended));
   }, [spotsTotal, niche, deliverable, estMin, estMax]);
 
-  // Find creators
-  const matchingCreators = () => {
-    return (creators || CREATORS).map((creator) => {
-      const dist = getDistanceKm(centerLat, centerLng, creator.lat, creator.lng);
-      return { ...creator, dist, isInside: true };
-    });
-  };
-
   // Deposit handled automatically by backend now
-
-  const currentMatches = matchingCreators();
 
   // Create Campaign via Convex mutation
   const handleLaunchCampaign = async () => {
@@ -1267,92 +1257,6 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               </>
             )}
           </button>
-        </div>
-
-        {/* Verified Creators in Geofence Grid */}
-        <div className="w-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl p-6 flex flex-col gap-5">
-          <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-display font-semibold text-white font-mono uppercase">
-                  Verified Creators in Geofence
-                </h3>
-                <span className="bg-[#C9B8E8]/15 text-[#C9B8E8] border border-[#C9B8E8]/30 text-xs px-2.5 py-0.5 rounded-full font-mono font-bold flex items-center gap-1">
-                  <Briefcase className="w-3 h-3 text-[#C9B8E8]" />
-                  Portfolio Ready
-                </span>
-              </div>
-              <p className="text-sm text-zinc-400 mt-0.5">
-                Click any creator card or the View Past Work button to see verified deliverables and portfolio.
-              </p>
-            </div>
-            <span className="bg-[#C9B8E8] text-[#0C0B0D] text-xs px-3 py-1 rounded-full font-bold font-mono">
-              {currentMatches.length} Found
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {currentMatches.map((creator) => (
-              <div
-                key={creator.id}
-                onClick={() => {
-                  setSelectedCreator(creator);
-                  onRoastCreator?.(creator);
-                }}
-                className="bg-[#151417] border border-[#26232B] hover:border-[#C9B8E8]/50 rounded-2xl p-4 flex flex-col gap-3 transition-all hover:bg-[#1a1820] cursor-pointer group shadow-sm hover:shadow-[#C9B8E8]/5"
-                title={`Click to view ${creator.name}'s profile & portfolio`}
-              >
-                <div className="flex items-center gap-3">
-                  <img
-                    src={creator.avatar}
-                    alt={creator.name}
-                    className="w-12 h-12 rounded-full object-cover border-2 border-[#26232B] group-hover:border-[#C9B8E8] transition-colors"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-1">
-                      <h4 className="text-sm font-bold text-white group-hover:text-[#C9B8E8] transition-colors truncate">
-                        {creator.name}
-                      </h4>
-                      <span className="text-[10px] font-mono font-bold text-[#C9B8E8] bg-[#C9B8E8]/10 px-2 py-0.5 rounded-full border border-[#C9B8E8]/30 shrink-0">
-                        {creator.matchScore}% Match
-                      </span>
-                    </div>
-                    <span className="text-[11px] font-mono text-zinc-400 block truncate">
-                      {creator.handle}
-                    </span>
-                    <span className="text-[10px] text-zinc-500 block truncate mt-0.5">
-                      {creator.niche} • {creator.locality}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#26232B] text-[11px] font-mono">
-                  <div className="flex flex-col">
-                    <span className="text-zinc-500 text-[10px]">Followers</span>
-                    <span className="text-zinc-300 font-bold">{creator.followers}</span>
-                  </div>
-                  <div className="flex flex-col text-right">
-                    <span className="text-zinc-500 text-[10px]">Local Audience</span>
-                    <span className="text-zinc-300 font-bold">{creator.audienceInLocality}%</span>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedCreator(creator);
-                    onRoastCreator?.(creator);
-                  }}
-                  className="w-full mt-1 py-2 px-3 bg-[#C9B8E8] hover:bg-[#D8CAF2] text-[#0C0B0D] font-mono font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-md cursor-pointer transition-all border border-[#C9B8E8] active:scale-[0.98]"
-                >
-                  <Briefcase className="w-3.5 h-3.5 text-[#0C0B0D]" />
-                  <span>View Profile & Portfolio</span>
-                </button>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     );

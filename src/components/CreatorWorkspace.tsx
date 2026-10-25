@@ -481,14 +481,16 @@ export default function CreatorWorkspace({
       return;
     }
     
-    // Direct Instagram Login OAuth dialog (Instagram-branded, no Facebook screens)
+    // Meta Facebook Login for Instagram Professional Insights
     const redirectUri = window.location.origin + window.location.pathname;
     const scopes = [
-      'instagram_business_basic',
-      'instagram_business_manage_insights',
+      'instagram_basic',
+      'instagram_manage_insights',
+      'pages_show_list',
+      'pages_read_engagement',
     ].join(',');
     
-    const authUrl = `https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}&response_type=code&state=radius_ig_oauth`;
+    const authUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}&response_type=code&state=radius_ig_oauth`;
     
     window.location.href = authUrl;
   };

@@ -291,13 +291,21 @@ export default function MinimalMap({
               eventHandlers={{
                 click: () => {
                   if (onSelectCreator) onSelectCreator(creator.id);
+                  if (onRoastCreator) onRoastCreator(creator);
                 },
               }}
             >
               <Popup className="custom-popup">
                 <div 
                   className="flex items-center gap-2.5 mb-2.5 min-w-[170px] cursor-pointer hover:opacity-90 transition-opacity"
-                  onClick={() => onRoastCreator?.(creator)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRoastCreator?.(creator);
+                  }}
+                  onPointerDown={(e) => {
+                    e.stopPropagation();
+                    onRoastCreator?.(creator);
+                  }}
                   title={`Click to roast ${creator.name}'s profile`}
                 >
                   <img 
@@ -331,6 +339,10 @@ export default function MinimalMap({
                   <button
                     type="button"
                     onClick={(e) => {
+                      e.stopPropagation();
+                      onRoastCreator(creator);
+                    }}
+                    onPointerDown={(e) => {
                       e.stopPropagation();
                       onRoastCreator(creator);
                     }}

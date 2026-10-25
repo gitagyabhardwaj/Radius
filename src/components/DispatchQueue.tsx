@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Clock, UserCheck, UserX, User, AlertCircle, TimerReset } from 'lucide-react';
+import { Clock, UserCheck, UserX, User, AlertCircle, TimerReset, Flame } from 'lucide-react';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 
@@ -14,7 +14,13 @@ function formatTimeLeft(ms: number) {
   return `${m}:${s}`;
 }
 
-export default function DispatchQueue({ campaignId }: { campaignId: string }) {
+export default function DispatchQueue({ 
+  campaignId,
+  onRoastCreator,
+}: { 
+  campaignId: string;
+  onRoastCreator?: (creator: any) => void;
+}) {
   const queue = useQuery(api.campaigns.getDispatchQueue, { campaignId: campaignId as any });
   const [now, setNow] = useState(Date.now());
 
@@ -82,15 +88,39 @@ export default function DispatchQueue({ campaignId }: { campaignId: string }) {
             <div key={item.offerId} className="bg-black/20 border border-white/5 rounded-xl p-3 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between transition-all hover:bg-black/30">
               
               {/* Creator Profile Inline */}
-              <div className="flex items-center gap-3 w-full md:w-auto">
+              <div 
+                className={`flex items-center gap-3 w-full md:w-auto ${onRoastCreator ? 'cursor-pointer group' : ''}`}
+                onClick={() => {
+                  if (onRoastCreator) {
+                    onRoastCreator({
+                      id: creator.id || `q_${creator.handle}`,
+                      name: creator.name,
+                      handle: creator.handle,
+                      avatar: creator.avatarUrl || `https://api.dicebear.com/7.x/notionists/svg?seed=${creator.handle}`,
+                      niche: creator.niche || 'Lifestyle & Culture',
+                      followers: creator.followers || '15K',
+                      locality: 'Delhi-NCR',
+                      matchScore: creator.matchScore || 85,
+                      audienceInLocality: 65,
+                      lat: 28.5276,
+                      lng: 77.2197,
+                      isInside: true,
+                    });
+                  }
+                }}
+                title={onRoastCreator ? `Click to roast ${creator.name}'s profile` : undefined}
+              >
                 <div className="relative">
-                  <img src={creator.avatarUrl || `https://api.dicebear.com/7.x/notionists/svg?seed=${creator.handle}`} alt={creator.name} className="w-10 h-10 rounded-full bg-zinc-800 object-cover" />
+                  <img src={creator.avatarUrl || `https://api.dicebear.com/7.x/notionists/svg?seed=${creator.handle}`} alt={creator.name} className="w-10 h-10 rounded-full bg-zinc-800 object-cover group-hover:ring-2 group-hover:ring-orange-400 transition-all" />
                   <div className="absolute -bottom-1 -right-1 bg-zinc-900 border border-zinc-800 rounded-md px-1 py-0.5 text-[8px] font-mono text-emerald-400">
                     {creator.matchScore}%
                   </div>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-white leading-tight">{creator.name}</span>
+                  <span className="text-sm font-semibold text-white leading-tight group-hover:text-orange-400 transition-colors flex items-center gap-1">
+                    <span>{creator.name}</span>
+                    <Flame className="w-3 h-3 text-orange-400 fill-orange-400 opacity-60 group-hover:opacity-100" />
+                  </span>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="text-[10px] text-zinc-400 font-mono">@{creator.handle}</span>
                     <span className="text-[10px] text-zinc-600">•</span>

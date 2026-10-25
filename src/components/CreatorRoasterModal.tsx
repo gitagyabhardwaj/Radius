@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Creator } from '../types';
 import { generateDynamicRoast, SpiceLevel, RoastResult } from '../utils/roasterEngine';
@@ -33,19 +34,17 @@ export default function CreatorRoasterModal({
   onDirectSelect,
 }: CreatorRoasterModalProps) {
   const [spiceLevel, setSpiceLevel] = useState<SpiceLevel>('spicy');
-  const [roastData, setRoastData] = useState<RoastResult | null>(null);
   const [copied, setCopied] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [reroastKey, setReroastKey] = useState(0);
 
-  // Re-generate roast whenever creator or spice level changes
-  useEffect(() => {
-    if (creator) {
-      const result = generateDynamicRoast(creator, spiceLevel);
-      setRoastData(result);
-    }
-  }, [creator, spiceLevel]);
+  // Synchronously compute roast data so there is zero delay or null flash on first render
+  const roastData: RoastResult | null = useMemo(() => {
+    if (!creator) return null;
+    return generateDynamicRoast(creator, spiceLevel);
+  }, [creator, spiceLevel, reroastKey]);
 
-  // Handle escape key
+  // Handle escape key to close
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -56,7 +55,9 @@ export default function CreatorRoasterModal({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  if (!isOpen || !creator || !roastData) return null;
+  if (!isOpen || !creator || !roastData || typeof document === 'undefined') {
+    return null;
+  }
 
   const handleCopyRoast = () => {
     if (!roastData) return;
@@ -70,16 +71,14 @@ export default function CreatorRoasterModal({
   const handleReroast = () => {
     setIsRegenerating(true);
     setTimeout(() => {
-      if (creator) {
-        setRoastData(generateDynamicRoast(creator, spiceLevel));
-      }
+      setReroastKey(prev => prev + 1);
       setIsRegenerating(false);
-    }, 350);
+    }, 250);
   };
 
-  return (
+  const modalContent = (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+      <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -393,4 +392,6 @@ export default function CreatorRoasterModal({
       </div>
     </AnimatePresence>
   );
+
+  return createPortal(modalContent, document.body);
 }

@@ -1249,6 +1249,97 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
             )}
           </button>
         </div>
+
+        {/* Verified Creators in Geofence Grid */}
+        <div className="w-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl p-6 flex flex-col gap-5">
+          <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-display font-semibold text-white font-mono uppercase">
+                  Verified Creators in Geofence
+                </h3>
+                <span className="bg-amber-500/20 text-orange-400 border border-orange-500/40 text-xs px-2.5 py-0.5 rounded-full font-mono font-bold flex items-center gap-1">
+                  <Flame className="w-3 h-3 fill-orange-400" />
+                  Roaster Ready
+                </span>
+              </div>
+              <p className="text-sm text-zinc-400 mt-0.5">
+                Click any creator card or the Roast button to see their AI roast profile and stats.
+              </p>
+            </div>
+            <span className="bg-[#C9B8E8] text-[#0C0B0D] text-xs px-3 py-1 rounded-full font-bold font-mono">
+              {currentMatches.length} Found
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {currentMatches.map((creator) => (
+              <div
+                key={creator.id}
+                onClick={() => {
+                  setSelectedCreator(creator);
+                  onRoastCreator?.(creator);
+                }}
+                className="bg-[#151417] border border-[#26232B] hover:border-orange-500/60 rounded-2xl p-4 flex flex-col gap-3 transition-all hover:bg-[#1a1820] cursor-pointer group shadow-sm hover:shadow-orange-500/10"
+                title={`Click to roast ${creator.name}'s profile`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <img
+                      src={creator.avatar}
+                      alt={creator.name}
+                      className="w-12 h-12 rounded-full object-cover border-2 border-[#26232B] group-hover:border-orange-400 transition-colors"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute -bottom-1 -right-1 bg-black/80 border border-orange-500/60 rounded-full p-0.5">
+                      <Flame className="w-3 h-3 text-orange-400 fill-orange-400" />
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <h4 className="text-sm font-bold text-white group-hover:text-orange-400 transition-colors truncate">
+                        {creator.name}
+                      </h4>
+                      <span className="text-[10px] font-mono font-bold text-[#C9B8E8] bg-[#C9B8E8]/10 px-2 py-0.5 rounded-full border border-[#C9B8E8]/30 shrink-0">
+                        {creator.matchScore}% Match
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-mono text-zinc-400 block truncate">
+                      {creator.handle}
+                    </span>
+                    <span className="text-[10px] text-zinc-500 block truncate mt-0.5">
+                      {creator.niche} • {creator.locality}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#26232B] text-[11px] font-mono">
+                  <div className="flex flex-col">
+                    <span className="text-zinc-500 text-[10px]">Followers</span>
+                    <span className="text-zinc-300 font-bold">{creator.followers}</span>
+                  </div>
+                  <div className="flex flex-col text-right">
+                    <span className="text-zinc-500 text-[10px]">Local Audience</span>
+                    <span className="text-zinc-300 font-bold">{creator.audienceInLocality}%</span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedCreator(creator);
+                    onRoastCreator?.(creator);
+                  }}
+                  className="w-full mt-1 py-2 px-3 bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-600 hover:to-rose-700 text-white font-mono font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-md cursor-pointer transition-all border border-orange-400/30 group-hover:shadow-lg group-hover:shadow-orange-500/20"
+                >
+                  <Flame className="w-3.5 h-3.5 fill-current" />
+                  <span>Roast Profile 🔥</span>
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -1461,7 +1552,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 />
 
                 <ErrorBoundary label="Live Dispatch Queue" fallback={null}>
-                  <DispatchQueue campaignId={camp.id} />
+                  <DispatchQueue campaignId={camp.id} onRoastCreator={onRoastCreator} />
                 </ErrorBoundary>
 
                 <DispatchFeed campaignId={camp.id} />

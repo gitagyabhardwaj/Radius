@@ -623,15 +623,15 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
   const creditEscrow = useMutation(api.users.creditEscrow);
 
   // Campaign Creator State
-  const [title, setTitle] = useState('New South Delhi Flash Tour');
-  const [brandName, setBrandName] = useState(customBrandName || 'Local Craft Brewers');
+  const [title, setTitle] = useState('');
+  const [brandName, setBrandName] = useState(customBrandName || '');
   const [niche, setNiche] = useState('Food & Lifestyle');
-  const [deliverable, setDeliverable] = useState('1 Instagram Story highlighting local patio dining');
+  const [deliverable, setDeliverable] = useState('');
   const [budget, setBudget] = useState(2000);
   const [spotsTotal, setSpotsTotal] = useState(3);
   const [durationHours, setDurationHours] = useState(24);
   const [contentFormat, setContentFormat] = useState('Instagram Story');
-  const [creativeGuidelines, setCreativeGuidelines] = useState('Must show product clearly. No competitor logos.');
+  const [creativeGuidelines, setCreativeGuidelines] = useState('');
   const [targetAudience, setTargetAudience] = useState('Gen Z (18 - 24 years)');
   const [submissionDeadlineDays, setSubmissionDeadlineDays] = useState(3);
   const [description, setDescription] = useState('');
@@ -881,8 +881,11 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
               <input
                 type="text"
                 value={brandName || ''}
-                readOnly
-                className="w-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl px-3.5 py-2 text-base text-white cursor-not-allowed focus:outline-none focus:border-zinc-800 transition-colors"
+                readOnly={!!customBrandName}
+                onChange={(e) => setBrandName(e.target.value)}
+                className={`w-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl px-3.5 py-2 text-base text-white placeholder-zinc-400 focus:outline-none focus:border-zinc-800 transition-colors ${
+                  customBrandName ? 'cursor-not-allowed' : 'focus:bg-zinc-900'
+                }`}
                 placeholder="e.g. Blue Tokai"
               />
             </div>
@@ -926,6 +929,7 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                 type="text"
                 value={deliverable || ''}
                 onChange={(e) => setDeliverable(e.target.value)}
+                placeholder="e.g. 1 Instagram Story highlighting local patio dining"
                 className="w-full bg-zinc-900/70 border border-zinc-800/50 backdrop-blur-xl shadow-2xl ring-1 ring-white/5 rounded-2xl px-3.5 py-2 text-base text-white placeholder-zinc-400 focus:outline-none focus:border-zinc-800 focus:bg-zinc-900 transition-colors"
               />
             </div>

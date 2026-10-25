@@ -207,9 +207,16 @@ export default function App() {
       setInstagramSyncStatus(null);
       setActiveCreatorSubTab('profile');
 
+      // Ensure trailing slash matches registered Meta Business Login Redirect URI exactly
+      const origin = window.location.origin;
+      const pathname = window.location.pathname.endsWith('/')
+        ? window.location.pathname
+        : `${window.location.pathname}/`;
+      const redirectUri = `${origin}${pathname}`;
+
       exchangeMetaCodeAndSyncDemographics({
         code,
-        redirectUri: window.location.origin + window.location.pathname,
+        redirectUri,
         locality: currentUser?.locality,
       })
         .then((res) => {

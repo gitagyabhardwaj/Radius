@@ -67,6 +67,18 @@ export default defineSchema({
     bio: v.optional(v.string()),
     upiId: v.optional(v.string()), // Added for creator wallet withdrawals
     acceptedCampaignIds: v.optional(v.array(v.id("campaigns"))),
+    audienceCities: v.optional(
+      v.array(
+        v.object({
+          name: v.string(),
+          count: v.optional(v.number()),
+          percentage: v.number(),
+        })
+      )
+    ),
+    instagramConnected: v.optional(v.boolean()),
+    instagramId: v.optional(v.string()),
+    instagramUsername: v.optional(v.string()),
   })
     .index("by_clerk_id", ["clerkId"])
     .index("by_role", ["role"]),

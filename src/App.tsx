@@ -8,6 +8,7 @@ import BrandWorkspace from './components/BrandWorkspace';
 import CreatorWorkspace from './components/CreatorWorkspace';
 import EntryGate from './components/EntryGate';
 import ErrorBoundary from './components/ErrorBoundary';
+import CreatorRoasterModal from './components/CreatorRoasterModal';
 import { Campaign, Creator } from './types';
 import { CREATORS } from './data';
 import {
@@ -21,6 +22,7 @@ import {
   Radio,
   DollarSign,
   Image,
+  Flame,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -126,6 +128,7 @@ export default function App() {
   const [pendingRole, setPendingRole] = useState<'brand' | 'creator' | null>(null);
   const [customBrandName, setCustomBrandName] = useState<string>('');
   const [selectedCreatorId, setSelectedCreatorId] = useState<string>('');
+  const [roastingCreator, setRoastingCreator] = useState<Creator | null>(null);
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
   const [isSyncingInstagram, setIsSyncingInstagram] = useState(false);
   const [instagramSyncStatus, setInstagramSyncStatus] = useState<{
@@ -501,9 +504,18 @@ export default function App() {
                 {view === 'brand' ? brandDisplayName.substring(0, 2) : '?'}
               </div>
             )}
-            <div className="flex flex-col">
-              <span className="text-xs font-bold text-white tracking-tight line-clamp-1 leading-none">
+            <div 
+              className={`flex flex-col ${view === 'creator' ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
+              onClick={() => {
+                if (view === 'creator' && currentCreatorProfile) {
+                  setRoastingCreator(currentCreatorProfile);
+                }
+              }}
+              title={view === 'creator' ? 'Click to roast your profile' : undefined}
+            >
+              <span className="text-xs font-bold text-white tracking-tight line-clamp-1 leading-none flex items-center gap-1">
                 {view === 'brand' ? brandDisplayName : currentCreatorProfile?.name || 'Creator'}
+                {view === 'creator' && <Flame className="w-2.5 h-2.5 text-orange-400 fill-orange-400" />}
               </span>
               <span className="text-[10px] font-mono text-zinc-500 mt-1 leading-none truncate max-w-[120px]" title={clerkUser?.primaryEmailAddress?.emailAddress || ''}>
                 {clerkUser?.primaryEmailAddress?.emailAddress || (view === 'brand' ? 'Active Brand Admin' : 'Grid Operator')}
@@ -531,8 +543,17 @@ export default function App() {
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <span className="text-sm font-mono font-bold text-zinc-400 uppercase">Current Node:</span>
-              <span className="text-xs font-mono font-bold text-[#0C0B0D] bg-[#C9B8E8] border border-[#C9B8E8] px-3 py-1 rounded-full uppercase shadow-sm">
+              <span 
+                onClick={() => {
+                  if (view === 'creator' && currentCreatorProfile) {
+                    setRoastingCreator(currentCreatorProfile);
+                  }
+                }}
+                className={`text-xs font-mono font-bold text-[#0C0B0D] bg-[#C9B8E8] border border-[#C9B8E8] px-3 py-1 rounded-full uppercase shadow-sm flex items-center gap-1.5 ${view === 'creator' ? 'cursor-pointer hover:bg-[#D8CAF2]' : ''}`}
+                title={view === 'creator' ? 'Click to roast your profile' : undefined}
+              >
                 {view === 'brand' ? `${brandDisplayName} Admin` : `${currentCreatorProfile?.name || 'Creator'} Terminal`}
+                {view === 'creator' && <Flame className="w-3 h-3 text-orange-600 fill-orange-600" />}
               </span>
             </div>
 
@@ -599,6 +620,7 @@ export default function App() {
                   }}
                   selectedCreatorId={selectedCreatorId}
                   onSelectCreator={handleSelectCreatorOnMap}
+                  onRoastCreator={(creator) => setRoastingCreator(creator)}
                   activeCampaignId={selectedCampaignId}
                   creators={creators}
                 />
@@ -628,7 +650,9 @@ export default function App() {
                     activeCampaigns={activeCampaigns}
                     setSelectedCreator={(creator) => {
                       setSelectedCreatorId(creator.id);
+                      setRoastingCreator(creator);
                     }}
+                    onRoastCreator={(creator) => setRoastingCreator(creator)}
                     setView={() => {}}
                     setSelectedCampaignId={setSelectedCampaignId}
                     activeSubTab={activeBrandSubTab}
@@ -651,6 +675,7 @@ export default function App() {
                     activeCampaigns={activeCampaigns}
                     selectedCreatorId={selectedCreatorId}
                     setSelectedCreatorId={setSelectedCreatorId}
+                    onRoastCreator={(creator) => setRoastingCreator(creator)}
                     selectedCampaignId={selectedCampaignId}
                     setSelectedCampaignId={(id) => {
                       setSelectedCampaignId(id);
@@ -666,6 +691,16 @@ export default function App() {
             )}
           </AnimatePresence>
         </main>
+
+        {/* Creator Profile Roaster Modal */}
+        <CreatorRoasterModal
+          isOpen={!!roastingCreator}
+          creator={roastingCreator}
+          onClose={() => setRoastingCreator(null)}
+          onDirectSelect={(creator) => {
+            setSelectedCreatorId(creator.id);
+          }}
+        />
 
         {/* Meta / Instagram Demographics Sync Status Toast */}
         {isSyncingInstagram && (

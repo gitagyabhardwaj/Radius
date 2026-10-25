@@ -18,6 +18,7 @@ import {
   Terminal,
   Check,
   ExternalLink,
+  Flame,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useClerk } from '@clerk/clerk-react';
@@ -69,6 +70,7 @@ interface CreatorWorkspaceProps {
   setSelectedCampaignId: (id: string | null) => void;
   activeSubTab?: 'radar' | 'escrow' | 'wallet' | 'portfolio' | 'profile';
   creators?: Creator[];
+  onRoastCreator?: (creator: Creator) => void;
 }
 
 export default function CreatorWorkspace({
@@ -79,6 +81,7 @@ export default function CreatorWorkspace({
   setSelectedCampaignId,
   activeSubTab = 'radar',
   creators,
+  onRoastCreator,
 }: CreatorWorkspaceProps) {
   // Convex mutations & queries
   const { signOut } = useClerk();
@@ -505,16 +508,27 @@ export default function CreatorWorkspace({
                 Manage your public creator workspace details, geolocated coordinates, and verify your photography gear credentials.
               </p>
             </div>
-            {currentCreator.velocityTier === 'Velocity' ? (
-              <span className="bg-amber-50 text-amber-700 text-sm px-2.5 py-1 rounded-2xl font-semibold border border-amber-200 flex items-center gap-1.5 animate-pulse">
-                <Zap className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                Velocity Node
-              </span>
-            ) : (
-              <span className="bg-zinc-900 text-white text-sm px-2.5 py-1 rounded-2xl font-semibold border border-zinc-800 flex items-center gap-1.5">
-                Basic Node
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => onRoastCreator?.(currentCreator)}
+                className="bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-600 hover:to-rose-700 text-white text-xs px-3 py-1.5 rounded-xl font-bold font-mono flex items-center gap-1.5 shadow-md cursor-pointer transition-all border border-orange-400/40"
+                title="Roast this profile"
+              >
+                <Flame className="w-3.5 h-3.5 fill-current" />
+                <span>Roast Profile 🔥</span>
+              </button>
+              {currentCreator.velocityTier === 'Velocity' ? (
+                <span className="bg-amber-50 text-amber-700 text-sm px-2.5 py-1 rounded-2xl font-semibold border border-amber-200 flex items-center gap-1.5 animate-pulse">
+                  <Zap className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                  Velocity Node
+                </span>
+              ) : (
+                <span className="bg-zinc-900 text-white text-sm px-2.5 py-1 rounded-2xl font-semibold border border-zinc-800 flex items-center gap-1.5">
+                  Basic Node
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -785,12 +799,29 @@ export default function CreatorWorkspace({
               <img
                 src={currentCreator.avatar}
                 alt={currentCreator.name}
-                className="w-16 h-16 rounded-full object-cover border-2 border-slate-700/50  referrerPolicy='no-referrer'"
+                className="w-16 h-16 rounded-full object-cover border-2 border-slate-700/50 referrerPolicy='no-referrer' cursor-pointer hover:border-orange-500 transition-colors"
+                onClick={() => onRoastCreator?.(currentCreator)}
+                title={`Click to roast ${currentCreator.name}`}
               />
-              <div className="flex flex-col">
-                <span className="text-2xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500 tracking-tight leading-none bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">{currentCreator.name}</span>
+              <div className="flex flex-col flex-1 min-w-0">
+                <span 
+                  onClick={() => onRoastCreator?.(currentCreator)}
+                  className="text-2xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500 tracking-tight leading-none bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent cursor-pointer hover:opacity-85 transition-opacity"
+                  title={`Click to roast ${currentCreator.name}`}
+                >
+                  {currentCreator.name}
+                </span>
                 <span className="text-[11px] font-mono text-white mt-1.5 uppercase">{currentCreator.handle}</span>
               </div>
+              <button
+                type="button"
+                onClick={() => onRoastCreator?.(currentCreator)}
+                className="shrink-0 py-1.5 px-3 bg-gradient-to-r from-orange-500/20 to-rose-500/20 hover:from-orange-500/30 hover:to-rose-500/30 border border-orange-500/40 text-orange-400 text-xs font-bold font-mono rounded-xl flex items-center gap-1 cursor-pointer transition-all shadow-sm"
+                title="Roast this creator profile"
+              >
+                <Flame className="w-3.5 h-3.5 fill-current" />
+                <span>Roast 🔥</span>
+              </button>
             </div>
 
             <div className="flex flex-col gap-4">

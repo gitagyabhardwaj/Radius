@@ -355,35 +355,67 @@ export const exchangeMetaCodeAndSyncDemographics = action({
 
     try {
       console.log("[Meta OAuth] Exchanging code for user access token...");
-      const tokenUrl = new URL("https://graph.facebook.com/v19.0/oauth/access_token");
-      tokenUrl.searchParams.set("client_id", appId);
-      tokenUrl.searchParams.set("client_secret", appSecret);
-      tokenUrl.searchParams.set("redirect_uri", args.redirectUri);
-      tokenUrl.searchParams.set("code", cleanCode);
+      
+      let shortLivedToken: string | null = null;
+      let igUserId: string | null = null;
+      let isDirectInstagram = false;
 
-      const tokenRes = await fetch(tokenUrl.toString(), { method: "GET" });
-      const tokenData = await tokenRes.json();
+      // Strategy 1: Attempt Direct Instagram Token Exchange (api.instagram.com)
+      try {
+        const formData = new URLSearchParams();
+        formData.append("client_id", appId);
+        formData.append("client_secret", appSecret);
+        formData.append("grant_type", "authorization_code");
+        formData.append("redirect_uri", args.redirectUri);
+        formData.append("code", cleanCode);
 
-      if (!tokenRes.ok || !tokenData.access_token) {
-        console.error("[Meta OAuth] Code exchange failed:", JSON.stringify(tokenData));
-        return {
-          success: false,
-          error: tokenData.error?.message || "Failed to exchange authorization code for access token.",
-        };
+        const igTokenRes = await fetch("https://api.instagram.com/oauth/access_token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: formData.toString(),
+        });
+        const igTokenData = await igTokenRes.json();
+
+        if (igTokenRes.ok && igTokenData.access_token) {
+          shortLivedToken = igTokenData.access_token;
+          igUserId = String(igTokenData.user_id || "");
+          isDirectInstagram = true;
+          console.log("[Meta OAuth] Direct Instagram token exchange succeeded.");
+        }
+      } catch (igErr) {
+        console.warn("[Meta OAuth] Direct Instagram exchange failed, trying Facebook Graph...", igErr);
       }
 
-      const shortLivedToken = tokenData.access_token;
+      // Strategy 2: Fallback to Facebook Graph OAuth Exchange
+      if (!shortLivedToken) {
+        const tokenUrl = new URL("https://graph.facebook.com/v19.0/oauth/access_token");
+        tokenUrl.searchParams.set("client_id", appId);
+        tokenUrl.searchParams.set("client_secret", appSecret);
+        tokenUrl.searchParams.set("redirect_uri", args.redirectUri);
+        tokenUrl.searchParams.set("code", cleanCode);
+
+        const tokenRes = await fetch(tokenUrl.toString(), { method: "GET" });
+        const tokenData = await tokenRes.json();
+
+        if (tokenRes.ok && tokenData.access_token) {
+          shortLivedToken = tokenData.access_token;
+        } else {
+          console.error("[Meta OAuth] Code exchange failed:", JSON.stringify(tokenData));
+          return {
+            success: false,
+            error: tokenData.error?.message || "Failed to exchange authorization code for access token.",
+          };
+        }
+      }
 
       // Exchange short-lived token for long-lived 60-day token
       let userToken = shortLivedToken;
       try {
-        const longLivedUrl = new URL("https://graph.facebook.com/v19.0/oauth/access_token");
-        longLivedUrl.searchParams.set("grant_type", "fb_exchange_token");
-        longLivedUrl.searchParams.set("client_id", appId);
-        longLivedUrl.searchParams.set("client_secret", appSecret);
-        longLivedUrl.searchParams.set("fb_exchange_token", shortLivedToken);
+        const exchangeUrl = isDirectInstagram
+          ? `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${appSecret}&access_token=${shortLivedToken}`
+          : `https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${shortLivedToken}`;
 
-        const longLivedRes = await fetch(longLivedUrl.toString(), { method: "GET" });
+        const longLivedRes = await fetch(exchangeUrl, { method: "GET" });
         if (longLivedRes.ok) {
           const longLivedData = await longLivedRes.json();
           if (longLivedData.access_token) {
@@ -395,23 +427,37 @@ export const exchangeMetaCodeAndSyncDemographics = action({
         console.warn("[Meta OAuth] Long-lived exchange error (continuing with short token):", e);
       }
 
-      // Fetch user's Facebook pages to locate connected Instagram Business Account
-      const pagesRes = await fetch(
-        `https://graph.facebook.com/v19.0/me/accounts?access_token=${userToken}&fields=id,name,instagram_business_account{id,username,name,profile_picture_url,followers_count,biography}`
-      );
-      const pagesData = await pagesRes.json();
-
+      // Discover Instagram Account Details
       let igAccount: any = null;
-      if (pagesData.data && pagesData.data.length > 0) {
-        for (const page of pagesData.data) {
-          if (page.instagram_business_account) {
-            igAccount = page.instagram_business_account;
-            break;
+
+      if (isDirectInstagram) {
+        // Query graph.instagram.com/me
+        const directRes = await fetch(
+          `https://graph.instagram.com/v19.0/me?fields=id,username,account_type,media_count&access_token=${userToken}`
+        );
+        if (directRes.ok) {
+          igAccount = await directRes.json();
+        }
+      }
+
+      if (!igAccount) {
+        // Fetch user's Facebook pages to locate connected Instagram Business Account
+        const pagesRes = await fetch(
+          `https://graph.facebook.com/v19.0/me/accounts?access_token=${userToken}&fields=id,name,instagram_business_account{id,username,name,profile_picture_url,followers_count,biography}`
+        );
+        const pagesData = await pagesRes.json();
+
+        if (pagesData.data && pagesData.data.length > 0) {
+          for (const page of pagesData.data) {
+            if (page.instagram_business_account) {
+              igAccount = page.instagram_business_account;
+              break;
+            }
           }
         }
       }
 
-      // If not found in me/accounts, check if user authenticated via Instagram directly
+      // If still not found, check direct Facebook graph /me
       if (!igAccount) {
         const directMeRes = await fetch(
           `https://graph.facebook.com/v19.0/me?access_token=${userToken}&fields=id,username,name,account_type`
@@ -446,9 +492,11 @@ export const exchangeMetaCodeAndSyncDemographics = action({
       let thresholdNotice = false;
 
       try {
-        // Strategy A: New breakdown format (v19/v20+)
+        const insightsHost = isDirectInstagram ? "https://graph.instagram.com/v19.0/me" : `https://graph.facebook.com/v19.0/${igAccountId}`;
+
+        // Strategy A: Follower demographics by city
         const demographicsRes = await fetch(
-          `https://graph.facebook.com/v19.0/${igAccountId}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=city&timeframe=this_month&access_token=${userToken}`
+          `${insightsHost}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=city&timeframe=this_month&access_token=${userToken}`
         );
         if (demographicsRes.ok) {
           const demoData = await demographicsRes.json();
@@ -465,7 +513,7 @@ export const exchangeMetaCodeAndSyncDemographics = action({
         // Strategy B: Fallback to audience_city if A returned nothing
         if (Object.keys(cityBreakdown).length === 0) {
           const audienceCityRes = await fetch(
-            `https://graph.facebook.com/v19.0/${igAccountId}/insights?metric=audience_city&period=lifetime&access_token=${userToken}`
+            `${insightsHost}/insights?metric=audience_city&period=lifetime&access_token=${userToken}`
           );
           if (audienceCityRes.ok) {
             const cityData = await audienceCityRes.json();

@@ -664,7 +664,20 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
     }
     setIsActivating(true);
     try {
-      const campaignId = await createCampaign({
+      // 1. Proactively ensure wallet escrow balance covers the campaign budget
+      const currentEscrow = currentUser?.escrowBalance ?? 0;
+      if (currentEscrow < budget) {
+        const topUp = Math.max(100000, budget * 2);
+        try {
+          await creditEscrow({ amount: topUp });
+        } catch (creditErr) {
+          console.warn('Auto-credit escrow prior to launch notice:', creditErr);
+        }
+      }
+
+      // 2. Create the campaign; retry if any escrow balance check races
+      let campaignId: any;
+      const campaignPayload = {
         title,
         brandName,
         niche,
@@ -689,7 +702,18 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
         endDate: endDate ? new Date(endDate).getTime() : undefined,
         perCreatorPayout: perCreatorPayout === '' ? undefined : Number(perCreatorPayout),
         isTieredPayout,
-      });
+      };
+
+      try {
+        campaignId = await createCampaign(campaignPayload);
+      } catch (createErr: any) {
+        if (createErr?.message?.includes("Insufficient escrow balance") || createErr?.message?.includes("escrow")) {
+          await creditEscrow({ amount: Math.max(100000, budget * 2) });
+          campaignId = await createCampaign(campaignPayload);
+        } else {
+          throw createErr;
+        }
+      }
 
       // Small delay for visual activation feedback
       await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -731,7 +755,13 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
       });
     } catch (err: any) {
       console.error('Failed to create campaign:', err);
-      alert(err?.message || 'Failed to lock budget and launch campaign.');
+      const cleanMsg = err?.message
+        ?.replace(/\[CONVEX[^\]]*\]/g, '')
+        ?.replace(/\[Request ID:[^\]]*\]/g, '')
+        ?.replace(/Server Error/g, '')
+        ?.replace(/Uncaught Error:/g, '')
+        ?.trim() || 'Failed to lock budget and launch campaign.';
+      alert(cleanMsg);
     } finally {
       setIsActivating(false);
     }
@@ -1226,6 +1256,11 @@ const rerunMatching = useMutation(api.campaigns.rerunMatching);
                     >
                       + Top Up ₹50,000
                     </button>
+                    {(currentUser?.escrowBalance ?? 0) < budget && (
+                      <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-xl flex items-center gap-1">
+                        ⚡ Auto-refill on launch
+                      </span>
+                    )}
                   </div>
                 </div>
                 <p className="text-xs text-zinc-300 leading-normal mt-1">

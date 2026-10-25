@@ -38,7 +38,6 @@ import RatingWidget, { ReviewsCard } from './RatingWidget';
 import DispatchFeed from './DispatchFeed';
 import DispatchQueue from './DispatchQueue';
 import BrandProfileEditor from './BrandProfileEditor';
-import CorkboardGallery from './CorkboardGallery';
 import ErrorBoundary from './ErrorBoundary';
 import { Id } from '../../convex/_generated/dataModel';
 
@@ -78,7 +77,6 @@ function SubmissionsReviewPanel({
   const approveFinal = useMutation(api.submissions.approveFinal);
   const rejectFinal = useMutation(api.submissions.rejectFinal);
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'corkboard' | 'review'>('corkboard');
 
   if (submissions === undefined) return null; // loading state
 
@@ -91,15 +89,9 @@ function SubmissionsReviewPanel({
     sub.status === 'final_verifying'
   );
 
-  const verifiedSubmissions = submissions.filter((sub: any) =>
-    sub.status === 'approved' ||
-    sub.status === 'published_uploaded' ||
-    sub.status === 'final_verifying'
-  );
-
   return (
     <div className="mt-2 pt-5 border-t border-zinc-800 flex flex-col gap-4">
-      {/* Header with Switcher Tabs */}
+      {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-sans tracking-wide text-white font-bold uppercase">
@@ -111,71 +103,14 @@ function SubmissionsReviewPanel({
             </span>
           )}
         </div>
-
-        <div className="flex items-center gap-1 bg-[#0C0B0D] border border-[#26232B] p-1 rounded-xl">
-          <button
-            onClick={() => setActiveTab('corkboard')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'corkboard'
-                ? 'bg-[#C9B8E8] text-[#0C0B0D] shadow-sm'
-                : 'text-zinc-400 hover:text-white'
-            }`}
-          >
-            <span>📌 Corkboard Wall</span>
-            <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
-              activeTab === 'corkboard' ? 'bg-[#0C0B0D] text-[#C9B8E8]' : 'bg-[#151417] text-zinc-400'
-            }`}>
-              {verifiedSubmissions.length}
-            </span>
-          </button>
-          <button
-            onClick={() => setActiveTab('review')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'review'
-                ? 'bg-[#C9B8E8] text-[#0C0B0D] shadow-sm'
-                : 'text-zinc-400 hover:text-white'
-            }`}
-          >
-            <span>📋 Review Queue</span>
-            {pendingReview.length > 0 && (
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-[#F1E3A8] text-[#0C0B0D] font-bold">
-                {pendingReview.length}
-              </span>
-            )}
-          </button>
-        </div>
       </div>
 
-      {/* VIEW: CORKBOARD WALL */}
-      {activeTab === 'corkboard' && (
-        <div className="flex flex-col gap-3">
-          {pendingReview.length > 0 && (
-            <div className="flex items-center justify-between p-3 px-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>
-                  <strong>{pendingReview.length} deliverable{pendingReview.length > 1 ? 's' : ''}</strong> waiting for your approval. Approved posts drop directly onto this board!
-                </span>
-              </div>
-              <button
-                onClick={() => setActiveTab('review')}
-                className="underline font-bold hover:text-white shrink-0 ml-2 cursor-pointer"
-              >
-                Review Now &rarr;
-              </button>
-            </div>
-          )}
-
-          <CorkboardGallery 
-            submissions={submissions}
-            campaignTitle={campaignTitle}
-            centerLocality={centerLocality}
-          />
+      {/* Deliverables List or Empty State */}
+      {submissions.length === 0 ? (
+        <div className="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800/60 text-xs text-zinc-400 font-mono">
+          No deliverables submitted yet. Submissions from accepted creators will appear here for your review and approval.
         </div>
-      )}
-
-      {/* VIEW: REVIEW QUEUE */}
-      {activeTab === 'review' && (
+      ) : (
         <div className="flex flex-col gap-3 animate-fade-in">
           {submissions.map((sub: any) => (
             <div

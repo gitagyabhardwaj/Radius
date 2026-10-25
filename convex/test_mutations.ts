@@ -9,3 +9,17 @@ export const setAcceptedCampaigns = internalMutation({
     });
   },
 });
+
+export const clearRatingsForUser = internalMutation({
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    const ratings = await ctx.db
+      .query("ratings")
+      .withIndex("by_rated_user", (q) => q.eq("ratedUserId", args.userId))
+      .collect();
+    for (const r of ratings) {
+      await ctx.db.delete(r._id);
+    }
+    return { deleted: ratings.length };
+  },
+});

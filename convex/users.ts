@@ -184,6 +184,18 @@ export const updateProfile = mutation({
     ),
     bio: v.optional(v.string()),
     upiId: v.optional(v.string()),
+    audienceCities: v.optional(
+      v.array(
+        v.object({
+          name: v.string(),
+          count: v.optional(v.number()),
+          percentage: v.number(),
+        })
+      )
+    ),
+    instagramConnected: v.optional(v.boolean()),
+    instagramId: v.optional(v.string()),
+    instagramUsername: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -206,6 +218,44 @@ export const updateProfile = mutation({
 
     await ctx.db.patch(user._id, updates);
     return user._id;
+  },
+});
+
+/**
+ * Mutation to save Instagram demographics directly for a user (called after Meta OAuth exchange).
+ */
+export const saveInstagramData = mutation({
+  args: {
+    userId: v.id("users"),
+    handle: v.optional(v.string()),
+    followers: v.optional(v.string()),
+    audienceInLocality: v.optional(v.number()),
+    audienceCities: v.optional(
+      v.array(
+        v.object({
+          name: v.string(),
+          count: v.optional(v.number()),
+          percentage: v.number(),
+        })
+      )
+    ),
+    instagramConnected: v.boolean(),
+    instagramId: v.optional(v.string()),
+    instagramUsername: v.optional(v.string()),
+    avatarUrl: v.optional(v.string()),
+    name: v.optional(v.string()),
+    bio: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { userId, ...updates } = args;
+    const cleanUpdates: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(updates)) {
+      if (value !== undefined) {
+        cleanUpdates[key] = value;
+      }
+    }
+    await ctx.db.patch(userId, cleanUpdates);
+    return true;
   },
 });
 

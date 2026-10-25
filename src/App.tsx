@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useUser, useClerk } from '@clerk/clerk-react';
-import { useQuery, useMutation } from 'convex/react';
+import { useQuery, useMutation, useAction } from 'convex/react';
 import { api } from '../convex/_generated/api';
 import MinimalMap from './components/MinimalMap';
 import AddressSearch from './components/AddressSearch';
@@ -35,6 +35,9 @@ function convexUserToCreator(user: any): Creator {
     lat: user.lat || 0,
     lng: user.lng || 0,
     audienceInLocality: user.audienceInLocality || 0,
+    audienceCities: user.audienceCities,
+    instagramConnected: user.instagramConnected,
+    instagramUsername: user.instagramUsername,
     niche: user.niche || '',
     matchScore: user.name ? 80 + (user.name.charCodeAt(0) % 19) : 88,
     latencyHours: user.latencyHours || 0,
@@ -115,12 +118,20 @@ export default function App() {
   const allCampaignsData = useQuery(api.campaigns.getAll);
 
   const createOrUpdateUser = useMutation(api.users.createOrUpdateUser);
+  const exchangeMetaCodeAndSyncDemographics = useAction(
+    api.instagram.exchangeMetaCodeAndSyncDemographics
+  );
 
   // Local UI state
   const [pendingRole, setPendingRole] = useState<'brand' | 'creator' | null>(null);
   const [customBrandName, setCustomBrandName] = useState<string>('');
   const [selectedCreatorId, setSelectedCreatorId] = useState<string>('');
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
+  const [isSyncingInstagram, setIsSyncingInstagram] = useState(false);
+  const [instagramSyncStatus, setInstagramSyncStatus] = useState<{
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
 
   // Interactive Map Geofence Center (South Delhi default)
   const [centerLat, setCenterLat] = useState<number>(28.5276);
@@ -178,6 +189,52 @@ export default function App() {
       }
     }
   }, [selectedCampaignId, activeCampaigns]);
+
+  // Capture Meta / Instagram OAuth Callback (?code=...&state=radius_ig_oauth)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const state = params.get('state');
+
+    if (code && (state === 'radius_ig_oauth' || !state)) {
+      // Clean query string immediately so reloads don't retry expired code
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      setIsSyncingInstagram(true);
+      setInstagramSyncStatus(null);
+      setActiveCreatorSubTab('profile');
+
+      exchangeMetaCodeAndSyncDemographics({
+        code,
+        redirectUri: window.location.origin + window.location.pathname,
+        locality: currentUser?.locality,
+      })
+        .then((res) => {
+          if (res.success) {
+            setInstagramSyncStatus({
+              message: res.thresholdNotice
+                ? `Connected @${res.username}! (Demographics estimated until 100+ followers)`
+                : `Connected @${res.username}! Live audience demographics synced.`,
+              type: 'success',
+            });
+          } else {
+            setInstagramSyncStatus({
+              message: res.error || 'Failed to sync with Meta.',
+              type: 'error',
+            });
+          }
+        })
+        .catch((err) => {
+          setInstagramSyncStatus({
+            message: err.message || 'Error communicating with Meta.',
+            type: 'error',
+          });
+        })
+        .finally(() => {
+          setIsSyncingInstagram(false);
+        });
+    }
+  }, [exchangeMetaCodeAndSyncDemographics, currentUser?.locality]);
 
   // Synchronize persona map marker when selected creator changes
   const handleSelectCreatorOnMap = (creatorId: string) => {
@@ -609,6 +666,29 @@ export default function App() {
             )}
           </AnimatePresence>
         </main>
+
+        {/* Meta / Instagram Demographics Sync Status Toast */}
+        {isSyncingInstagram && (
+          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl bg-zinc-900/90 border border-violet-500/50 backdrop-blur-xl shadow-2xl text-white text-xs font-mono">
+            <div className="w-3.5 h-3.5 rounded-full border-2 border-violet-400 border-t-transparent animate-spin" />
+            Connecting to Meta & fetching audience demographics...
+          </div>
+        )}
+        {instagramSyncStatus && (
+          <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl border backdrop-blur-xl shadow-2xl text-xs font-mono ${
+            instagramSyncStatus.type === 'success'
+              ? 'bg-zinc-900/90 border-emerald-500/50 text-emerald-300'
+              : 'bg-zinc-900/90 border-rose-500/50 text-rose-300'
+          }`}>
+            <span>{instagramSyncStatus.message}</span>
+            <button
+              onClick={() => setInstagramSyncStatus(null)}
+              className="text-zinc-400 hover:text-white cursor-pointer ml-2 text-sm"
+            >
+              ✕
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

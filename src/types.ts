@@ -1,3 +1,9 @@
+export interface AudienceCity {
+  name: string;
+  count?: number;
+  percentage: number;
+}
+
 export interface Creator {
   id: string;
   name: string;
@@ -7,6 +13,9 @@ export interface Creator {
   lat: number;
   lng: number;
   audienceInLocality: number; // e.g. 87 for 87% audience in locality
+  audienceCities?: AudienceCity[];
+  instagramConnected?: boolean;
+  instagramUsername?: string;
   niche: string; // e.g. "Food & Lifestyle", "Tech & Gaming", "Fashion"
   matchScore: number; // e.g. 94
   latencyHours: number; // typical response time, e.g. 2
